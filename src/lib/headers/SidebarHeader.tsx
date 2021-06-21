@@ -1,20 +1,25 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { TimelineHeadersConsumer } from "./HeadersContext";
-import { LEFT_VARIANT, RIGHT_VARIANT } from "./constants";
 
-class SidebarHeader extends React.PureComponent {
-    static propTypes = {
-        children: PropTypes.func.isRequired,
-        rightSidebarWidth: PropTypes.number,
-        leftSidebarWidth: PropTypes.number.isRequired,
-        variant: PropTypes.string,
-        headerData: PropTypes.object,
-    };
+export interface ISidebarHeaderChildrenFnProps<T> {
+    getRootProps: (propsToOverride: { style: React.CSSProperties }) => { style: React.CSSProperties };
+    data: T;
+}
 
-    getRootProps = (props = {}) => {
-        const { style } = props;
-        const width = this.props.variant === RIGHT_VARIANT ? this.props.rightSidebarWidth : this.props.leftSidebarWidth;
+export interface ISidebarHeaderProps<T> {
+    rightSidebarWidth?: number;
+    leftSidebarWidth: number;
+    variant: "left" | "right";
+    headerData: T;
+    children: (props: ISidebarHeaderChildrenFnProps<T>) => JSX.Element;
+    style?: React.CSSProperties;
+}
+
+class SidebarHeader<T> extends React.PureComponent<ISidebarHeaderProps<T>> {
+    getRootProps = (props: { style: React.CSSProperties }) => {
+        const { style = {} } = props;
+        const width = this.props.variant === "right" ? this.props.rightSidebarWidth : this.props.leftSidebarWidth;
         return {
             style: {
                 ...style,
@@ -31,9 +36,9 @@ class SidebarHeader extends React.PureComponent {
     };
 
     render() {
-        const props = this.getStateAndHelpers();
+        const renderProps = this.getStateAndHelpers();
         const Renderer = this.props.children;
-        return <Renderer {...props} />;
+        return <Renderer {...renderProps} />;
     }
 }
 
@@ -60,7 +65,7 @@ SidebarWrapper.propTypes = {
 };
 
 SidebarWrapper.defaultProps = {
-    variant: LEFT_VARIANT,
+    variant: "left",
     children: ({ getRootProps }) => <div data-testid="sidebarHeader" {...getRootProps()} />,
 };
 
