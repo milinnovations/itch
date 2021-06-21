@@ -1,12 +1,9 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import {
-  createMarkerStylesWithLeftOffset,
-  createDefaultRenderer
-} from './shared'
-import { MarkerCanvasConsumer } from '../MarkerCanvasContext'
+import React from "react";
+import PropTypes from "prop-types";
+import { createMarkerStylesWithLeftOffset, createDefaultRenderer } from "./shared";
+import { MarkerCanvasConsumer } from "../MarkerCanvasContext";
 
-const defaultRenderer = createDefaultRenderer('default-cursor-marker')
+const defaultRenderer = createDefaultRenderer("default-cursor-marker");
 
 /**
  * CursorMarker implementation subscribes to 'subscribeToCanvasMouseOver' on mount.
@@ -19,73 +16,66 @@ const defaultRenderer = createDefaultRenderer('default-cursor-marker')
  *  when the user mouseleaves the element
  */
 class CursorMarker extends React.Component {
-  static propTypes = {
-    subscribeToCanvasMouseOver: PropTypes.func.isRequired,
-    renderer: PropTypes.func
-  }
+    static propTypes = {
+        subscribeToCanvasMouseOver: PropTypes.func.isRequired,
+        renderer: PropTypes.func,
+    };
 
-  static defaultProps = {
-    renderer: defaultRenderer
-  }
+    static defaultProps = {
+        renderer: defaultRenderer,
+    };
 
-  constructor() {
-    super()
+    constructor() {
+        super();
 
-    this.state = {
-      leftOffset: 0,
-      date: 0,
-      isShowingCursor: false
+        this.state = {
+            leftOffset: 0,
+            date: 0,
+            isShowingCursor: false,
+        };
     }
-  }
 
-  handleCanvasMouseOver = ({ leftOffset, date, isCursorOverCanvas }) => {
-    this.setState({
-      leftOffset,
-      date,
-      isShowingCursor: isCursorOverCanvas
-    })
-  }
+    handleCanvasMouseOver = ({ leftOffset, date, isCursorOverCanvas }) => {
+        this.setState({
+            leftOffset,
+            date,
+            isShowingCursor: isCursorOverCanvas,
+        });
+    };
 
-  componentDidMount() {
-    this.unsubscribe = this.props.subscribeToCanvasMouseOver(
-      this.handleCanvasMouseOver
-    )
-  }
-
-  componentWillUnmount() {
-    if (this.unsubscribe != null) {
-      this.unsubscribe()
-      this.unsubscribe = null
+    componentDidMount() {
+        this.unsubscribe = this.props.subscribeToCanvasMouseOver(this.handleCanvasMouseOver);
     }
-  }
 
-  render() {
-    const { isShowingCursor, leftOffset, date } = this.state
+    componentWillUnmount() {
+        if (this.unsubscribe != null) {
+            this.unsubscribe();
+            this.unsubscribe = null;
+        }
+    }
 
-    if (!isShowingCursor) return null
+    render() {
+        const { isShowingCursor, leftOffset, date } = this.state;
 
-    const styles = createMarkerStylesWithLeftOffset(leftOffset)
+        if (!isShowingCursor) return null;
 
-    return this.props.renderer({ styles, date })
-  }
+        const styles = createMarkerStylesWithLeftOffset(leftOffset);
+
+        return this.props.renderer({ styles, date });
+    }
 }
 
 // TODO: turn into HOC?
 const CursorMarkerWrapper = props => {
-  return (
-    <MarkerCanvasConsumer>
-      {({ subscribeToMouseOver }) => {
-        return (
-          <CursorMarker
-            subscribeToCanvasMouseOver={subscribeToMouseOver}
-            {...props}
-          />
-        )
-      }}
-    </MarkerCanvasConsumer>
-  )
-}
+    return (
+        <MarkerCanvasConsumer>
+            {({ subscribeToMouseOver }) => {
+                return <CursorMarker subscribeToCanvasMouseOver={subscribeToMouseOver} {...props} />;
+            }}
+        </MarkerCanvasConsumer>
+    );
+};
 
-CursorMarkerWrapper.displayName = 'CursorMarkerWrapper'
+CursorMarkerWrapper.displayName = "CursorMarkerWrapper";
 
-export default CursorMarkerWrapper
+export default CursorMarkerWrapper;
