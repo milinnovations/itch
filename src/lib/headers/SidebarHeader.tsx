@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { TimelineHeadersConsumer } from "./HeadersContext";
 
 export interface ISidebarHeaderChildrenFnProps<T> {
@@ -7,17 +6,20 @@ export interface ISidebarHeaderChildrenFnProps<T> {
     data: T;
 }
 
-export interface ISidebarHeaderProps<T> {
-    rightSidebarWidth?: number;
-    leftSidebarWidth: number;
+export interface ISidebarWrapperProps<T> {
     variant: "left" | "right";
     headerData: T;
     children: (props: ISidebarHeaderChildrenFnProps<T>) => JSX.Element;
+}
+
+export interface ISidebarHeaderProps<T> extends ISidebarWrapperProps<T> {
+    rightSidebarWidth?: number;
+    leftSidebarWidth: number;
     style?: React.CSSProperties;
 }
 
 class SidebarHeader<T> extends React.PureComponent<ISidebarHeaderProps<T>> {
-    getRootProps = (props: { style: React.CSSProperties }) => {
+    getRootProps = (props: { style?: React.CSSProperties } = {}) => {
         const { style = {} } = props;
         const width = this.props.variant === "right" ? this.props.rightSidebarWidth : this.props.leftSidebarWidth;
         return {
@@ -42,32 +44,28 @@ class SidebarHeader<T> extends React.PureComponent<ISidebarHeaderProps<T>> {
     }
 }
 
-const SidebarWrapper = ({ children, variant, headerData }) => (
-    <TimelineHeadersConsumer>
-        {({ leftSidebarWidth, rightSidebarWidth }) => {
-            return (
-                <SidebarHeader
-                    leftSidebarWidth={leftSidebarWidth}
-                    rightSidebarWidth={rightSidebarWidth}
-                    children={children}
-                    variant={variant}
-                    headerData={headerData}
-                />
-            );
-        }}
-    </TimelineHeadersConsumer>
+const defaultSidebarHeaderChildren = ({ getRootProps }: ISidebarHeaderChildrenFnProps<unknown>) => (
+    <div data-testid="sidebarHeader" {...getRootProps({ style: {} })} />
 );
 
-SidebarWrapper.propTypes = {
-    children: PropTypes.func.isRequired,
-    variant: PropTypes.string,
-    headerData: PropTypes.object,
-};
-
-SidebarWrapper.defaultProps = {
-    variant: "left",
-    children: ({ getRootProps }) => <div data-testid="sidebarHeader" {...getRootProps()} />,
-};
+function SidebarWrapper<T>(props: ISidebarWrapperProps<T>): React.ReactNode {
+    const { children = defaultSidebarHeaderChildren, variant = "left", headerData } = props;
+    return (
+        <TimelineHeadersConsumer>
+            {({ leftSidebarWidth, rightSidebarWidth }) => {
+                return (
+                    <SidebarHeader
+                        leftSidebarWidth={leftSidebarWidth}
+                        rightSidebarWidth={rightSidebarWidth}
+                        children={children}
+                        variant={variant}
+                        headerData={headerData}
+                    />
+                );
+            }}
+        </TimelineHeadersConsumer>
+    );
+}
 
 SidebarWrapper.secretKey = "SidebarHeader";
 

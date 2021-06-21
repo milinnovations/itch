@@ -1,8 +1,28 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { noop } from "../utility/generic";
 
-const defaultContextState = {
+// TODO: Find a better place for this interface once we use it in more files.
+export interface ITimeSteps {
+    second?: number;
+    minute?: number;
+    hour?: number;
+    day?: number;
+    month?: number;
+    year?: number;
+}
+
+export interface IHeaderContext {
+    timeSteps: ITimeSteps;
+    rightSidebarWidth: number;
+    leftSidebarWidth: number;
+    registerScroll: React.RefCallback<HTMLElement>;
+}
+
+export interface ITimelineHeadersProviderProps extends IHeaderContext {
+    children: JSX.Element;
+}
+
+const defaultContextState: IHeaderContext = {
     registerScroll: () => {
         // eslint-disable-next-line
         console.warn("default registerScroll header used");
@@ -15,17 +35,8 @@ const defaultContextState = {
 
 const { Consumer, Provider } = React.createContext(defaultContextState);
 
-export class TimelineHeadersProvider extends React.Component {
-    static propTypes = {
-        children: PropTypes.element.isRequired,
-        rightSidebarWidth: PropTypes.number,
-        leftSidebarWidth: PropTypes.number.isRequired,
-        //TODO: maybe this should be skipped?
-        timeSteps: PropTypes.object.isRequired,
-        registerScroll: PropTypes.func.isRequired,
-    };
-
-    render() {
+export class TimelineHeadersProvider extends React.Component<ITimelineHeadersProviderProps> {
+    render(): React.ReactNode {
         const contextValue = {
             rightSidebarWidth: this.props.rightSidebarWidth,
             leftSidebarWidth: this.props.leftSidebarWidth,
