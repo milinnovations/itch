@@ -3,7 +3,6 @@ import classNames from "classnames";
 import { TimelineHeadersConsumer } from "./HeadersContext";
 import PropTypes from "prop-types";
 import SidebarHeader from "./SidebarHeader";
-import { RIGHT_VARIANT } from "./constants";
 class TimelineHeaders extends React.Component {
     static propTypes = {
         registerScroll: PropTypes.func.isRequired,
@@ -62,7 +61,7 @@ class TimelineHeaders extends React.Component {
             : [this.props.children];
         React.Children.map(children, child => {
             if (this.isSidebarHeader(child)) {
-                if (child.props.variant === RIGHT_VARIANT) {
+                if (child.props.variant === "right") {
                     rightSidebarHeader = child;
                 } else {
                     leftSidebarHeader = child;
