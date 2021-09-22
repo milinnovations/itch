@@ -10,7 +10,7 @@
 import * as React from "react";
 import { Moment } from "moment";
 
-declare module "itch" {
+declare module "@mil/itch" {
     type Id = number | string;
 
     export interface TimelineGroupBase {
