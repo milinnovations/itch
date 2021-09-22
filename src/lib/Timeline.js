@@ -31,7 +31,6 @@ import { TimelineMarkersProvider } from "./markers/TimelineMarkersContext";
 import { TimelineHeadersProvider } from "./headers/HeadersContext";
 import TimelineHeaders from "./headers/TimelineHeaders";
 import DateHeader from "./headers/DateHeader";
-import SidebarHeader from "./headers/SidebarHeader";
 
 export default class ReactCalendarTimeline extends Component {
     static propTypes = {
@@ -72,8 +71,9 @@ export default class ReactCalendarTimeline extends Component {
         onCanvasClick: PropTypes.func,
         onItemDoubleClick: PropTypes.func,
         onItemContextMenu: PropTypes.func,
-        onCanvasDoubleClick: PropTypes.func,
         onCanvasContextMenu: PropTypes.func,
+        onCanvasDoubleClick: PropTypes.func,
+        onCanvasDrop: PropTypes.func,
         onZoom: PropTypes.func,
         onItemDrag: PropTypes.func,
 
@@ -698,6 +698,14 @@ export default class ReactCalendarTimeline extends Component {
         }
     };
 
+    handleScrollDrop = (e, rowIndex) => {
+        if (this.props.onCanvasDrop === undefined) return;
+
+        const time = this.getTimeFromRowClickEvent(e);
+        const groupId = _get(this.props.groups[rowIndex], this.props.keys.groupIdKey);
+        this.props.onCanvasDrop(groupId, time, e);
+    };
+
     rows(canvasWidth, groupHeights, groups) {
         return (
             <GroupRows
@@ -708,6 +716,7 @@ export default class ReactCalendarTimeline extends Component {
                 clickTolerance={this.props.clickTolerance}
                 onRowClick={this.handleRowClick}
                 onRowDoubleClick={this.handleRowDoubleClick}
+                onRowDrop={this.props.onCanvasDrop !== undefined ? this.handleScrollDrop : undefined}
                 horizontalLineClassNamesForGroup={this.props.horizontalLineClassNamesForGroup}
                 onRowContextClick={this.handleScrollContextMenu}
             />

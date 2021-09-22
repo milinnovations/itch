@@ -5,8 +5,9 @@ import PreventClickOnDrag from "../interaction/PreventClickOnDrag";
 class GroupRow extends Component {
     static propTypes = {
         onClick: PropTypes.func.isRequired,
-        onDoubleClick: PropTypes.func.isRequired,
         onContextMenu: PropTypes.func.isRequired,
+        onDoubleClick: PropTypes.func.isRequired,
+        onDrop: PropTypes.func,
         isEvenRow: PropTypes.bool.isRequired,
         style: PropTypes.object.isRequired,
         clickTolerance: PropTypes.number.isRequired,
@@ -14,10 +15,17 @@ class GroupRow extends Component {
         horizontalLineClassNamesForGroup: PropTypes.func,
     };
 
+    handleDragOver = e => {
+        if (this.props.onDrop !== undefined) {
+            e.preventDefault();
+        }
+    };
+
     render() {
         const {
             onContextMenu,
             onDoubleClick,
+            onDrop,
             isEvenRow,
             style,
             onClick,
@@ -36,6 +44,8 @@ class GroupRow extends Component {
                 <div
                     onContextMenu={onContextMenu}
                     onDoubleClick={onDoubleClick}
+                    onDragOver={this.handleDragOver}
+                    onDrop={onDrop}
                     className={
                         (isEvenRow ? "rct-hl-even " : "rct-hl-odd ") +
                         (classNamesForGroup ? classNamesForGroup.join(" ") : "")

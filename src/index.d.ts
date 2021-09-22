@@ -229,8 +229,9 @@ declare module "@mil/itch" {
         onItemDoubleClick?(itemId: Id, e: React.SyntheticEvent, time: number): void;
         onItemContextMenu?(itemId: Id, e: React.SyntheticEvent, time: number): void;
         onCanvasClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
-        onCanvasDoubleClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
         onCanvasContextMenu?(groupId: Id, time: number, e: React.SyntheticEvent): void;
+        onCanvasDoubleClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
+        onCanvasDrop?(groupId: Id, time: number, e: React.DragEvent): void;
         onZoom?(timelineContext: TimelineContext): void;
         moveResizeValidator?(action: "move" | "resize", itemId: Id, time: number, resizeEdge: "left" | "right"): number;
         onTimeChange?(
