@@ -195,6 +195,7 @@ declare module "@mil/itch" {
         groups: CustomGroup[];
         items: CustomItem[];
         keys?: TimelineKeys;
+        className?: string;
         defaultTimeStart?: Date | Moment;
         defaultTimeEnd?: Date | Moment;
         visibleTimeStart?: Date | Moment | number;
