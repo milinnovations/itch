@@ -464,7 +464,7 @@ export default class ReactCalendarTimeline extends Component {
         this.scrollHeaderRef.scrollLeft = width;
     };
 
-    onScroll = (scrollX, scrollY) => {
+    scrollHorizontally = scrollX => {
         const width = this.state.width;
 
         const canvasTimeStart = this.state.canvasTimeStart;
@@ -476,9 +476,11 @@ export default class ReactCalendarTimeline extends Component {
         if (this.state.visibleTimeStart !== visibleTimeStart || this.state.visibleTimeEnd !== visibleTimeStart + zoom) {
             this.props.onTimeChange(visibleTimeStart, visibleTimeStart + zoom, this.updateScrollCanvas);
         }
+    };
 
-        if (scrollY) {
-            this.container?.parentElement?.scrollBy(0, scrollY);
+    scrollVerticallyBy = deltaY => {
+        if (deltaY) {
+            this.container?.parentElement?.scrollBy(0, deltaY);
         }
     };
 
@@ -970,7 +972,8 @@ export default class ReactCalendarTimeline extends Component {
                                     onZoom={this.changeZoom}
                                     onWheelZoom={this.handleWheelZoom}
                                     traditionalZoom={traditionalZoom}
-                                    onScroll={this.onScroll}
+                                    onHorizontalScroll={this.scrollHorizontally}
+                                    onVerticalScrollBy={this.scrollVerticallyBy}
                                     isInteractingWithItem={isInteractingWithItem}
                                     zoomSpeed={this.props.zoomSpeed}
                                 >

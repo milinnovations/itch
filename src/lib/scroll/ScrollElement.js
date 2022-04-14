@@ -18,7 +18,8 @@ class ScrollElement extends Component {
         isInteractingWithItem: PropTypes.bool.isRequired,
         onZoom: PropTypes.func.isRequired,
         onWheelZoom: PropTypes.func.isRequired,
-        onScroll: PropTypes.func.isRequired,
+        onHorizontalScroll: PropTypes.func.isRequired,
+        onVerticalScrollBy: PropTypes.func.isRequired,
         zoomSpeed: PropTypes.object,
     };
 
@@ -34,7 +35,7 @@ class ScrollElement extends Component {
      */
     handleScroll = () => {
         const scrollX = this.scrollComponent.scrollLeft;
-        this.props.onScroll(scrollX, 0);
+        this.props.onHorizontalScroll(scrollX);
     };
 
     refHandler = el => {
@@ -62,7 +63,7 @@ class ScrollElement extends Component {
         } else if (e.shiftKey) {
             e.preventDefault();
             // shift+scroll event from a touchpad has deltaY property populated; shift+scroll event from a mouse has deltaX
-            this.props.onScroll(this.scrollComponent.scrollLeft + (e.deltaY || e.deltaX), 0);
+            this.props.onHorizontalScroll(this.scrollComponent.scrollLeft + (e.deltaY || e.deltaX));
             // no modifier pressed? we prevented the default event, so scroll or zoom as needed
         }
     };
@@ -81,10 +82,8 @@ class ScrollElement extends Component {
         // this.props.onMouseMove(e)
         //why is interacting with item important?
         if (this.state.isDragging && !this.props.isInteractingWithItem) {
-            this.props.onScroll(
-                this.scrollComponent.scrollLeft + this.dragLastPosition.x - e.pageX,
-                this.dragLastPosition.y - e.pageY,
-            );
+            this.props.onHorizontalScroll(this.scrollComponent.scrollLeft + this.dragLastPosition.x - e.pageX);
+            this.props.onVerticalScrollBy(this.dragLastPosition.y - e.pageY);
             this.dragLastPosition = { x: e.pageX, y: e.pageY };
         }
     };
@@ -150,7 +149,7 @@ class ScrollElement extends Component {
             let moveX = Math.abs(deltaX0) * 3 > Math.abs(deltaY0);
             let moveY = Math.abs(deltaY0) * 3 > Math.abs(deltaX0);
             if (deltaX !== 0 && moveX) {
-                this.props.onScroll(this.scrollComponent.scrollLeft - deltaX, 0);
+                this.props.onHorizontalScroll(this.scrollComponent.scrollLeft - deltaX);
             }
             if (moveY) {
                 window.scrollTo(window.pageXOffset, this.singleTouchStart.screenY - deltaY0);
