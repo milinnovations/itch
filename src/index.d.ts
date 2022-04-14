@@ -221,6 +221,7 @@ declare module "@mil/itch" {
         itemTouchSendsClick?: boolean;
         timeSteps?: TimelineTimeSteps;
         scrollRef?: React.Ref<any>;
+        zoomSpeed?: { alt: number; ctrl: number; meta: number };
         onItemDrag?(itemDragObject: OnItemDragObjectMove | OnItemDragObjectResize): void;
         onItemMove?(itemId: Id, dragTime: number, newGroupOrder: number): void;
         onItemResize?(itemId: Id, endTimeOrStartTime: number, edge: "left" | "right"): void;
