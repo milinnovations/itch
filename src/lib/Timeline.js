@@ -465,16 +465,14 @@ export default class ReactCalendarTimeline extends Component {
     };
 
     scrollHorizontally = scrollX => {
-        const width = this.state.width;
+        const visibleDuration = this.state.visibleTimeEnd - this.state.visibleTimeStart;
+        const millisecondsPerPixel = visibleDuration / this.state.width;
 
         const canvasTimeStart = this.state.canvasTimeStart;
+        const visibleTimeStart = canvasTimeStart + millisecondsPerPixel * scrollX;
 
-        const zoom = this.state.visibleTimeEnd - this.state.visibleTimeStart;
-
-        const visibleTimeStart = canvasTimeStart + (zoom * scrollX) / width;
-
-        if (this.state.visibleTimeStart !== visibleTimeStart || this.state.visibleTimeEnd !== visibleTimeStart + zoom) {
-            this.props.onTimeChange(visibleTimeStart, visibleTimeStart + zoom, this.updateScrollCanvas);
+        if (this.state.visibleTimeStart !== visibleTimeStart) {
+            this.props.onTimeChange(visibleTimeStart, visibleTimeStart + visibleDuration, this.updateScrollCanvas);
         }
     };
 

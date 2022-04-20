@@ -69,12 +69,13 @@ class ScrollElement extends Component {
     };
 
     handleMouseDown = e => {
+        if (e.isDefaultPrevented()) return;
+
         if (e.button === 0) {
-            this.dragLastPosition = { x: e.pageX, y: e.pageY };
-            this.dragLastWindowScroll = { x: window.scrollX, y: window.scrollY };
             this.setState({
                 isDragging: true,
             });
+            e.preventDefault();
         }
     };
 
@@ -82,15 +83,12 @@ class ScrollElement extends Component {
         // this.props.onMouseMove(e)
         //why is interacting with item important?
         if (this.state.isDragging && !this.props.isInteractingWithItem) {
-            this.props.onHorizontalScroll(this.scrollComponent.scrollLeft + this.dragLastPosition.x - e.pageX);
-            this.props.onVerticalScrollBy(this.dragLastPosition.y - e.pageY);
-            this.dragLastPosition = { x: e.pageX, y: e.pageY };
+            this.props.onHorizontalScroll(this.scrollComponent.scrollLeft - e.movementX);
+            this.props.onVerticalScrollBy(-e.movementY);
         }
     };
 
     handleMouseUp = () => {
-        this.dragLastPosition = null;
-
         this.setState({
             isDragging: false,
         });
@@ -98,7 +96,6 @@ class ScrollElement extends Component {
 
     handleMouseLeave = () => {
         // this.props.onMouseLeave(e)
-        this.dragLastPosition = null;
         this.setState({
             isDragging: false,
         });
