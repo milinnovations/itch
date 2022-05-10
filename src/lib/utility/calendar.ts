@@ -367,8 +367,9 @@ function groupStack(lineHeight: number, item: ItemDimensions, group: ItemDimensi
     if (item.dimensions.stack && item.dimensions.top === null) {
         item.dimensions.top = groupTop + verticalMargin;
         curHeight = Math.max(curHeight, lineHeight);
+        let collidingItem;
         do {
-            var collidingItem = null;
+            collidingItem = null;
             //Items are placed from i=0 onwards, only check items with index < i
             for (let j = itemIndex - 1; j >= 0; j--) {
                 let other = group[j];
@@ -471,7 +472,7 @@ function stackAll(itemsDimensions: ItemDimensions[], groupOrders: GroupOrders, l
  * @returns  The calculated height of the group.
  */
 function stackGroup(itemsDimensions: ItemDimensions[], isGroupStacked: boolean, lineHeight: number, groupTop: number): number {
-    var groupHeight = 0;
+    let groupHeight = 0;
     // Find positions for each item in group
     for (let itemIndex = 0; itemIndex < itemsDimensions.length; itemIndex++) {
         let r = {};
