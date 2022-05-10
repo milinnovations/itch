@@ -6,7 +6,7 @@ import moment from "moment";
 import { _get, deepObjectCompare } from "../utility/generic";
 import { composeEvents } from "../utility/events";
 import { defaultItemRenderer } from "./defaultItemRenderer";
-import { coordinateToTimeRatio } from "../utility/calendar";
+import { millisecondsInPixel } from "../utility/calendar";
 import { getSumScroll, getSumOffset } from "../utility/dom-helpers";
 import {
     overridableStyles,
@@ -127,7 +127,7 @@ export default class Item extends Component {
 
     getTimeRatio() {
         const { canvasTimeStart, canvasTimeEnd, canvasWidth } = this.props;
-        return coordinateToTimeRatio(canvasTimeStart, canvasTimeEnd, canvasWidth);
+        return millisecondsInPixel(canvasTimeStart, canvasTimeEnd, canvasWidth);
     }
 
     dragTimeSnap(dragTime, considerOffset) {
@@ -161,7 +161,7 @@ export default class Item extends Component {
     }
 
     timeFor(e) {
-        const ratio = coordinateToTimeRatio(
+        const ratio = millisecondsInPixel(
             this.props.canvasTimeStart,
             this.props.canvasTimeEnd,
             this.props.canvasWidth,

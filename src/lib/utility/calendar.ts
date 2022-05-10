@@ -25,7 +25,6 @@ export type ItemDimensions = {
     dimensions: Dimensions,
 };
 
-// TODO: rename this function to millisecondsInPixel.
 /**
  * Calculate the ms / pixel ratio of the timeline.
  * 
@@ -34,7 +33,7 @@ export type ItemDimensions = {
  * @param canvasWidth The width of the canvas in pixels.
  * @returns The time represented by a single pixel on the canvas in milliseconds.
  */
-export function coordinateToTimeRatio(canvasTimeStart: number, canvasTimeEnd: number, canvasWidth: number): number {
+export function millisecondsInPixel(canvasTimeStart: number, canvasTimeEnd: number, canvasWidth: number): number {
     return (canvasTimeEnd - canvasTimeStart) / canvasWidth;
 }
 
@@ -65,7 +64,7 @@ export function calculateXPositionForTime(canvasTimeStart: number, canvasTimeEnd
  * @returns The time represented by the given X position (leftOffset).
  */
 export function calculateTimeForXPosition(canvasTimeStart: number, canvasTimeEnd: number, canvasWidth: number, leftOffset: number): number {
-    const timeToPxRatio = coordinateToTimeRatio(canvasTimeStart, canvasTimeEnd, canvasWidth);
+    const timeToPxRatio = millisecondsInPixel(canvasTimeStart, canvasTimeEnd, canvasWidth);
     const timeFromCanvasTimeStart = timeToPxRatio * leftOffset;
 
     return timeFromCanvasTimeStart + canvasTimeStart;
