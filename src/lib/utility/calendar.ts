@@ -372,8 +372,7 @@ function groupStack(lineHeight: number, item: ItemDimensions, group: ItemDimensi
         do {
             var collidingItem = null;
             //Items are placed from i=0 onwards, only check items with index < i
-            // TODO: the value of jj is always 0, no need to store it in a variable
-            for (let j = itemIndex - 1, jj = 0; j >= jj; j--) {
+            for (let j = itemIndex - 1; j >= 0; j--) {
                 let other = group[j];
                 if (
                     other.dimensions.top !== null &&
