@@ -1,15 +1,6 @@
 import React from "react";
 import { noop } from "../utility/generic";
-
-// TODO: Find a better place for this interface once we use it in more files.
-export interface ITimeSteps {
-    second?: number;
-    minute?: number;
-    hour?: number;
-    day?: number;
-    month?: number;
-    year?: number;
-}
+import type { ITimeSteps } from "../types";
 
 export interface IHeaderContext {
     timeSteps: ITimeSteps;
