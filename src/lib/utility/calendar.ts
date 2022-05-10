@@ -419,49 +419,45 @@ function groupNoStack(lineHeight: number, item: ItemDimensions, groupHeight: num
 }
 
 /**
- * Calculates the sum of numbers in an array.
- * @param arr  The array containing the numbers.
- * @returns  The sum of the numbers.
- */
-function sum(arr: number[] = []):number {
-    return arr.reduce((acc, i) => acc + i, 0);
-}
-
-/**
  * Stack all groups.
  * 
  * @param itemsDimensions  The dimensions of items to be stacked.
  * @param groupOrders  The groupOrders object.
  * @param lineHeight  The height of a single line in pixels.
  * @param stackItems  Whether items should be stacked by default.
+ * @returns  The height of the whole chart, the height of each group, and the top position of each group.
  */
 function stackAll(itemsDimensions: ItemDimensions[], groupOrders: GroupOrders, lineHeight: number, stackItems: boolean) {
     let groupHeights: number[] = [];
     let groupTops: number[] = [];
+    let currentHeight: number = 0;
 
     const groupedItems = getGroupedItems(itemsDimensions, groupOrders);
 
     for (let index in groupedItems) {
         const groupItems = groupedItems[index];
         const { items: itemsDimensions, group } = groupItems;
-        // TODO: No need to calculate the sum here in every step. We can just update the current height every step.
-        const groupTop = sum(groupHeights);
+        const groupTop = currentHeight;
 
         // Is group being stacked?
-        const isGroupStacked = group.stackItems !== undefined ? group.stackItems : stackItems;
+        const isGroupStacked = group.stackItems ?? stackItems;
         const groupHeight = stackGroup(itemsDimensions, isGroupStacked, lineHeight, groupTop);
+
+        groupTops.push(groupTop);
         // If group height is overridden, push new height
         // Do this late as item position still needs to be calculated
-        groupTops.push(groupTop);
+        let effectiveGroupHeight: number;
         if (group.height) {
-            groupHeights.push(group.height);
+            effectiveGroupHeight = group.height;
         } else {
-            groupHeights.push(Math.max(groupHeight, lineHeight));
+            effectiveGroupHeight = Math.max(groupHeight, lineHeight);
         }
+        currentHeight += effectiveGroupHeight;
+        groupHeights.push(effectiveGroupHeight);
     }
 
     return {
-        height: sum(groupHeights),
+        height: currentHeight,
         groupHeights,
         groupTops,
     };
