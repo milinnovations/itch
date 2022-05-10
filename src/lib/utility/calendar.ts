@@ -281,17 +281,16 @@ export function getGroupOrders(groups: TimelineGroupBase[], keys: TimelineKeys):
  * @param groupOrders the result of getGroupOrders
  */
 function getGroupedItems(items: ItemDimensions[], groupOrders: GroupOrders) {
-    // TODO: There is absolutely no need for this to be a record instead of a simple array.
-    let groupedItems: Record<number, { index: number, group: TimelineGroupBase, items: ItemDimensions[]}> = {};
+    let groupedItems: { index: number, group: TimelineGroupBase, items: ItemDimensions[]}[] = [];
     let keys = Object.keys(groupOrders);
     // Initialize with result object for each group
     for (let i = 0; i < keys.length; i++) {
         const groupOrder = groupOrders[keys[i]];
-        groupedItems[i] = {
+        groupedItems.push({
             index: groupOrder.index,
             group: groupOrder.group,
             items: [],
-        };
+        });
     }
 
     // Populate groups
