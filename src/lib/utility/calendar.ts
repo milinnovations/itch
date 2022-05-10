@@ -1,5 +1,5 @@
 import moment from "moment";
-import type { Moment, unitOfTime } from "moment";
+import type { Moment } from "moment";
 import { _get } from "./generic";
 import type { Id, ITimeSteps, TimelineGroupBase, TimelineItemBase, TimelineKeys, TimeUnit } from "../types";
 
