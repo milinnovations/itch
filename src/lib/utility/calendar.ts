@@ -701,10 +701,9 @@ function getItemWithInteractions({
  * @param visibleTimeEnd  The visible end time in milliseconds.
  */
 export function getCanvasBoundariesFromVisibleTime(visibleTimeStart: number, visibleTimeEnd: number) {
-    // TODO: this shouldn't be this convoluted
     const zoom = visibleTimeEnd - visibleTimeStart;
-    const canvasTimeStart = visibleTimeStart - (visibleTimeEnd - visibleTimeStart);
-    const canvasTimeEnd = canvasTimeStart + zoom * 3;
+    const canvasTimeStart = visibleTimeStart - zoom;
+    const canvasTimeEnd = visibleTimeEnd + zoom;
     return [canvasTimeStart, canvasTimeEnd];
 }
 
