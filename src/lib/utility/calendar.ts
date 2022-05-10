@@ -563,9 +563,7 @@ export function stackTimelineItems(
                 lineHeight,
                 itemHeightRatio,
             }),
-        )
-        // TODO: the item can never be undefined or null, no need for this filter.
-        .filter(item => !!item);
+        );
     // Get a new array of groupOrders holding the stacked items
     const { height, groupHeights, groupTops } = stackAll(dimensionItems, groupOrders, lineHeight, stackItems);
     return { dimensionItems, height, groupHeights, groupTops };
