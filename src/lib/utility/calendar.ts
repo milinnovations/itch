@@ -327,7 +327,6 @@ export function getVisibleItems(items: TimelineItemBase[], canvasTimeStart: numb
 
 const EPSILON = 0.001;
 
-// TODO: lineHeight is not used in this function, so remove it from the parameters.
 /**
  * Calculates whether two items are colliding on the chart.
  * @param a  The dimensions of the first item. Its 'top' should not be null when this function is called.
@@ -336,7 +335,7 @@ const EPSILON = 0.001;
  * @param collisionPadding  A small collision padding, so touching items don't collide due to a rounding error.
  * @returns  True if the two items overlap.
  */
-function collision(a: Dimensions, b: Dimensions, lineHeight: number, collisionPadding = EPSILON): boolean {
+function collision(a: Dimensions, b: Dimensions, collisionPadding = EPSILON): boolean {
     if (a.top === null || b.top === null) {
         // This function should not be called before the item top is set for both items.
         return false;
@@ -379,7 +378,7 @@ function groupStack(lineHeight: number, item: ItemDimensions, group: ItemDimensi
                 if (
                     other.dimensions.top !== null &&
                     other.dimensions.stack &&
-                    collision(item.dimensions, other.dimensions, lineHeight)
+                    collision(item.dimensions, other.dimensions)
                 ) {
                     collidingItem = other;
                     break;
