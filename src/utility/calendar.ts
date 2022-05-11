@@ -1,16 +1,24 @@
 import moment from "moment";
 import type { Moment } from "moment";
 import { _get } from "./generic";
-import type { Id, ITimeSteps, TimelineGroupBase, TimelineItemBase, TimelineKeys, TimeUnit } from "../types";
+import type {
+    CompleteTimeSteps,
+    Id,
+    ITimeSteps,
+    TimelineGroupBase,
+    TimelineItemBase,
+    TimelineKeys,
+    TimeUnit,
+} from "../types";
 
-export type GroupOrder = { index: number, group: TimelineGroupBase};
+export type GroupOrder = { index: number; group: TimelineGroupBase };
 export type GroupOrders = Record<string | number, GroupOrder>;
 
 export type VerticalDimensions = {
-    left: number,
-    width: number,
-    collisionLeft: number,
-    collisionWidth: number,
+    left: number;
+    width: number;
+    collisionLeft: number;
+    collisionWidth: number;
 };
 
 export type Dimensions = VerticalDimensions & {
@@ -21,13 +29,13 @@ export type Dimensions = VerticalDimensions & {
 };
 
 export type ItemDimensions = {
-    id: Id,
-    dimensions: Dimensions,
+    id: Id;
+    dimensions: Dimensions;
 };
 
 /**
  * Calculate the ms / pixel ratio of the timeline.
- * 
+ *
  * @param canvasTimeStart The millisecond value at the left edge of the canvas.
  * @param canvasTimeEnd The millisecond value at the right edge of the canvas.
  * @param canvasWidth The width of the canvas in pixels.
@@ -39,14 +47,19 @@ export function millisecondsInPixel(canvasTimeStart: number, canvasTimeEnd: numb
 
 /**
  * Calculate the X position on the canvas for a given time.
- * 
+ *
  * @param canvasTimeStart The millisecond value at the left edge of the canvas.
  * @param canvasTimeEnd The millisecond value at the right edge of the canvas.
  * @param canvasWidth The width of the canvas in pixels.
  * @param time The time to get the X position for.
  * @returns The X position on the canvas representing the given time in pixels.
  */
-export function calculateXPositionForTime(canvasTimeStart: number, canvasTimeEnd: number, canvasWidth: number, time: number): number {
+export function calculateXPositionForTime(
+    canvasTimeStart: number,
+    canvasTimeEnd: number,
+    canvasWidth: number,
+    time: number,
+): number {
     const widthToZoomRatio = canvasWidth / (canvasTimeEnd - canvasTimeStart);
     const timeOffset = time - canvasTimeStart;
 
@@ -56,14 +69,19 @@ export function calculateXPositionForTime(canvasTimeStart: number, canvasTimeEnd
 /**
  * For a given x position (leftOffset) in pixels, calculate time based on
  * timeline state (timeline width in px, canvas time range).
- * 
+ *
  * @param canvasTimeStart The millisecond value at the left edge of the canvas.
  * @param canvasTimeEnd The millisecond value at the right edge of the canvas.
  * @param canvasWidth The width of the canvas in pixels.
  * @param leftOffset The X position in pixels to calculate the time for.
  * @returns The time represented by the given X position (leftOffset).
  */
-export function calculateTimeForXPosition(canvasTimeStart: number, canvasTimeEnd: number, canvasWidth: number, leftOffset: number): number {
+export function calculateTimeForXPosition(
+    canvasTimeStart: number,
+    canvasTimeEnd: number,
+    canvasWidth: number,
+    leftOffset: number,
+): number {
     const timeToPxRatio = millisecondsInPixel(canvasTimeStart, canvasTimeEnd, canvasWidth);
     const timeFromCanvasTimeStart = timeToPxRatio * leftOffset;
 
@@ -76,14 +94,20 @@ export function calculateTimeForXPosition(canvasTimeStart: number, canvasTimeEnd
  * two dates. The first call of the callback function will include the start time, so it could
  * easily represent an interval that actually starts before the start time. The last interval
  * to call the callback function will similarly include the end time.
- * 
+ *
  * @param start Where the iteration starts in milliseconds.
  * @param end Where the iteration ends in milliseconds.
  * @param unit The unit of the iteration (for example days).
  * @param timeSteps An object describing how many steps to go in each iteration depending on the unit.
  * @param callback The callback that will be called in each iteration.
  */
-export function iterateTimes(start: number, end: number, unit: keyof ITimeSteps, timeSteps: ITimeSteps, callback: (time: Moment, nextTime: Moment) => void): void {
+export function iterateTimes(
+    start: number,
+    end: number,
+    unit: TimeUnit,
+    timeSteps: ITimeSteps,
+    callback: (time: Moment, nextTime: Moment) => void,
+): void {
     let time = moment(start).startOf(unit);
     const steps = timeSteps[unit] ?? 1;
 
@@ -113,7 +137,7 @@ export const minCellWidth = 17;
 // units has a natural progression to the other. i.e. a year is 12 months
 // a month is 24 days, a day is 24 hours.
 // with weeks this isnt the case so weeks needs to be handled specially
-const timeDividers = {
+const timeDividers: CompleteTimeSteps = {
     second: 1000,
     minute: 60,
     hour: 60,
@@ -124,7 +148,7 @@ const timeDividers = {
 
 /**
  * Determine the current rendered time unit based on timeline time span.
- * 
+ *
  * This function is VERY HOT as its used in Timeline.js render function.
  * TODO: check if there are performance implications here.
  * When "weeks" feature is implemented, this function will be modified heavily.
@@ -179,11 +203,11 @@ const nextTimeUnitMap: Record<TimeUnit, TimeUnit> = {
     day: "month",
     month: "year",
     year: "year",
-}
+};
 
 /**
  * Returns the next, one step longer time unit.
- * 
+ *
  * @param unit The time unit to get the next unit for.
  * @returns The time unit that is one step longer or the longest time unit.
  */
@@ -194,7 +218,7 @@ export function getNextUnit(unit: TimeUnit): TimeUnit {
 /**
  * Get the new start and new end time of item that is being
  * dragged or resized.
- * 
+ *
  * @param itemTimeStart original item time in milliseconds
  * @param itemTimeEnd original item time in milliseconds
  * @param dragTime new start time if item is dragged in milliseconds
@@ -203,14 +227,22 @@ export function getNextUnit(unit: TimeUnit): TimeUnit {
  * @param resizingEdge resize edge
  * @param resizeTime new resize time in milliseconds
  */
-function calculateInteractionNewTimes({itemTimeStart, itemTimeEnd, dragTime, isDragging, isResizing, resizingEdge, resizeTime}: {
-    itemTimeStart: number,
-    itemTimeEnd: number,
-    dragTime: number,
-    isDragging: boolean,
-    isResizing: boolean,
-    resizingEdge: "left" | "right",
-    resizeTime: number,
+function calculateInteractionNewTimes({
+    itemTimeStart,
+    itemTimeEnd,
+    dragTime,
+    isDragging,
+    isResizing,
+    resizingEdge,
+    resizeTime,
+}: {
+    itemTimeStart: number;
+    itemTimeEnd: number;
+    dragTime: number;
+    isDragging: boolean;
+    isResizing: boolean;
+    resizingEdge: "left" | "right";
+    resizeTime: number;
 }) {
     const originalItemRange = itemTimeEnd - itemTimeStart;
     const itemStart = isResizing && resizingEdge === "left" ? resizeTime : itemTimeStart;
@@ -220,7 +252,7 @@ function calculateInteractionNewTimes({itemTimeStart, itemTimeEnd, dragTime, isD
 
 /**
  * Calculates the vertical dimension of an item on the chart.
- * 
+ *
  * @param itemTimeStart The start time of the item in milliseconds.
  * @param itemTimeEnd The end time of the item in milliseconds.
  * @param canvasTimeStart The start time of the canvas in milliseconds.
@@ -229,13 +261,19 @@ function calculateInteractionNewTimes({itemTimeStart, itemTimeEnd, dragTime, isD
  * @returns The dimensions of the item where left is the start position on the canvas in pixels, width is also measured in pixels,
  *          collisionLeft is the start time in milliseconds, collisionWidth is the duration in milliseconds.
  */
-function calculateDimensions({ itemTimeStart, itemTimeEnd, canvasTimeStart, canvasTimeEnd, canvasWidth } : {
-    itemTimeStart: number,
-    itemTimeEnd: number,
-    canvasTimeStart: number,
-    canvasTimeEnd: number,
-    canvasWidth: number,
-}):VerticalDimensions {
+function calculateDimensions({
+    itemTimeStart,
+    itemTimeEnd,
+    canvasTimeStart,
+    canvasTimeEnd,
+    canvasWidth,
+}: {
+    itemTimeStart: number;
+    itemTimeEnd: number;
+    canvasTimeStart: number;
+    canvasTimeEnd: number;
+    canvasWidth: number;
+}): VerticalDimensions {
     const itemTimeRange = itemTimeEnd - itemTimeStart;
 
     // restrict startTime and endTime to be bounded by canvasTimeStart and canvasTimeEnd
@@ -258,7 +296,7 @@ function calculateDimensions({ itemTimeStart, itemTimeEnd, canvasTimeStart, canv
 
 /**
  * Get the order of groups based on their keys.
- * 
+ *
  * @param groups Array of groups.
  * @param keys The keys object.
  * @returns Ordered hash from group ids to the group index in the array and the group itself.
@@ -281,7 +319,7 @@ export function getGroupOrders(groups: TimelineGroupBase[], keys: TimelineKeys):
  * @param groupOrders the result of getGroupOrders
  */
 function getGroupedItems(items: ItemDimensions[], groupOrders: GroupOrders) {
-    let groupedItems: { index: number, group: TimelineGroupBase, items: ItemDimensions[]}[] = [];
+    let groupedItems: { index: number; group: TimelineGroupBase; items: ItemDimensions[] }[] = [];
     let keys = Object.keys(groupOrders);
     // Initialize with result object for each group
     for (let i = 0; i < keys.length; i++) {
@@ -308,14 +346,19 @@ function getGroupedItems(items: ItemDimensions[], groupOrders: GroupOrders) {
 
 /**
  * Filters timeline items to those that should be visible on the canvas.
- * 
+ *
  * @param items The timeline items to filter.
  * @param canvasTimeStart The start time of the canvas in milliseconds.
  * @param canvasTimeEnd The end time of the canvas in milliseconds.
  * @param keys The keys object.
  * @returns The filtered list of timeline items.
  */
-export function getVisibleItems(items: TimelineItemBase[], canvasTimeStart: number, canvasTimeEnd: number, keys: TimelineKeys) {
+export function getVisibleItems(
+    items: TimelineItemBase[],
+    canvasTimeStart: number,
+    canvasTimeEnd: number,
+    keys: TimelineKeys,
+) {
     const { itemTimeStartKey, itemTimeEndKey } = keys;
 
     return items.filter(item => {
@@ -351,7 +394,7 @@ function collision(a: Dimensions, b: Dimensions, collisionPadding = EPSILON): bo
 
 /**
  * Calculate the position of a given item for a group that is being stacked.
- * 
+ *
  * @param lineHeight  The height of a line in pixels.
  * @param item  The item to calculate the position for.
  * @param group  All the items in the same group as 'item'.
@@ -360,7 +403,14 @@ function collision(a: Dimensions, b: Dimensions, collisionPadding = EPSILON): bo
  * @param itemIndex  The index of the 'item' within 'group'.
  * @returns  A potentially increased group height.
  */
-function groupStack(lineHeight: number, item: ItemDimensions, group: ItemDimensions[], groupHeight: number, groupTop: number, itemIndex: number): number {
+function groupStack(
+    lineHeight: number,
+    item: ItemDimensions,
+    group: ItemDimensions[],
+    groupHeight: number,
+    groupTop: number,
+    itemIndex: number,
+): number {
     // calculate non-overlapping positions
     let curHeight = groupHeight;
     let verticalMargin = (lineHeight - item.dimensions.height) / 2;
@@ -401,7 +451,7 @@ function groupStack(lineHeight: number, item: ItemDimensions, group: ItemDimensi
 
 /**
  * Calculate the position of an item for a group that is not being stacked.
- * 
+ *
  * @param lineHeight  The height of a line in pixels.
  * @param item  The item to calculate the position for.
  * @param groupHeight  The current group height in pixels (calculated by previously stacked items).
@@ -419,14 +469,19 @@ function groupNoStack(lineHeight: number, item: ItemDimensions, groupHeight: num
 
 /**
  * Stack all groups.
- * 
+ *
  * @param itemsDimensions  The dimensions of items to be stacked.
  * @param groupOrders  The groupOrders object.
  * @param lineHeight  The height of a single line in pixels.
  * @param stackItems  Whether items should be stacked by default.
  * @returns  The height of the whole chart, the height of each group, and the top position of each group.
  */
-function stackAll(itemsDimensions: ItemDimensions[], groupOrders: GroupOrders, lineHeight: number, stackItems: boolean) {
+function stackAll(
+    itemsDimensions: ItemDimensions[],
+    groupOrders: GroupOrders,
+    lineHeight: number,
+    stackItems: boolean,
+) {
     let groupHeights: number[] = [];
     let groupTops: number[] = [];
     let currentHeight: number = 0;
@@ -464,20 +519,32 @@ function stackAll(itemsDimensions: ItemDimensions[], groupOrders: GroupOrders, l
 
 /**
  * Calculates the position of each item in a group.
- * 
+ *
  * @param itemsDimensions  The dimensions of each item in the group.
  * @param isGroupStacked  Whether items in the group should stack.
  * @param lineHeight  The line height in pixels.
  * @param groupTop  The top position of the group.
  * @returns  The calculated height of the group.
  */
-function stackGroup(itemsDimensions: ItemDimensions[], isGroupStacked: boolean, lineHeight: number, groupTop: number): number {
+function stackGroup(
+    itemsDimensions: ItemDimensions[],
+    isGroupStacked: boolean,
+    lineHeight: number,
+    groupTop: number,
+): number {
     let groupHeight = 0;
     // Find positions for each item in group
     for (let itemIndex = 0; itemIndex < itemsDimensions.length; itemIndex++) {
         let r = {};
         if (isGroupStacked) {
-            groupHeight = groupStack(lineHeight, itemsDimensions[itemIndex], itemsDimensions, groupHeight, groupTop, itemIndex);
+            groupHeight = groupStack(
+                lineHeight,
+                itemsDimensions[itemIndex],
+                itemsDimensions,
+                groupHeight,
+                groupTop,
+                itemIndex,
+            );
         } else {
             groupHeight = groupNoStack(lineHeight, itemsDimensions[itemIndex], groupHeight, groupTop);
         }
@@ -487,7 +554,7 @@ function stackGroup(itemsDimensions: ItemDimensions[], isGroupStacked: boolean, 
 
 /**
  * Stack the items that will be visible within the canvas area.
- * 
+ *
  * @param items  All the items on the chart.
  * @param groups  All the groups on the chart.
  * @param canvasWidth  The width of the canvas in pixels.
@@ -550,19 +617,18 @@ export function stackTimelineItems(
 
     // Get the order of groups based on their id key
     const groupOrders = getGroupOrders(groups, keys);
-    let dimensionItems = visibleItemsWithInteraction
-        .map(item =>
-            getItemDimensions({
-                item,
-                keys,
-                canvasTimeStart,
-                canvasTimeEnd,
-                canvasWidth,
-                groupOrders,
-                lineHeight,
-                itemHeightRatio,
-            }),
-        );
+    let dimensionItems = visibleItemsWithInteraction.map(item =>
+        getItemDimensions({
+            item,
+            keys,
+            canvasTimeStart,
+            canvasTimeEnd,
+            canvasWidth,
+            groupOrders,
+            lineHeight,
+            itemHeightRatio,
+        }),
+    );
     // Get a new array of groupOrders holding the stacked items
     const { height, groupHeights, groupTops } = stackAll(dimensionItems, groupOrders, lineHeight, stackItems);
     return { dimensionItems, height, groupHeights, groupTops };
@@ -570,7 +636,7 @@ export function stackTimelineItems(
 
 /**
  * Get canvas width from visible width.
- * 
+ *
  * @param width  The visible width in pixels.
  * @param buffer  The buffer ratio - 3 by default, so the actual canvas will be 3 times as wide.
  */
@@ -580,7 +646,7 @@ export function getCanvasWidth(width: number, buffer = 3) {
 
 /**
  * Get item's position, dimensions and collisions.
- * 
+ *
  * @param item  The item to get the dimensions for.
  * @param keys  The keys object.
  * @param canvasTimeStart  The time at the left edge of the canvas in milliseconds.
@@ -601,17 +667,17 @@ function getItemDimensions({
     lineHeight,
     itemHeightRatio,
 }: {
-    item: TimelineItemBase,
-    keys: TimelineKeys,
-    canvasTimeStart: number,
-    canvasTimeEnd: number,
-    canvasWidth: number,
-    groupOrders: GroupOrders,
-    lineHeight: number,
-    itemHeightRatio: number,
-}):  { id: Id, dimensions: Dimensions } {
+    item: TimelineItemBase;
+    keys: TimelineKeys;
+    canvasTimeStart: number;
+    canvasTimeEnd: number;
+    canvasWidth: number;
+    groupOrders: GroupOrders;
+    lineHeight: number;
+    itemHeightRatio: number;
+}): { id: Id; dimensions: Dimensions } {
     const itemId = _get(item, keys.itemIdKey);
-    const verticalDimensions :VerticalDimensions = calculateDimensions({
+    const verticalDimensions: VerticalDimensions = calculateDimensions({
         itemTimeStart: _get(item, keys.itemTimeStartKey),
         itemTimeEnd: _get(item, keys.itemTimeEndKey),
         canvasTimeStart,
@@ -626,19 +692,18 @@ function getItemDimensions({
         // Disabled the undocumented magic that if an item has an isOverlay=true property we won't stack it.
         // stack: !item.isOverlay;
         stack: true,
-        height: lineHeight * itemHeightRatio
+        height: lineHeight * itemHeightRatio,
     };
     return {
         id: itemId,
         dimensions,
     };
-    
 }
 
 /**
  * Get new item with changed  `itemTimeStart` , `itemTimeEnd` and `itemGroupKey` according
  * to user interaction (dragging an item or resizing left or right).
- * 
+ *
  * @param item  The item to check.
  * @param keys  The keys object.
  * @param draggingItem  The id of the item being dragged.
@@ -660,7 +725,7 @@ function getItemWithInteractions({
     resizeTime,
     groups,
     newGroupOrder,
-}: { 
+}: {
     item: TimelineItemBase;
     keys: TimelineKeys;
     draggingItem: Id;
@@ -695,7 +760,7 @@ function getItemWithInteractions({
 
 /**
  * Get canvas start and end time from visible start and end time.
- * 
+ *
  * @param visibleTimeStart  The visible start time in milliseconds.
  * @param visibleTimeEnd  The visible end time in milliseconds.
  */
@@ -709,7 +774,7 @@ export function getCanvasBoundariesFromVisibleTime(visibleTimeStart: number, vis
 /**
  * Get the canvas area for a given visible time. Will shift the start/end of
  * the canvas if the visible time does not fit within the existing canvas.
- * 
+ *
  * @param visibleTimeStart  The visible start time in milliseconds.
  * @param visibleTimeEnd  The visible end time in milliseconds.
  * @param forceUpdateDimensions  Whether to force a new canvas even if the visible
@@ -733,10 +798,10 @@ export function calculateScrollCanvas(
     const oldZoom = state.visibleTimeEnd - state.visibleTimeStart;
     const newZoom = visibleTimeEnd - visibleTimeStart;
     const newState: {
-        visibleTimeStart: number,
-        visibleTimeEnd: number,
-        canvasTimeStart?: number,
-        canvasTimeEnd?: number
+        visibleTimeStart: number;
+        visibleTimeEnd: number;
+        canvasTimeStart?: number;
+        canvasTimeEnd?: number;
     } = { visibleTimeStart, visibleTimeEnd };
 
     // Check if the current canvas covers the new times

@@ -7,44 +7,34 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 3.5
 
-import * as React from "react";
-import { Moment } from "moment";
+import type React from "react";
+import type { Moment } from "moment";
+
+import type {
+    Id as Id_,
+    ITimeSteps as ITimeSteps_,
+    ResizeOptions as ResizeOptions_,
+    TimelineContext as TimelineContext_,
+    TimelineGroupBase as TimelineGroupBase_,
+    TimelineItemBase as TimelineItemBase_,
+    TimelineItemEdge as TimelineItemEdge_,
+    TimelineKeys as TimelineKeys_,
+    TimeUnit as TimeUnit_,
+} from "./types";
 
 declare module "@mil/itch" {
-    type Id = number | string;
+    export type Id = Id_;
+    export type ITimeSteps = ITimeSteps_;
+    export type ResizeOptions = ResizeOptions_;
+    export type TimelineContext = TimelineContext_;
+    export type TimelineGroupBase = TimelineGroupBase_;
+    export type TimelineItemBase = TimelineItemBase_;
+    export type TimelineItemEdge = TimelineItemEdge_;
+    export type TimelineKeys = TimelineKeys_;
+    export type TimeUnit = TimeUnit_;
 
-    export interface TimelineGroupBase {
-        id: Id;
-        title: React.ReactNode;
-        rightTitle?: React.ReactNode;
-        height?: number;
-        stackItems?: boolean;
-    }
-
-    export interface TimelineItemBase<DateType> {
-        id: Id;
-        group: Id;
-        title?: React.ReactNode;
-        start_time: DateType;
-        end_time: DateType;
-        canMove?: boolean;
-        canResize?: boolean | "left" | "right" | "both";
-        canChangeGroup?: boolean;
-        className?: string;
-        style?: React.CSSProperties;
-        itemProps?: React.HTMLAttributes<HTMLDivElement>;
-    }
-
-    export type TimelineItem<CustomItemFields, DateType = number> = TimelineItemBase<DateType> & CustomItemFields;
+    export type TimelineItem<CustomItemFields> = TimelineItemBase & CustomItemFields;
     export type TimelineGroup<CustomGroupFields> = TimelineGroupBase & CustomGroupFields;
-
-    export interface TimelineContext {
-        timelineWidth: number;
-        visibleTimeStart: number;
-        visibleTimeEnd: number;
-        canvasTimeStart: number;
-        canvasTimeEnd: number;
-    }
 
     export interface ItemContext {
         dimensions: {
@@ -78,7 +68,7 @@ declare module "@mil/itch" {
         dragTime: number;
         dragGroupDelta: number;
         resizing: boolean;
-        resizeEdge: "left" | "right";
+        resizeEdge: TimelineItemEdge;
         resizeStart: number;
         resizeTime: number;
         width: boolean;
@@ -135,9 +125,7 @@ declare module "@mil/itch" {
         rightClassName?: string;
     };
 
-    export interface ReactCalendarItemRendererProps<
-        CustomItem extends TimelineItemBase<any> = TimelineItemBase<number>,
-    > {
+    export interface ReactCalendarItemRendererProps<CustomItem extends TimelineItemBase = TimelineItemBase> {
         item: CustomItem;
         itemContext: ItemContext;
         getItemProps: (props: GetItemsProps) => {
@@ -173,23 +161,11 @@ declare module "@mil/itch" {
 
     export interface OnItemDragObjectResize extends OnItemDragObjectBase {
         eventType: "resize";
-        edge?: "left" | "right";
-    }
-
-    export interface TimelineKeys {
-        groupIdKey: string;
-        groupTitleKey: string;
-        groupRightTitleKey: string;
-        itemIdKey: string;
-        itemTitleKey: string;
-        itemDivTitleKey: string;
-        itemGroupKey: string;
-        itemTimeStartKey: string;
-        itemTimeEndKey: string;
+        edge?: TimelineItemEdge;
     }
 
     export interface ReactCalendarTimelineProps<
-        CustomItem extends TimelineItemBase<any> = TimelineItemBase<number>,
+        CustomItem extends TimelineItemBase = TimelineItemBase,
         CustomGroup extends TimelineGroupBase = TimelineGroupBase,
     > {
         groups: CustomGroup[];
@@ -214,17 +190,17 @@ declare module "@mil/itch" {
         clickTolerance?: number;
         canMove?: boolean;
         canChangeGroup?: boolean;
-        canResize?: false | true | "left" | "right" | "both";
+        canResize?: ResizeOptions;
         useResizeHandle?: boolean;
         stackItems?: boolean;
         traditionalZoom?: boolean;
         itemTouchSendsClick?: boolean;
-        timeSteps?: TimelineTimeSteps;
+        timeSteps?: ITimeSteps;
         scrollRef?: React.Ref<any>;
         zoomSpeed?: { alt: number; ctrl: number; meta: number };
         onItemDrag?(itemDragObject: OnItemDragObjectMove | OnItemDragObjectResize): void;
         onItemMove?(itemId: Id, dragTime: number, newGroupOrder: number): void;
-        onItemResize?(itemId: Id, endTimeOrStartTime: number, edge: "left" | "right"): void;
+        onItemResize?(itemId: Id, endTimeOrStartTime: number, edge: TimelineItemEdge): void;
         onItemSelect?(itemId: Id, e: any, time: number): void;
         onItemDeselect?(e: React.SyntheticEvent): void;
         onItemClick?(itemId: Id, e: React.SyntheticEvent, time: number): void;
@@ -235,7 +211,7 @@ declare module "@mil/itch" {
         onCanvasDoubleClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
         onCanvasDrop?(groupId: Id, time: number, e: React.DragEvent): void;
         onZoom?(timelineContext: TimelineContext): void;
-        moveResizeValidator?(action: "move" | "resize", itemId: Id, time: number, resizeEdge: "left" | "right"): number;
+        moveResizeValidator?(action: "move" | "resize", itemId: Id, time: number, resizeEdge: TimelineItemEdge): number;
         onTimeChange?(
             visibleTimeStart: number,
             visibleTimeEnd: number,
@@ -250,15 +226,6 @@ declare module "@mil/itch" {
 
         // Fields that are in propTypes but not documented
         headerRef?: React.Ref<any>;
-    }
-
-    export interface TimelineTimeSteps {
-        second: number;
-        minute: number;
-        hour: number;
-        day: number;
-        month: number;
-        year: number;
     }
 
     export class TimelineMarkers extends React.Component {}
@@ -305,8 +272,6 @@ declare module "@mil/itch" {
     }
     export class SidebarHeader<Data = any> extends React.Component<SidebarHeaderProps<Data>> {}
 
-    export type Unit = "second" | "minute" | "hour" | "day" | "week" | "month" | "year";
-
     export interface IntervalContext {
         interval: { startTime: number; endTime: number; labelWidth: number; left: number };
         intervalText: string;
@@ -324,8 +289,8 @@ declare module "@mil/itch" {
     export interface DateHeaderProps<Data> {
         style?: React.CSSProperties;
         className?: string;
-        unit?: Unit | "primaryHeader";
-        labelFormat?: string | (([startTime, endTime]: [Moment, Moment], unit: Unit, labelWidth: number) => string);
+        unit?: TimeUnit | "primaryHeader";
+        labelFormat?: string | (([startTime, endTime]: [Moment, Moment], unit: TimeUnit, labelWidth: number) => string);
         intervalRenderer?: (props?: IntervalRenderer<Data>) => React.ReactNode;
         headerData?: Data;
         children?: (props: SidebarHeaderChildrenFnProps<Data>) => React.ReactNode;
@@ -349,7 +314,7 @@ declare module "@mil/itch" {
         data: Data;
     }
     export interface CustomHeaderProps<Data> {
-        unit?: Unit;
+        unit?: TimeUnit;
         headerData?: Data;
         height?: number;
         children: (props?: CustomHeaderPropsChildrenFnProps<Data>) => React.ReactNode;
@@ -357,11 +322,11 @@ declare module "@mil/itch" {
     export class CustomHeader<Data = any> extends React.Component<CustomHeaderProps<Data>> {}
 
     export const defaultKeys: TimelineKeys;
-    export const defaultTimeSteps: TimelineTimeSteps;
+    export const defaultTimeSteps: ITimeSteps;
     export const defaultHeaderFormats: LabelFormat;
 
     export default class ReactCalendarTimeline<
-        CustomItem extends TimelineItemBase<any> = TimelineItemBase<number>,
+        CustomItem extends TimelineItemBase = TimelineItemBase,
         CustomGroup extends TimelineGroupBase = TimelineGroupBase,
     > extends React.Component<ReactCalendarTimelineProps<CustomItem, CustomGroup>> {}
 }
