@@ -22,8 +22,10 @@ import type {
     ResizeStyles as ResizeStyles_,
     TimelineContext as TimelineContext_,
     TimelineGroupBase as TimelineGroupBase_,
+    TimelineHeaderProps as TimelineHeaderProps_,
     TimelineItemBase as TimelineItemBase_,
     TimelineItemEdge as TimelineItemEdge_,
+    TimelineItemProps as TimelineItemProps_,
     TimelineKeys as TimelineKeys_,
     TimeFormat as TimeFormat_,
     TimeUnit as TimeUnit_,
@@ -40,8 +42,10 @@ declare module "@mil/itch" {
     export type ResizeStyles = ResizeStyles_;
     export type TimelineContext = TimelineContext_;
     export type TimelineGroupBase = TimelineGroupBase_;
+    export type TimelineHeaderProps = TimelineHeaderProps_;
     export type TimelineItemBase = TimelineItemBase_;
     export type TimelineItemEdge = TimelineItemEdge_;
+    export type TimelineItemProps = TimelineItemProps_;
     export type TimelineKeys = TimelineKeys_;
     export type TimeFormat = TimeFormat_;
     export type TimeUnit = TimeUnit_;
@@ -161,16 +165,7 @@ declare module "@mil/itch" {
     export type CursorMarkerProps = Omit<MarkerProps, "date">;
     export class CursorMarker extends React.Component<CursorMarkerProps> {}
 
-    export interface TimelineHeadersProps {
-        style?: React.CSSProperties;
-        className?: string;
-        calendarHeaderStyle?: React.CSSProperties;
-        calendarHeaderClassName?: string;
-        headerRef?: React.Ref<any>;
-    }
-    export class TimelineHeaders extends React.Component<TimelineHeadersProps> {}
-
-    export type TimelineHeaderProps = TimelineHeadersProps;
+    export class TimelineHeaders extends React.Component<TimelineHeaderProps> {}
 
     export interface SidebarHeaderChildrenFnProps<Data> {
         getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };

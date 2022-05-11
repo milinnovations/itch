@@ -1,3 +1,5 @@
+import type React from "react";
+
 export type Id = number | string;
 
 export type TimelineItemEdge = "left" | "right";
@@ -31,6 +33,14 @@ export type TimelineGroupBase = {
     rightTitle?: React.ReactNode;
     height?: number;
     stackItems?: boolean;
+};
+
+export type TimelineHeaderProps = {
+    style?: React.CSSProperties;
+    className?: string;
+    calendarHeaderStyle?: React.CSSProperties;
+    calendarHeaderClassName?: string;
+    headerRef?: React.Ref<any>;
 };
 
 export type TimelineItemBase = {
