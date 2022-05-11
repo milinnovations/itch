@@ -1,4 +1,6 @@
-export const overridableStyles = {
+import type { CSSProperties } from "react";
+
+export const overridableStyles: CSSProperties = {
     fontSize: 12,
     color: "white",
     cursor: "pointer",
@@ -6,28 +8,34 @@ export const overridableStyles = {
     border: "1px solid #1a6fb3",
     zIndex: 80,
 };
-export const selectedStyle = {
+
+export const selectedStyle: CSSProperties = {
     background: "#ffc107",
     border: "1px solid #ff9800",
     zIndex: 82,
 };
-export const selectedAndCanMove = {
+
+export const selectedAndCanMove: CSSProperties = {
     cursor: "move",
 };
-export const selectedAndCanResizeLeft = {
+
+export const selectedAndCanResizeLeft: CSSProperties = {
     borderLeftWidth: 3,
 };
-export const selectedAndCanResizeLeftAndDragLeft = {
+
+export const selectedAndCanResizeLeftAndDragLeft: CSSProperties = {
     cursor: "w-resize",
 };
-export const selectedAndCanResizeRight = {
+
+export const selectedAndCanResizeRight: CSSProperties = {
     borderRightWidth: 3,
 };
-export const selectedAndCanResizeRightAndDragRight = {
+
+export const selectedAndCanResizeRightAndDragRight: CSSProperties = {
     cursor: "e-resize",
 };
 
-export const leftResizeStyle = {
+export const leftResizeStyle: CSSProperties = {
     position: "absolute",
     width: 24,
     maxWidth: "20%",
@@ -39,7 +47,7 @@ export const leftResizeStyle = {
     zIndex: 88,
 };
 
-export const rightResizeStyle = {
+export const rightResizeStyle: CSSProperties = {
     position: "absolute",
     width: 24,
     maxWidth: "20%",
