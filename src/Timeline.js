@@ -57,8 +57,6 @@ export default class ReactCalendarTimeline extends Component {
 
         stackItems: PropTypes.bool,
 
-        traditionalZoom: PropTypes.bool,
-
         itemTouchSendsClick: PropTypes.bool,
 
         horizontalLineClassNamesForGroup: PropTypes.func,
@@ -183,8 +181,6 @@ export default class ReactCalendarTimeline extends Component {
         canSelect: true,
 
         stackItems: false,
-
-        traditionalZoom: false,
 
         horizontalLineClassNamesForGroup: null,
 
@@ -898,7 +894,7 @@ export default class ReactCalendarTimeline extends Component {
     };
 
     render() {
-        const { items, groups, sidebarWidth, rightSidebarWidth, timeSteps, traditionalZoom } = this.props;
+        const { items, groups, sidebarWidth, rightSidebarWidth, timeSteps } = this.props;
         const { draggingItem, resizingItem, width, visibleTimeStart, visibleTimeEnd, canvasTimeStart, canvasTimeEnd } =
             this.state;
         let { dimensionItems, height, groupHeights, groupTops } = this.state;
@@ -969,7 +965,6 @@ export default class ReactCalendarTimeline extends Component {
                                     height={height}
                                     onZoom={this.changeZoom}
                                     onWheelZoom={this.handleWheelZoom}
-                                    traditionalZoom={traditionalZoom}
                                     onHorizontalScroll={this.scrollHorizontally}
                                     onVerticalScrollBy={this.scrollVerticallyBy}
                                     isInteractingWithItem={isInteractingWithItem}

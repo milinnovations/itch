@@ -193,7 +193,6 @@ declare module "@mil/itch" {
         canResize?: ResizeOptions;
         useResizeHandle?: boolean;
         stackItems?: boolean;
-        traditionalZoom?: boolean;
         itemTouchSendsClick?: boolean;
         timeSteps?: ITimeSteps;
         scrollRef?: React.Ref<any>;
