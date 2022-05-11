@@ -19,13 +19,13 @@ export type ITimeSteps = Partial<CompleteTimeSteps>;
 
 export type TimeUnit = keyof CompleteTimeSteps;
 
-export interface TimelineContext {
+export type TimelineContext = {
     timelineWidth: number;
     visibleTimeStart: number;
     visibleTimeEnd: number;
     canvasTimeStart: number;
     canvasTimeEnd: number;
-}
+};
 
 export type TimelineGroupBase = {
     id: Id;
@@ -142,10 +142,10 @@ type ItemRendererSideResizeProps = {
     style: React.CSSProperties;
 };
 
-export interface ItemRendererResizeProps {
+export type ItemRendererResizeProps = {
     left?: ItemRendererSideResizeProps;
     right?: ItemRendererSideResizeProps;
-}
+};
 
 export type ResizeStyles = {
     leftStyle?: React.CSSProperties;

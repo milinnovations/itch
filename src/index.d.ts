@@ -54,8 +54,8 @@ declare module "@mil/itch" {
     export interface ReactCalendarItemRendererProps<CustomItem extends TimelineItemBase = TimelineItemBase> {
         item: CustomItem;
         itemContext: ItemContext;
-        getItemProps: (props: Partial<Omit<TimelineItemProps, "key" | "ref">>) => TimelineItemProps;
-        getResizeProps: (propsOverride?: ResizeStyles) => ItemRendererResizeProps;
+        getItemProps: (props?: Partial<Omit<TimelineItemProps, "key" | "ref">>) => TimelineItemProps;
+        getResizeProps: (styles?: ResizeStyles) => ItemRendererResizeProps;
     }
 
     export interface ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase = TimelineGroupBase> {
