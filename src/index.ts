@@ -1,11 +1,11 @@
-import Timeline from "./lib/Timeline";
+import Timeline from "./Timeline";
 
-export { default as TimelineMarkers } from "./lib/markers/public/TimelineMarkers";
-export { default as TodayMarker } from "./lib/markers/public/TodayMarker";
-export { default as CustomMarker } from "./lib/markers/public/CustomMarker";
-export { default as CursorMarker } from "./lib/markers/public/CursorMarker";
-export { default as TimelineHeaders } from "./lib/headers/TimelineHeaders";
-export { default as SidebarHeader } from "./lib/headers/SidebarHeader";
-export { default as CustomHeader } from "./lib/headers/CustomHeader";
-export { default as DateHeader } from "./lib/headers/DateHeader";
+export { default as TimelineMarkers } from "./markers/public/TimelineMarkers";
+export { default as TodayMarker } from "./markers/public/TodayMarker";
+export { default as CustomMarker } from "./markers/public/CustomMarker";
+export { default as CursorMarker } from "./markers/public/CursorMarker";
+export { default as TimelineHeaders } from "./headers/TimelineHeaders";
+export { default as SidebarHeader } from "./headers/SidebarHeader";
+export { default as CustomHeader } from "./headers/CustomHeader";
+export { default as DateHeader } from "./headers/DateHeader";
 export default Timeline;

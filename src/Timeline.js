@@ -8,7 +8,7 @@ import Columns from "./columns/Columns";
 import GroupRows from "./row/GroupRows";
 import ScrollElement from "./scroll/ScrollElement";
 import MarkerCanvas from "./markers/MarkerCanvas";
-import windowResizeDetector from "../resize-detector/window";
+import windowResizeDetector from "./resizeDetector/window";
 
 import {
     getMinUnit,
