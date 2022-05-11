@@ -11,136 +11,49 @@ import type React from "react";
 import type { Moment } from "moment";
 
 import type {
+    CompleteTimeSteps,
     Id as Id_,
+    ItemContext as ItemContext_,
+    ItemProps as ItemProps_,
+    ItemRendererResizeProps as ItemRendererResizeProps_,
     ITimeSteps as ITimeSteps_,
+    LabelFormat as LabelFormat_,
     ResizeOptions as ResizeOptions_,
+    ResizeStyles as ResizeStyles_,
     TimelineContext as TimelineContext_,
     TimelineGroupBase as TimelineGroupBase_,
     TimelineItemBase as TimelineItemBase_,
     TimelineItemEdge as TimelineItemEdge_,
     TimelineKeys as TimelineKeys_,
+    TimeFormat as TimeFormat_,
     TimeUnit as TimeUnit_,
 } from "./types";
 
 declare module "@mil/itch" {
     export type Id = Id_;
+    export type ItemContext = ItemContext_;
+    export type ItemProps = ItemProps_;
+    export type ItemRendererResizeProps = ItemRendererResizeProps_;
     export type ITimeSteps = ITimeSteps_;
+    export type LabelFormat = LabelFormat_;
     export type ResizeOptions = ResizeOptions_;
+    export type ResizeStyles = ResizeStyles_;
     export type TimelineContext = TimelineContext_;
     export type TimelineGroupBase = TimelineGroupBase_;
     export type TimelineItemBase = TimelineItemBase_;
     export type TimelineItemEdge = TimelineItemEdge_;
     export type TimelineKeys = TimelineKeys_;
+    export type TimeFormat = TimeFormat_;
     export type TimeUnit = TimeUnit_;
 
     export type TimelineItem<CustomItemFields> = TimelineItemBase & CustomItemFields;
     export type TimelineGroup<CustomGroupFields> = TimelineGroupBase & CustomGroupFields;
 
-    export interface ItemContext {
-        dimensions: {
-            collisionLeft: number;
-            collisionWidth: number;
-            height: number;
-            isDragging: boolean;
-            left: number;
-            order: {
-                group: {
-                    id: string;
-                };
-                index: number;
-            };
-            originalLeft: number;
-            stack: boolean;
-            top: number | null;
-            width: number;
-        };
-        useResizeHandle: boolean;
-        title: string;
-        canMove: boolean;
-        canResizeLeft: boolean;
-        canResizeRight: boolean;
-        selected: boolean;
-        dragging: boolean;
-        dragStart: {
-            x: number;
-            y: number;
-        };
-        dragTime: number;
-        dragGroupDelta: number;
-        resizing: boolean;
-        resizeEdge: TimelineItemEdge;
-        resizeStart: number;
-        resizeTime: number;
-        width: boolean;
-    }
-
-    export interface TimeFormat {
-        long: string;
-        mediumLong: string;
-        medium: string;
-        short: string;
-    }
-
-    export interface LabelFormat {
-        year: TimeFormat;
-        month: TimeFormat;
-        week: TimeFormat;
-        day: TimeFormat;
-        hour: TimeFormat;
-        minute: TimeFormat;
-    }
-
-    export interface ItemRendererGetItemPropsReturnType {
-        key: Id;
-        ref: React.Ref<any>;
-        className: string;
-        onMouseDown: React.MouseEventHandler;
-        onMouseUp: React.MouseEventHandler;
-        onTouchStart: React.TouchEventHandler;
-        onTouchEnd: React.TouchEventHandler;
-        onDoubleClick: React.MouseEventHandler;
-        onContextMenu: React.ReactEventHandler;
-        style: React.CSSProperties;
-    }
-
-    export type GetItemsProps = Partial<Omit<ItemRendererGetItemPropsReturnType, "key" | "ref">>;
-
-    export interface ItemRendererGetResizePropsReturnType {
-        left?: {
-            ref: React.Ref<any>;
-            className: string;
-            style: React.CSSProperties;
-        };
-        right?: {
-            ref: React.Ref<any>;
-            className: string;
-            style: React.CSSProperties;
-        };
-    }
-
-    export type GetResizeProps = {
-        leftStyle?: React.CSSProperties;
-        rightStyle?: React.CSSProperties;
-        leftClassName?: string;
-        rightClassName?: string;
-    };
-
     export interface ReactCalendarItemRendererProps<CustomItem extends TimelineItemBase = TimelineItemBase> {
         item: CustomItem;
         itemContext: ItemContext;
-        getItemProps: (props: GetItemsProps) => {
-            key: Id;
-            ref: React.Ref<any>;
-            className: string;
-            onMouseDown: React.MouseEventHandler;
-            onMouseUp: React.MouseEventHandler;
-            onTouchStart: React.TouchEventHandler;
-            onTouchEnd: React.TouchEventHandler;
-            onDoubleClick: React.MouseEventHandler;
-            onContextMenu: React.ReactEventHandler;
-            style: React.CSSProperties;
-        };
-        getResizeProps: (propsOverride?: GetResizeProps) => ItemRendererGetResizePropsReturnType;
+        getItemProps: (props: Partial<Omit<ItemProps, "key" | "ref">>) => ItemProps;
+        getResizeProps: (propsOverride?: ResizeStyles) => ItemRendererResizeProps;
     }
 
     export interface ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase = TimelineGroupBase> {
@@ -321,7 +234,7 @@ declare module "@mil/itch" {
     export class CustomHeader<Data = any> extends React.Component<CustomHeaderProps<Data>> {}
 
     export const defaultKeys: TimelineKeys;
-    export const defaultTimeSteps: ITimeSteps;
+    export const defaultTimeSteps: CompleteTimeSteps;
     export const defaultHeaderFormats: LabelFormat;
 
     export default class ReactCalendarTimeline<
