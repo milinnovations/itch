@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import PreventClickOnDrag from "../interaction/PreventClickOnDrag";
+import { PreventClickOnDrag } from "../interaction/PreventClickOnDrag";
 
 class GroupRow extends Component {
     static propTypes = {
@@ -40,19 +40,24 @@ class GroupRow extends Component {
         }
 
         return (
-            <PreventClickOnDrag clickTolerance={clickTolerance} onClick={onClick}>
-                <div
-                    onContextMenu={onContextMenu}
-                    onDoubleClick={onDoubleClick}
-                    onDragOver={this.handleDragOver}
-                    onDrop={onDrop}
-                    className={
-                        (isEvenRow ? "rct-hl-even " : "rct-hl-odd ") +
-                        (classNamesForGroup ? classNamesForGroup.join(" ") : "")
-                    }
-                    style={style}
-                />
-            </PreventClickOnDrag>
+            <PreventClickOnDrag
+                clickTolerance={clickTolerance}
+                onClick={onClick}
+                renderChildren={childProps => (
+                    <div
+                        {...childProps}
+                        onContextMenu={onContextMenu}
+                        onDoubleClick={onDoubleClick}
+                        onDragOver={this.handleDragOver}
+                        onDrop={onDrop}
+                        className={
+                            (isEvenRow ? "rct-hl-even " : "rct-hl-odd ") +
+                            (classNamesForGroup ? classNamesForGroup.join(" ") : "")
+                        }
+                        style={style}
+                    />
+                )}
+            ></PreventClickOnDrag>
         );
     }
 }
