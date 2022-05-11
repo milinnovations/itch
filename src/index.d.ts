@@ -14,7 +14,6 @@ import type {
     CompleteTimeSteps,
     Id as Id_,
     ItemContext as ItemContext_,
-    ItemProps as ItemProps_,
     ItemRendererResizeProps as ItemRendererResizeProps_,
     ITimeSteps as ITimeSteps_,
     LabelFormat as LabelFormat_,
@@ -34,7 +33,6 @@ import type {
 declare module "@mil/itch" {
     export type Id = Id_;
     export type ItemContext = ItemContext_;
-    export type ItemProps = ItemProps_;
     export type ItemRendererResizeProps = ItemRendererResizeProps_;
     export type ITimeSteps = ITimeSteps_;
     export type LabelFormat = LabelFormat_;
@@ -56,7 +54,7 @@ declare module "@mil/itch" {
     export interface ReactCalendarItemRendererProps<CustomItem extends TimelineItemBase = TimelineItemBase> {
         item: CustomItem;
         itemContext: ItemContext;
-        getItemProps: (props: Partial<Omit<ItemProps, "key" | "ref">>) => ItemProps;
+        getItemProps: (props: Partial<Omit<TimelineItemProps, "key" | "ref">>) => TimelineItemProps;
         getResizeProps: (propsOverride?: ResizeStyles) => ItemRendererResizeProps;
     }
 

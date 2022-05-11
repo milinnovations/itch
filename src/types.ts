@@ -57,7 +57,18 @@ export type TimelineItemBase = {
     itemProps?: React.HTMLAttributes<HTMLDivElement>;
 };
 
-export type TimelineItemProps = {};
+export type TimelineItemProps = {
+    key: Id;
+    ref: React.Ref<any>;
+    className: string;
+    onMouseDown: React.MouseEventHandler;
+    onMouseUp: React.MouseEventHandler;
+    onTouchStart: React.TouchEventHandler;
+    onTouchEnd: React.TouchEventHandler;
+    onDoubleClick: React.MouseEventHandler;
+    onContextMenu: React.ReactEventHandler;
+    style: React.CSSProperties;
+};
 
 export type TimelineKeys = {
     groupIdKey: string;
@@ -123,19 +134,6 @@ export type LabelFormat = {
     day: TimeFormat;
     hour: TimeFormat;
     minute: TimeFormat;
-};
-
-export type ItemProps = {
-    key: Id;
-    ref: React.Ref<any>;
-    className: string;
-    onMouseDown: React.MouseEventHandler;
-    onMouseUp: React.MouseEventHandler;
-    onTouchStart: React.TouchEventHandler;
-    onTouchEnd: React.TouchEventHandler;
-    onDoubleClick: React.MouseEventHandler;
-    onContextMenu: React.ReactEventHandler;
-    style: React.CSSProperties;
 };
 
 type ItemRendererSideResizeProps = {
