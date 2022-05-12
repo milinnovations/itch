@@ -5,7 +5,7 @@ import moment from "moment";
 import Items from "./items/Items";
 import Sidebar from "./layout/Sidebar";
 import Columns from "./columns/Columns";
-import GroupRows from "./row/GroupRows";
+import { GroupRows } from "./row/GroupRows";
 import ScrollElement from "./scroll/ScrollElement";
 import MarkerCanvas from "./markers/MarkerCanvas";
 import windowResizeDetector from "./resizeDetector/window";
