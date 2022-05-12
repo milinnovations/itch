@@ -52,7 +52,8 @@ module.exports = {
         eqeqeq: ["error", "always"],
 
         // Variables whose names begin with an underscore allow to be unused
-        "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
 
         "react/display-name": ["off"],
         // I see no reason to check prop types when we already use Typescript, and it has some false positives

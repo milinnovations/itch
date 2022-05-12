@@ -182,7 +182,7 @@ export default class ReactCalendarTimeline extends Component {
 
         stackItems: false,
 
-        horizontalLineClassNamesForGroup: null,
+        horizontalLineClassNamesForGroup: undefined,
 
         onItemMove: null,
         onItemResize: null,

@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React, { Component } from "react";
-import GroupRow from "./GroupRow";
+
+import { GroupRow } from "./GroupRow";
 
 export default class GroupRows extends Component {
     static propTypes = {
