@@ -11,8 +11,8 @@ import type {
     TimeUnit,
 } from "../types";
 
-export type GroupOrder = { index: number; group: TimelineGroupBase };
-export type GroupOrders = Record<string | number, GroupOrder>;
+export type GroupOrder<TGroup extends TimelineGroupBase> = { index: number; group: TGroup };
+export type GroupOrders<TGroup extends TimelineGroupBase> = Record<string | number, GroupOrder<TGroup>>;
 
 export type VerticalDimensions = {
     left: number;
@@ -21,16 +21,16 @@ export type VerticalDimensions = {
     collisionWidth: number;
 };
 
-export type Dimensions = VerticalDimensions & {
+export type Dimensions<TGroup extends TimelineGroupBase> = VerticalDimensions & {
     top: number | null;
-    order: GroupOrder;
+    order: GroupOrder<TGroup>;
     stack: boolean;
     height: number;
 };
 
-export type ItemDimensions = {
+export type ItemDimensions<TGroup extends TimelineGroupBase> = {
     id: Id;
-    dimensions: Dimensions;
+    dimensions: Dimensions<TGroup>;
 };
 
 /**
@@ -39,6 +39,7 @@ export type ItemDimensions = {
  * @param canvasTimeStart The millisecond value at the left edge of the canvas.
  * @param canvasTimeEnd The millisecond value at the right edge of the canvas.
  * @param canvasWidth The width of the canvas in pixels.
+ *
  * @returns The time represented by a single pixel on the canvas in milliseconds.
  */
 export function millisecondsInPixel(canvasTimeStart: number, canvasTimeEnd: number, canvasWidth: number): number {
@@ -52,6 +53,7 @@ export function millisecondsInPixel(canvasTimeStart: number, canvasTimeEnd: numb
  * @param canvasTimeEnd The millisecond value at the right edge of the canvas.
  * @param canvasWidth The width of the canvas in pixels.
  * @param time The time to get the X position for.
+ *
  * @returns The X position on the canvas representing the given time in pixels.
  */
 export function calculateXPositionForTime(
@@ -74,6 +76,7 @@ export function calculateXPositionForTime(
  * @param canvasTimeEnd The millisecond value at the right edge of the canvas.
  * @param canvasWidth The width of the canvas in pixels.
  * @param leftOffset The X position in pixels to calculate the time for.
+ *
  * @returns The time represented by the given X position (leftOffset).
  */
 export function calculateTimeForXPosition(
@@ -158,7 +161,7 @@ const timeDividers: CompleteTimeSteps = {
  * @param timeSteps Map of time units with number to indicate step of each unit.
  */
 export function getMinUnit(zoom: number, width: number, timeSteps: ITimeSteps) {
-    let minUnit = "year";
+    let minUnit: TimeUnit = "year";
 
     // this timespan is in ms initially
     let nextTimeSpanInUnitContext = zoom;
@@ -258,6 +261,7 @@ function calculateInteractionNewTimes({
  * @param canvasTimeStart The start time of the canvas in milliseconds.
  * @param canvasTimeEnd The end time of the canvas in milliseconds.
  * @param canvasWidth The width of the canvas in pixels.
+ *
  * @returns The dimensions of the item where left is the start position on the canvas in pixels, width is also measured in pixels,
  *          collisionLeft is the start time in milliseconds, collisionWidth is the duration in milliseconds.
  */
@@ -299,12 +303,16 @@ function calculateDimensions({
  *
  * @param groups Array of groups.
  * @param keys The keys object.
+ *
  * @returns Ordered hash from group ids to the group index in the array and the group itself.
  */
-export function getGroupOrders(groups: TimelineGroupBase[], keys: TimelineKeys): GroupOrders {
+export function getGroupOrders<TGroup extends TimelineGroupBase>(
+    groups: TGroup[],
+    keys: TimelineKeys,
+): GroupOrders<TGroup> {
     const { groupIdKey } = keys;
 
-    let groupOrders: GroupOrders = {};
+    const groupOrders: GroupOrders<TGroup> = {};
 
     for (let i = 0; i < groups.length; i++) {
         groupOrders[_get(groups[i], groupIdKey)] = { index: i, group: groups[i] };
@@ -315,12 +323,16 @@ export function getGroupOrders(groups: TimelineGroupBase[], keys: TimelineKeys):
 
 /**
  * Adds items relevant to each group to the result of getGroupOrders
- * @param items list of all items
- * @param groupOrders the result of getGroupOrders
+ *
+ * @param items List of all items.
+ * @param groupOrders The result of `getGroupOrders`.
  */
-function getGroupedItems(items: ItemDimensions[], groupOrders: GroupOrders) {
-    let groupedItems: { index: number; group: TimelineGroupBase; items: ItemDimensions[] }[] = [];
-    let keys = Object.keys(groupOrders);
+function getGroupedItems<TGroup extends TimelineGroupBase>(
+    items: ItemDimensions<TGroup>[],
+    groupOrders: GroupOrders<TGroup>,
+) {
+    const groupedItems: { index: number; group: TGroup; items: ItemDimensions<TGroup>[] }[] = [];
+    const keys = Object.keys(groupOrders);
     // Initialize with result object for each group
     for (let i = 0; i < keys.length; i++) {
         const groupOrder = groupOrders[keys[i]];
@@ -353,8 +365,8 @@ function getGroupedItems(items: ItemDimensions[], groupOrders: GroupOrders) {
  * @param keys The keys object.
  * @returns The filtered list of timeline items.
  */
-export function getVisibleItems(
-    items: TimelineItemBase[],
+export function getVisibleItems<TItem extends TimelineItemBase>(
+    items: TItem[],
     canvasTimeStart: number,
     canvasTimeEnd: number,
     keys: TimelineKeys,
@@ -372,11 +384,15 @@ const EPSILON = 0.001;
  * Calculates whether two items are colliding on the chart.
  * @param a  The dimensions of the first item. Its 'top' should not be null when this function is called.
  * @param b  The dimensions of the second item. Its 'top' should not be null when this function is called.
- * @param lineHeight  Unused parameter to confuse developers.
  * @param collisionPadding  A small collision padding, so touching items don't collide due to a rounding error.
+ *
  * @returns  True if the two items overlap.
  */
-function collision(a: Dimensions, b: Dimensions, collisionPadding = EPSILON): boolean {
+function collision<TGroup extends TimelineGroupBase>(
+    a: Dimensions<TGroup>,
+    b: Dimensions<TGroup>,
+    collisionPadding = EPSILON,
+): boolean {
     if (a.top === null || b.top === null) {
         // This function should not be called before the item top is set for both items.
         return false;
@@ -401,12 +417,13 @@ function collision(a: Dimensions, b: Dimensions, collisionPadding = EPSILON): bo
  * @param groupHeight  The current group height in pixels (calculated by previously stacked items).
  * @param groupTop  The top position of the group in pixels.
  * @param itemIndex  The index of the 'item' within 'group'.
+ *
  * @returns  A potentially increased group height.
  */
-function groupStack(
+function groupStack<TGroup extends TimelineGroupBase>(
     lineHeight: number,
-    item: ItemDimensions,
-    group: ItemDimensions[],
+    item: ItemDimensions<TGroup>,
+    group: ItemDimensions<TGroup>[],
     groupHeight: number,
     groupTop: number,
     itemIndex: number,
@@ -456,9 +473,15 @@ function groupStack(
  * @param item  The item to calculate the position for.
  * @param groupHeight  The current group height in pixels (calculated by previously stacked items).
  * @param groupTop  The top position of the group in pixels.
+ *
  * @returns  A potentially increased group height.
  */
-function groupNoStack(lineHeight: number, item: ItemDimensions, groupHeight: number, groupTop: number): number {
+function groupNoStack<TGroup extends TimelineGroupBase>(
+    lineHeight: number,
+    item: ItemDimensions<TGroup>,
+    groupHeight: number,
+    groupTop: number,
+): number {
     let verticalMargin = (lineHeight - item.dimensions.height) / 2;
     if (item.dimensions.top === null) {
         item.dimensions.top = groupTop + verticalMargin;
@@ -474,11 +497,12 @@ function groupNoStack(lineHeight: number, item: ItemDimensions, groupHeight: num
  * @param groupOrders  The groupOrders object.
  * @param lineHeight  The height of a single line in pixels.
  * @param stackItems  Whether items should be stacked by default.
+ *
  * @returns  The height of the whole chart, the height of each group, and the top position of each group.
  */
-function stackAll(
-    itemsDimensions: ItemDimensions[],
-    groupOrders: GroupOrders,
+function stackAll<TGroup extends TimelineGroupBase>(
+    itemsDimensions: ItemDimensions<TGroup>[],
+    groupOrders: GroupOrders<TGroup>,
     lineHeight: number,
     stackItems: boolean,
 ) {
@@ -524,10 +548,11 @@ function stackAll(
  * @param isGroupStacked  Whether items in the group should stack.
  * @param lineHeight  The line height in pixels.
  * @param groupTop  The top position of the group.
+ *
  * @returns  The calculated height of the group.
  */
-function stackGroup(
-    itemsDimensions: ItemDimensions[],
+function stackGroup<TGroup extends TimelineGroupBase>(
+    itemsDimensions: ItemDimensions<TGroup>[],
     isGroupStacked: boolean,
     lineHeight: number,
     groupTop: number,
@@ -573,9 +598,9 @@ function stackGroup(
  * @returns  The calculated item dimensions, the height of the whole chart, the height of
  *           each group, and the top position for each group.
  */
-export function stackTimelineItems(
-    items: TimelineItemBase[],
-    groups: TimelineGroupBase[],
+export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>(
+    items: TItem[],
+    groups: TGroup[],
     canvasWidth: number,
     canvasTimeStart: number,
     canvasTimeEnd: number,
@@ -655,9 +680,10 @@ export function getCanvasWidth(width: number, buffer = 3) {
  * @param groupOrders  The group orders.
  * @param lineHeight  The height of a row in pixels.
  * @param itemHeightRatio  The ratio of the height of an item to the height of the row.
+ *
  * @returns  The calculated dimensions the item.
  */
-function getItemDimensions({
+function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>({
     item,
     keys,
     canvasTimeStart,
@@ -667,15 +693,15 @@ function getItemDimensions({
     lineHeight,
     itemHeightRatio,
 }: {
-    item: TimelineItemBase;
+    item: TItem;
     keys: TimelineKeys;
     canvasTimeStart: number;
     canvasTimeEnd: number;
     canvasWidth: number;
-    groupOrders: GroupOrders;
+    groupOrders: GroupOrders<TGroup>;
     lineHeight: number;
     itemHeightRatio: number;
-}): { id: Id; dimensions: Dimensions } {
+}): { id: Id; dimensions: Dimensions<TGroup> } {
     const itemId = _get(item, keys.itemIdKey);
     const verticalDimensions: VerticalDimensions = calculateDimensions({
         itemTimeStart: _get(item, keys.itemTimeStartKey),
@@ -713,9 +739,10 @@ function getItemDimensions({
  * @param resizeTime  The current resize position in milliseconds.
  * @param groups  The groups of the chart.
  * @param newGroupOrder  The index of the group the dragged item is being dragged into.
+ *
  * @returns  A new item object with updated properties.
  */
-function getItemWithInteractions({
+function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>({
     item,
     keys,
     draggingItem,
@@ -726,14 +753,14 @@ function getItemWithInteractions({
     groups,
     newGroupOrder,
 }: {
-    item: TimelineItemBase;
+    item: TItem;
     keys: TimelineKeys;
     draggingItem: Id;
     resizingItem: Id;
     dragTime: number;
     resizingEdge: "left" | "right";
     resizeTime: number;
-    groups: TimelineGroupBase[];
+    groups: TGroup[];
     newGroupOrder: number;
 }) {
     if (!resizingItem && !draggingItem) return item;
@@ -783,14 +810,15 @@ export function getCanvasBoundariesFromVisibleTime(visibleTimeStart: number, vis
  * @param groups  All the groups of the timeline.
  * @param props  The props of the Timeline.
  * @param state  The state of the Timeline.
+ *
  * @returns  An object containing some updates to the state of the Timeline.
  */
-export function calculateScrollCanvas(
+export function calculateScrollCanvas<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>(
     visibleTimeStart: number,
     visibleTimeEnd: number,
     forceUpdateDimensions: boolean,
-    items: TimelineItemBase[],
-    groups: TimelineGroupBase[],
+    items: TItem[],
+    groups: TGroup[],
     props: any,
     state: any,
 ) {
