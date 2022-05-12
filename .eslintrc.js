@@ -10,7 +10,7 @@ module.exports = {
         "plugin:@typescript-eslint/recommended",
 
         // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
-        "prettier/@typescript-eslint",
+        "prettier",
 
         // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
         "plugin:prettier/recommended",

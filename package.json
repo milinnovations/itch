@@ -12,7 +12,9 @@
     "scripts": {
         "build": "npx rimraf ./lib && tsc && tsc-alias sass src/Timeline.scss lib/Timeline.css",
         "prepare": "npm run build",
-        "build-to": "npm run build && mkdir -p $npm_config_destination/node_modules/@mil/itch && cp -rf ./lib ./src ./package.json ./LICENSE ./README.md $npm_config_destination/node_modules/@mil/itch"
+        "build-to": "npm run build && mkdir -p $npm_config_destination/node_modules/@mil/itch && cp -rf ./lib ./src ./package.json ./LICENSE ./README.md $npm_config_destination/node_modules/@mil/itch",
+        "lint": "eslint \"./**/*.ts\" \"./**/*.tsx\" --ignore-pattern \"node_modules/\" --ignore-pattern \"./lib/\" ",
+        "lint:fix": "eslint \"./**/*.ts\" \"./**/*.tsx\" --ignore-pattern \"node_modules/\" --ignore-pattern \"./lib/\" --fix "
     },
     "typings": "./src/index.d.ts",
     "files": [
@@ -35,13 +37,15 @@
     "devDependencies": {
         "@types/lodash.isequal": "^4.5.6",
         "@types/react": "^17.0.9",
-        "@typescript-eslint/eslint-plugin": "^4.26.0",
-        "@typescript-eslint/parser": "^4.26.0",
-        "eslint": "^7.27.0",
-        "eslint-config-prettier": "^8.3.0",
-        "eslint-plugin-prettier": "^3.4.0",
+        "@typescript-eslint/eslint-plugin": "^5.23.0",
+        "@typescript-eslint/parser": "^5.23.0",
+        "eslint": "^8.15.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-react": "^7.29.4",
+        "eslint-plugin-react-hooks": "^4.5.0",
         "moment": "^2.11.1",
-        "prettier": "^2.3.0",
+        "prettier": "^2.6.2",
         "prop-types": "^15.6.2",
         "react": ">=17.0.2",
         "react-dom": ">=17.0.2",
