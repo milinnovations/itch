@@ -84,6 +84,45 @@ export function calculateTimeForXPosition(
 }
 
 /**
+ * Iterates over time units in a time window and yields the start and end of the time unit
+ * at each step.
+ *
+ * For example it yield every time instant that represents the beginning of a day between
+ * two dates. The first yield will include the start time, so it could easily represent an
+ * interval that actually starts before the start time. The last yielded interval will
+ * similarly include the end time.
+ *
+ * @param start Where the iteration starts in milliseconds.
+ * @param end Where the iteration ends in milliseconds.
+ * @param unit The unit of the iteration (for example days).
+ * @param timeSteps An object describing how many steps to go in each iteration depending on the unit.
+ */
+export function* generateTimes(
+    start: number,
+    end: number,
+    unit: TimeUnit,
+    timeSteps: ITimeSteps,
+): Generator<[Moment, Moment], void, void> {
+    let time = moment(start).startOf(unit);
+    const steps = timeSteps[unit] ?? 1;
+
+    // If we need to go more steps in an iteration (like iterate every 30 minutes), we need to find the
+    // last "whole" time before the start. So if start is at 2022.05.05.10:34, we will iterate like
+    // 2022.05.05.10:30, 2022.05.05.11:00 and so on (and not 2022.05.05.10:34, 2022.05.05.11:04, ...).
+    if (steps > 1) {
+        const value = time.get(unit);
+        time.set(unit, value - (value % steps));
+    }
+
+    // The actual iteration
+    while (time.valueOf() < end) {
+        const nextTime = moment(time).add(steps, unit);
+        yield [time, nextTime];
+        time = nextTime;
+    }
+}
+
+/**
  * Iterates over time units in a time window and calls a callback at each step. For example it
  * calls the callback with every time instant that represents the beginning of a day between
  * two dates. The first call of the callback function will include the start time, so it could
@@ -103,22 +142,8 @@ export function iterateTimes(
     timeSteps: ITimeSteps,
     callback: (time: Moment, nextTime: Moment) => void,
 ): void {
-    let time = moment(start).startOf(unit);
-    const steps = timeSteps[unit] ?? 1;
-
-    // If we need to go more steps in an iteration (like iterate every 30 minutes), we need to find the
-    // last "whole" time before the start. So if start is at 2022.05.05.10:34, we will iterate like
-    // 2022.05.05.10:30, 2022.05.05.11:00 and so on (and not 2022.05.05.10:34, 2022.05.05.11:04, ...).
-    if (steps > 1) {
-        const value = time.get(unit);
-        time.set(unit, value - (value % steps));
-    }
-
-    // The actual iteration
-    while (time.valueOf() < end) {
-        const nextTime = moment(time).add(steps, unit);
+    for (const [time, nextTime] of generateTimes(start, end, unit, timeSteps)) {
         callback(time, nextTime);
-        time = nextTime;
     }
 }
 

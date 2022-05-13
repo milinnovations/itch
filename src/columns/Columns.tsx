@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 
 import type { CompleteTimeSteps, TimeUnit } from "../types";
-import { iterateTimes } from "../utility/calendar";
+import { generateTimes } from "../utility/calendar";
+import { map } from "../utility/generators";
 import { TimelineStateConsumer } from "../timeline/TimelineStateContext";
 
 type BaseProps = {
@@ -44,40 +45,40 @@ class Columns extends Component<Props> {
             verticalLineClassNamesForTime,
             getLeftOffsetFromDate,
         } = this.props;
-        const lines: React.ReactNode[] = [];
+        const lines: React.ReactNode[] = Array.from(
+            map(generateTimes(canvasTimeStart, canvasTimeEnd, minUnit, timeSteps), ([time, nextTime]) => {
+                const minUnitValue = time.get(minUnit === "day" ? "date" : minUnit);
+                const firstOfType = minUnitValue === (minUnit === "day" ? 1 : 0);
 
-        iterateTimes(canvasTimeStart, canvasTimeEnd, minUnit, timeSteps, (time, nextTime) => {
-            const minUnitValue = time.get(minUnit === "day" ? "date" : minUnit);
-            const firstOfType = minUnitValue === (minUnit === "day" ? 1 : 0);
+                const classNames: string[] = [
+                    "rct-vl",
+                    firstOfType ? " rct-vl-first" : "",
+                    minUnit === "day" || minUnit === "hour" || minUnit === "minute" ? ` rct-day-${time.day()} ` : "",
+                    ...(verticalLineClassNamesForTime
+                        ? verticalLineClassNamesForTime(
+                              time.unix() * 1000, // turn into ms, which is what verticalLineClassNamesForTime expects
+                              nextTime.unix() * 1000 - 1,
+                          ) ?? []
+                        : []),
+                ];
 
-            const classNames: string[] = [
-                "rct-vl",
-                firstOfType ? " rct-vl-first" : "",
-                minUnit === "day" || minUnit === "hour" || minUnit === "minute" ? ` rct-day-${time.day()} ` : "",
-                ...(verticalLineClassNamesForTime
-                    ? verticalLineClassNamesForTime(
-                          time.unix() * 1000, // turn into ms, which is what verticalLineClassNamesForTime expects
-                          nextTime.unix() * 1000 - 1,
-                      ) ?? []
-                    : []),
-            ];
-
-            const left = getLeftOffsetFromDate(time.valueOf());
-            const right = getLeftOffsetFromDate(nextTime.valueOf());
-            lines.push(
-                <div
-                    key={`line-${time.valueOf()}`}
-                    className={classNames.join(" ")}
-                    style={{
-                        pointerEvents: "none",
-                        top: "0px",
-                        left: `${left}px`,
-                        width: `${right - left}px`,
-                        height: `${height}px`,
-                    }}
-                />,
-            );
-        });
+                const left = getLeftOffsetFromDate(time.valueOf());
+                const right = getLeftOffsetFromDate(nextTime.valueOf());
+                return (
+                    <div
+                        key={`line-${time.valueOf()}`}
+                        className={classNames.join(" ")}
+                        style={{
+                            pointerEvents: "none",
+                            top: "0px",
+                            left: `${left}px`,
+                            width: `${right - left}px`,
+                            height: `${height}px`,
+                        }}
+                    />
+                );
+            }),
+        );
 
         return <div className="rct-vertical-lines">{lines}</div>;
     }
