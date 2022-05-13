@@ -70,18 +70,6 @@ export type TimelineItemProps = {
     style: React.CSSProperties;
 };
 
-export type TimelineKeys = {
-    groupIdKey: string;
-    groupTitleKey: string;
-    groupRightTitleKey: string;
-    itemIdKey: string;
-    itemTitleKey: string;
-    itemDivTitleKey: string;
-    itemGroupKey: string;
-    itemTimeStartKey: string;
-    itemTimeEndKey: string;
-};
-
 export type ItemContext = {
     dimensions: {
         collisionLeft: number;

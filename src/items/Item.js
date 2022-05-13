@@ -38,7 +38,6 @@ export default class Item extends Component {
         canResizeLeft: PropTypes.bool.isRequired,
         canResizeRight: PropTypes.bool.isRequired,
 
-        keys: PropTypes.object.isRequired,
         item: PropTypes.object.isRequired,
 
         onSelect: PropTypes.func,
@@ -97,7 +96,6 @@ export default class Item extends Component {
             nextState.dragGroupDelta !== this.state.dragGroupDelta ||
             nextState.resizing !== this.state.resizing ||
             nextState.resizeTime !== this.state.resizeTime ||
-            nextProps.keys !== this.props.keys ||
             !deepObjectCompare(nextProps.itemProps, this.props.itemProps) ||
             nextProps.selected !== this.props.selected ||
             nextProps.item !== this.props.item ||
@@ -118,11 +116,11 @@ export default class Item extends Component {
     }
 
     cacheDataFromProps(props) {
-        this.itemId = _get(props.item, props.keys.itemIdKey);
-        this.itemTitle = _get(props.item, props.keys.itemTitleKey);
-        this.itemDivTitle = props.keys.itemDivTitleKey ? _get(props.item, props.keys.itemDivTitleKey) : this.itemTitle;
-        this.itemTimeStart = _get(props.item, props.keys.itemTimeStartKey);
-        this.itemTimeEnd = _get(props.item, props.keys.itemTimeEndKey);
+        this.itemId = _get(props.item, "id");
+        this.itemTitle = _get(props.item, "title");
+        this.itemDivTitle = this.itemTitle;
+        this.itemTimeStart = _get(props.item, "start_time");
+        this.itemTimeEnd = _get(props.item, "end_time");
     }
 
     getTimeRatio() {
@@ -161,11 +159,7 @@ export default class Item extends Component {
     }
 
     timeFor(e) {
-        const ratio = millisecondsInPixel(
-            this.props.canvasTimeStart,
-            this.props.canvasTimeEnd,
-            this.props.canvasWidth,
-        );
+        const ratio = millisecondsInPixel(this.props.canvasTimeStart, this.props.canvasTimeEnd, this.props.canvasWidth);
 
         const offset = getSumOffset(this.props.scrollRef).offsetLeft;
         const scrolls = getSumScroll(this.props.scrollRef);

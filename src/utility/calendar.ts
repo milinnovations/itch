@@ -1,15 +1,7 @@
 import moment from "moment";
 import type { Moment } from "moment";
 import { _get } from "./generic";
-import type {
-    CompleteTimeSteps,
-    Id,
-    ITimeSteps,
-    TimelineGroupBase,
-    TimelineItemBase,
-    TimelineKeys,
-    TimeUnit,
-} from "../types";
+import type { CompleteTimeSteps, Id, ITimeSteps, TimelineGroupBase, TimelineItemBase, TimeUnit } from "../types";
 
 export type GroupOrder<TGroup extends TimelineGroupBase> = { index: number; group: TGroup };
 export type GroupOrders<TGroup extends TimelineGroupBase> = Record<string | number, GroupOrder<TGroup>>;
@@ -118,13 +110,13 @@ export function iterateTimes(
     // last "whole" time before the start. So if start is at 2022.05.05.10:34, we will iterate like
     // 2022.05.05.10:30, 2022.05.05.11:00 and so on (and not 2022.05.05.10:34, 2022.05.05.11:04, ...).
     if (steps > 1) {
-        let value = time.get(unit);
+        const value = time.get(unit);
         time.set(unit, value - (value % steps));
     }
 
     // The actual iteration
     while (time.valueOf() < end) {
-        let nextTime = moment(time).add(steps, unit);
+        const nextTime = moment(time).add(steps, unit);
         callback(time, nextTime);
         time = nextTime;
     }
@@ -302,20 +294,14 @@ function calculateDimensions({
  * Get the order of groups based on their keys.
  *
  * @param groups Array of groups.
- * @param keys The keys object.
  *
  * @returns Ordered hash from group ids to the group index in the array and the group itself.
  */
-export function getGroupOrders<TGroup extends TimelineGroupBase>(
-    groups: TGroup[],
-    keys: TimelineKeys,
-): GroupOrders<TGroup> {
-    const { groupIdKey } = keys;
-
+export function getGroupOrders<TGroup extends TimelineGroupBase>(groups: TGroup[]): GroupOrders<TGroup> {
     const groupOrders: GroupOrders<TGroup> = {};
 
     for (let i = 0; i < groups.length; i++) {
-        groupOrders[_get(groups[i], groupIdKey)] = { index: i, group: groups[i] };
+        groupOrders[_get(groups[i], "id")] = { index: i, group: groups[i] };
     }
 
     return groupOrders;
@@ -362,19 +348,16 @@ function getGroupedItems<TGroup extends TimelineGroupBase>(
  * @param items The timeline items to filter.
  * @param canvasTimeStart The start time of the canvas in milliseconds.
  * @param canvasTimeEnd The end time of the canvas in milliseconds.
- * @param keys The keys object.
+ *
  * @returns The filtered list of timeline items.
  */
 export function getVisibleItems<TItem extends TimelineItemBase>(
     items: TItem[],
     canvasTimeStart: number,
     canvasTimeEnd: number,
-    keys: TimelineKeys,
 ) {
-    const { itemTimeStartKey, itemTimeEndKey } = keys;
-
     return items.filter(item => {
-        return _get(item, itemTimeStartKey) <= canvasTimeEnd && _get(item, itemTimeEndKey) >= canvasTimeStart;
+        return _get(item, "start_time") <= canvasTimeEnd && _get(item, "end_time") >= canvasTimeStart;
     });
 }
 
@@ -430,16 +413,16 @@ function groupStack<TGroup extends TimelineGroupBase>(
 ): number {
     // calculate non-overlapping positions
     let curHeight = groupHeight;
-    let verticalMargin = (lineHeight - item.dimensions.height) / 2;
+    const verticalMargin = (lineHeight - item.dimensions.height) * 0.5;
     if (item.dimensions.stack && item.dimensions.top === null) {
         item.dimensions.top = groupTop + verticalMargin;
         curHeight = Math.max(curHeight, lineHeight);
-        let collidingItem;
+        let collidingItem: ItemDimensions<TGroup> | null;
         do {
             collidingItem = null;
             //Items are placed from i=0 onwards, only check items with index < i
             for (let j = itemIndex - 1; j >= 0; j--) {
-                let other = group[j];
+                const other = group[j];
                 if (
                     other.dimensions.top !== null &&
                     other.dimensions.stack &&
@@ -452,7 +435,7 @@ function groupStack<TGroup extends TimelineGroupBase>(
                 }
             }
 
-            if (collidingItem != null) {
+            if (collidingItem !== null) {
                 // There is a collision. Reposition the items above the colliding element
                 // collidingItem.dimensions.top is never null here - added the check to make typescript happy
                 item.dimensions.top = (collidingItem.dimensions.top ?? 0) + lineHeight;
@@ -482,7 +465,7 @@ function groupNoStack<TGroup extends TimelineGroupBase>(
     groupHeight: number,
     groupTop: number,
 ): number {
-    let verticalMargin = (lineHeight - item.dimensions.height) / 2;
+    const verticalMargin = (lineHeight - item.dimensions.height) * 0.5;
     if (item.dimensions.top === null) {
         item.dimensions.top = groupTop + verticalMargin;
         groupHeight = Math.max(groupHeight, lineHeight);
@@ -506,13 +489,13 @@ function stackAll<TGroup extends TimelineGroupBase>(
     lineHeight: number,
     stackItems: boolean,
 ) {
-    let groupHeights: number[] = [];
-    let groupTops: number[] = [];
-    let currentHeight: number = 0;
+    const groupHeights: number[] = [];
+    const groupTops: number[] = [];
+    let currentHeight = 0;
 
     const groupedItems = getGroupedItems(itemsDimensions, groupOrders);
 
-    for (let index in groupedItems) {
+    for (const index in groupedItems) {
         const groupItems = groupedItems[index];
         const { items: itemsDimensions, group } = groupItems;
         const groupTop = currentHeight;
@@ -560,7 +543,6 @@ function stackGroup<TGroup extends TimelineGroupBase>(
     let groupHeight = 0;
     // Find positions for each item in group
     for (let itemIndex = 0; itemIndex < itemsDimensions.length; itemIndex++) {
-        let r = {};
         if (isGroupStacked) {
             groupHeight = groupStack(
                 lineHeight,
@@ -585,7 +567,6 @@ function stackGroup<TGroup extends TimelineGroupBase>(
  * @param canvasWidth  The width of the canvas in pixels.
  * @param canvasTimeStart  The start time of the canvas in milliseconds.
  * @param canvasTimeEnd  The end time of the canvas in milliseconds.
- * @param keys  The keys object.
  * @param lineHeight  The height of a single line in pixels.
  * @param itemHeightRatio  The ratio of the height of an item to the height of the line.
  * @param stackItems  Whether items should be stacked by default.
@@ -604,7 +585,6 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
     canvasWidth: number,
     canvasTimeStart: number,
     canvasTimeEnd: number,
-    keys: TimelineKeys,
     lineHeight: number,
     itemHeightRatio: number,
     stackItems: boolean,
@@ -615,11 +595,10 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
     resizeTime: number,
     newGroupOrder: number,
 ) {
-    const visibleItems = getVisibleItems(items, canvasTimeStart, canvasTimeEnd, keys);
+    const visibleItems = getVisibleItems(items, canvasTimeStart, canvasTimeEnd);
     const visibleItemsWithInteraction = visibleItems.map(item =>
         getItemWithInteractions({
             item,
-            keys,
             draggingItem,
             resizingItem,
             dragTime,
@@ -641,11 +620,10 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
     }
 
     // Get the order of groups based on their id key
-    const groupOrders = getGroupOrders(groups, keys);
-    let dimensionItems = visibleItemsWithInteraction.map(item =>
+    const groupOrders = getGroupOrders(groups);
+    const dimensionItems = visibleItemsWithInteraction.map(item =>
         getItemDimensions({
             item,
-            keys,
             canvasTimeStart,
             canvasTimeEnd,
             canvasWidth,
@@ -673,7 +651,6 @@ export function getCanvasWidth(width: number, buffer = 3) {
  * Get item's position, dimensions and collisions.
  *
  * @param item  The item to get the dimensions for.
- * @param keys  The keys object.
  * @param canvasTimeStart  The time at the left edge of the canvas in milliseconds.
  * @param canvasTimeEnd  The time at the right edge of the canvas in milliseconds.
  * @param canvasWidth  The width of the canvas in pixels.
@@ -685,7 +662,6 @@ export function getCanvasWidth(width: number, buffer = 3) {
  */
 function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>({
     item,
-    keys,
     canvasTimeStart,
     canvasTimeEnd,
     canvasWidth,
@@ -694,7 +670,6 @@ function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends Timel
     itemHeightRatio,
 }: {
     item: TItem;
-    keys: TimelineKeys;
     canvasTimeStart: number;
     canvasTimeEnd: number;
     canvasWidth: number;
@@ -702,10 +677,10 @@ function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends Timel
     lineHeight: number;
     itemHeightRatio: number;
 }): { id: Id; dimensions: Dimensions<TGroup> } {
-    const itemId = _get(item, keys.itemIdKey);
+    const itemId = _get(item, "id");
     const verticalDimensions: VerticalDimensions = calculateDimensions({
-        itemTimeStart: _get(item, keys.itemTimeStartKey),
-        itemTimeEnd: _get(item, keys.itemTimeEndKey),
+        itemTimeStart: _get(item, "start_time"),
+        itemTimeEnd: _get(item, "end_time"),
         canvasTimeStart,
         canvasTimeEnd,
         canvasWidth,
@@ -714,7 +689,7 @@ function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends Timel
     const dimensions = {
         ...verticalDimensions,
         top: null,
-        order: groupOrders[_get(item, keys.itemGroupKey)],
+        order: groupOrders[_get(item, "group")],
         // Disabled the undocumented magic that if an item has an isOverlay=true property we won't stack it.
         // stack: !item.isOverlay;
         stack: true,
@@ -731,7 +706,6 @@ function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends Timel
  * to user interaction (dragging an item or resizing left or right).
  *
  * @param item  The item to check.
- * @param keys  The keys object.
  * @param draggingItem  The id of the item being dragged.
  * @param resizingItem  The id of the item being resized.
  * @param dragTime  The current drag position in milliseconds.
@@ -744,7 +718,6 @@ function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends Timel
  */
 function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>({
     item,
-    keys,
     draggingItem,
     resizingItem,
     dragTime,
@@ -754,7 +727,6 @@ function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends
     newGroupOrder,
 }: {
     item: TItem;
-    keys: TimelineKeys;
     draggingItem: Id;
     resizingItem: Id;
     dragTime: number;
@@ -764,12 +736,12 @@ function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends
     newGroupOrder: number;
 }) {
     if (!resizingItem && !draggingItem) return item;
-    const itemId = _get(item, keys.itemIdKey);
+    const itemId = _get(item, "id");
     const isDragging = itemId === draggingItem;
     const isResizing = itemId === resizingItem;
     const [itemTimeStart, itemTimeEnd] = calculateInteractionNewTimes({
-        itemTimeStart: _get(item, keys.itemTimeStartKey),
-        itemTimeEnd: _get(item, keys.itemTimeEndKey),
+        itemTimeStart: _get(item, "start_time"),
+        itemTimeEnd: _get(item, "end_time"),
         isDragging,
         isResizing,
         dragTime,
@@ -778,9 +750,9 @@ function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends
     });
     const newItem = {
         ...item,
-        [keys.itemTimeStartKey]: itemTimeStart,
-        [keys.itemTimeEndKey]: itemTimeEnd,
-        [keys.itemGroupKey]: isDragging ? _get(groups[newGroupOrder], keys.groupIdKey) : _get(item, keys.itemGroupKey),
+        start_time: itemTimeStart,
+        end_time: itemTimeEnd,
+        group: isDragging ? _get(groups[newGroupOrder], "group") : _get(item, "group"),
     };
     return newItem;
 }
@@ -860,7 +832,6 @@ export function calculateScrollCanvas<TGroup extends TimelineGroupBase, TItem ex
                 canvasWidth,
                 mergedState.canvasTimeStart,
                 mergedState.canvasTimeEnd,
-                props.keys,
                 props.lineHeight,
                 props.itemHeightRatio,
                 props.stackItems,

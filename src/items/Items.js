@@ -34,8 +34,6 @@ export default class Items extends Component {
         canResize: PropTypes.oneOf([true, false, "left", "right", "both"]),
         canSelect: PropTypes.bool,
 
-        keys: PropTypes.object.isRequired,
-
         moveResizeValidator: PropTypes.func,
         itemSelect: PropTypes.func,
         itemDrag: PropTypes.func,
@@ -64,7 +62,6 @@ export default class Items extends Component {
             arraysEqual(nextProps.groups, this.props.groups) &&
             arraysEqual(nextProps.items, this.props.items) &&
             arraysEqual(nextProps.dimensionItems, this.props.dimensionItems) &&
-            nextProps.keys === this.props.keys &&
             nextProps.canvasTimeStart === this.props.canvasTimeStart &&
             nextProps.canvasTimeEnd === this.props.canvasTimeEnd &&
             nextProps.canvasWidth === this.props.canvasWidth &&
@@ -79,41 +76,39 @@ export default class Items extends Component {
         );
     }
 
-    isSelected(item, itemIdKey) {
+    isSelected(item) {
         if (!this.props.selected) {
-            return this.props.selectedItem === _get(item, itemIdKey);
+            return this.props.selectedItem === _get(item, "id");
         } else {
-            let target = _get(item, itemIdKey);
+            let target = _get(item, "id");
             return this.props.selected.includes(target);
         }
     }
 
     getVisibleItems(canvasTimeStart, canvasTimeEnd) {
-        const { keys, items } = this.props;
+        const { items } = this.props;
 
-        return getVisibleItems(items, canvasTimeStart, canvasTimeEnd, keys);
+        return getVisibleItems(items, canvasTimeStart, canvasTimeEnd);
     }
 
     render() {
-        const { canvasTimeStart, canvasTimeEnd, dimensionItems, keys, groups } = this.props;
-        const { itemIdKey, itemGroupKey } = keys;
+        const { canvasTimeStart, canvasTimeEnd, dimensionItems, groups } = this.props;
 
-        const groupOrders = getGroupOrders(groups, keys);
+        const groupOrders = getGroupOrders(groups);
         const visibleItems = this.getVisibleItems(canvasTimeStart, canvasTimeEnd, groupOrders);
         const sortedDimensionItems = keyBy(dimensionItems, "id");
 
         return (
             <div className="rct-items">
                 {visibleItems
-                    .filter(item => sortedDimensionItems[_get(item, itemIdKey)])
+                    .filter(item => sortedDimensionItems[_get(item, "id")])
                     .map(item => (
                         <Item
-                            key={_get(item, itemIdKey)}
+                            key={_get(item, "id")}
                             item={item}
-                            keys={this.props.keys}
-                            order={groupOrders[_get(item, itemGroupKey)]}
-                            dimensions={sortedDimensionItems[_get(item, itemIdKey)].dimensions}
-                            selected={this.isSelected(item, itemIdKey)}
+                            order={groupOrders[_get(item, "group")]}
+                            dimensions={sortedDimensionItems[_get(item, "id")].dimensions}
+                            selected={this.isSelected(item)}
                             canChangeGroup={
                                 _get(item, "canChangeGroup") !== undefined
                                     ? _get(item, "canChangeGroup")

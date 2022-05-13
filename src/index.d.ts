@@ -25,7 +25,6 @@ import type {
     TimelineItemBase as TimelineItemBase_,
     TimelineItemEdge as TimelineItemEdge_,
     TimelineItemProps as TimelineItemProps_,
-    TimelineKeys as TimelineKeys_,
     TimeFormat as TimeFormat_,
     TimeUnit as TimeUnit_,
 } from "./types";
@@ -44,7 +43,6 @@ declare module "@mil/itch" {
     export type TimelineItemBase = TimelineItemBase_;
     export type TimelineItemEdge = TimelineItemEdge_;
     export type TimelineItemProps = TimelineItemProps_;
-    export type TimelineKeys = TimelineKeys_;
     export type TimeFormat = TimeFormat_;
     export type TimeUnit = TimeUnit_;
 
@@ -85,7 +83,6 @@ declare module "@mil/itch" {
     > {
         groups: CustomGroup[];
         items: CustomItem[];
-        keys?: TimelineKeys;
         className?: string;
         defaultTimeStart?: Date | Moment;
         defaultTimeEnd?: Date | Moment;
@@ -226,7 +223,6 @@ declare module "@mil/itch" {
     }
     export class CustomHeader<Data = any> extends React.Component<CustomHeaderProps<Data>> {}
 
-    export const defaultKeys: TimelineKeys;
     export const defaultTimeSteps: CompleteTimeSteps;
     export const defaultHeaderFormats: LabelFormat;
 

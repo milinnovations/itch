@@ -9,14 +9,12 @@ export default class Sidebar extends Component {
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired,
         groupHeights: PropTypes.array.isRequired,
-        keys: PropTypes.object.isRequired,
         groupRenderer: PropTypes.func,
         isRightSidebar: PropTypes.bool,
     };
 
     shouldComponentUpdate(nextProps) {
         return !(
-            nextProps.keys === this.props.keys &&
             nextProps.width === this.props.width &&
             nextProps.height === this.props.height &&
             arraysEqual(nextProps.groups, this.props.groups) &&
@@ -38,8 +36,6 @@ export default class Sidebar extends Component {
     render() {
         const { width, groupHeights, height, isRightSidebar } = this.props;
 
-        const { groupIdKey, groupTitleKey, groupRightTitleKey } = this.props.keys;
-
         const sidebarStyle = {
             width: `${width}px`,
             height: `${height}px`,
@@ -57,11 +53,11 @@ export default class Sidebar extends Component {
 
             return (
                 <div
-                    key={_get(group, groupIdKey)}
+                    key={_get(group, "id")}
                     className={"rct-sidebar-row rct-sidebar-row-" + (index % 2 === 0 ? "even" : "odd")}
                     style={elementStyle}
                 >
-                    {this.renderGroupContent(group, isRightSidebar, groupTitleKey, groupRightTitleKey)}
+                    {this.renderGroupContent(group, isRightSidebar, "title", "rightTitle")}
                 </div>
             );
         });

@@ -20,12 +20,7 @@ import {
     stackTimelineItems,
 } from "./utility/calendar";
 import { _get, _length } from "./utility/generic";
-import {
-    defaultKeys,
-    defaultTimeSteps,
-    defaultHeaderLabelFormats,
-    defaultSubHeaderLabelFormats,
-} from "./default-config";
+import { defaultTimeSteps, defaultHeaderLabelFormats, defaultSubHeaderLabelFormats } from "./default-config";
 import { TimelineStateProvider } from "./timeline/TimelineStateContext";
 import { TimelineMarkersProvider } from "./markers/TimelineMarkersContext";
 import { TimelineHeadersProvider } from "./headers/HeadersContext";
@@ -83,18 +78,6 @@ export default class ReactCalendarTimeline extends Component {
         className: PropTypes.string,
         style: PropTypes.object,
 
-        keys: PropTypes.shape({
-            groupIdKey: PropTypes.string,
-            groupTitleKey: PropTypes.string,
-            groupLabelKey: PropTypes.string,
-            groupRightTitleKey: PropTypes.string,
-            itemIdKey: PropTypes.string,
-            itemTitleKey: PropTypes.string,
-            itemDivTitleKey: PropTypes.string,
-            itemGroupKey: PropTypes.string,
-            itemTimeStartKey: PropTypes.string,
-            itemTimeEndKey: PropTypes.string,
-        }),
         headerRef: PropTypes.func,
         scrollRef: PropTypes.func,
 
@@ -208,7 +191,6 @@ export default class ReactCalendarTimeline extends Component {
 
         style: {},
         className: "",
-        keys: defaultKeys,
         timeSteps: defaultTimeSteps,
         headerRef: () => {},
         scrollRef: () => {},
@@ -301,7 +283,6 @@ export default class ReactCalendarTimeline extends Component {
             canvasWidth,
             this.state.canvasTimeStart,
             this.state.canvasTimeEnd,
-            props.keys,
             props.lineHeight,
             props.itemHeightRatio,
             props.stackItems,
@@ -378,7 +359,6 @@ export default class ReactCalendarTimeline extends Component {
                     canvasWidth,
                     prevState.canvasTimeStart,
                     prevState.canvasTimeEnd,
-                    nextProps.keys,
                     nextProps.lineHeight,
                     nextProps.itemHeightRatio,
                     nextProps.stackItems,
@@ -433,7 +413,6 @@ export default class ReactCalendarTimeline extends Component {
             canvasWidth,
             this.state.canvasTimeStart,
             this.state.canvasTimeEnd,
-            props.keys,
             props.lineHeight,
             props.itemHeightRatio,
             props.stackItems,
@@ -599,13 +578,12 @@ export default class ReactCalendarTimeline extends Component {
 
     dragItem = (item, dragTime, newGroupOrder) => {
         let newGroup = this.props.groups[newGroupOrder];
-        const keys = this.props.keys;
 
         this.setState({
             draggingItem: item,
             dragTime: dragTime,
             newGroupOrder: newGroupOrder,
-            dragGroupTitle: newGroup ? _get(newGroup, keys.groupLabelKey) : "",
+            dragGroupTitle: newGroup ? _get(newGroup, "title") : "",
         });
 
         this.updatingItem({
@@ -675,7 +653,7 @@ export default class ReactCalendarTimeline extends Component {
         if (this.props.onCanvasClick == null) return;
 
         const time = this.getTimeFromRowClickEvent(e);
-        const groupId = _get(this.props.groups[rowIndex], this.props.keys.groupIdKey);
+        const groupId = _get(this.props.groups[rowIndex], "id");
         this.props.onCanvasClick(groupId, time, e);
     };
 
@@ -683,7 +661,7 @@ export default class ReactCalendarTimeline extends Component {
         if (this.props.onCanvasDoubleClick == null) return;
 
         const time = this.getTimeFromRowClickEvent(e);
-        const groupId = _get(this.props.groups[rowIndex], this.props.keys.groupIdKey);
+        const groupId = _get(this.props.groups[rowIndex], "id");
         this.props.onCanvasDoubleClick(groupId, time, e);
     };
 
@@ -692,7 +670,7 @@ export default class ReactCalendarTimeline extends Component {
 
         const timePosition = this.getTimeFromRowClickEvent(e);
 
-        const groupId = _get(this.props.groups[rowIndex], this.props.keys.groupIdKey);
+        const groupId = _get(this.props.groups[rowIndex], "id");
 
         if (this.props.onCanvasContextMenu) {
             e.preventDefault();
@@ -704,7 +682,7 @@ export default class ReactCalendarTimeline extends Component {
         if (this.props.onCanvasDrop === undefined) return;
 
         const time = this.getTimeFromRowClickEvent(e);
-        const groupId = _get(this.props.groups[rowIndex], this.props.keys.groupIdKey);
+        const groupId = _get(this.props.groups[rowIndex], "id");
         this.props.onCanvasDrop(groupId, time, e);
     };
 
@@ -735,7 +713,6 @@ export default class ReactCalendarTimeline extends Component {
                 groupTops={groupTops}
                 items={this.props.items}
                 groups={this.props.groups}
-                keys={this.props.keys}
                 selectedItem={this.state.selectedItem}
                 dragSnap={this.props.dragSnap}
                 minResizeWidth={this.props.minResizeWidth}
@@ -771,7 +748,6 @@ export default class ReactCalendarTimeline extends Component {
                 <Sidebar
                     groups={this.props.groups}
                     groupRenderer={this.props.groupRenderer}
-                    keys={this.props.keys}
                     width={sidebarWidth}
                     groupHeights={groupHeights}
                     height={height}
@@ -786,7 +762,6 @@ export default class ReactCalendarTimeline extends Component {
             rightSidebarWidth && (
                 <Sidebar
                     groups={this.props.groups}
-                    keys={this.props.keys}
                     groupRenderer={this.props.groupRenderer}
                     isRightSidebar
                     width={rightSidebarWidth}
@@ -837,7 +812,6 @@ export default class ReactCalendarTimeline extends Component {
             dimensionItems,
             items: this.props.items,
             groups: this.props.groups,
-            keys: this.props.keys,
             groupHeights: groupHeights,
             groupTops: groupTops,
             selected: this.getSelected(),
@@ -912,7 +886,6 @@ export default class ReactCalendarTimeline extends Component {
                 canvasWidth,
                 this.state.canvasTimeStart,
                 this.state.canvasTimeEnd,
-                this.props.keys,
                 this.props.lineHeight,
                 this.props.itemHeightRatio,
                 this.props.stackItems,
