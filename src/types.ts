@@ -2,6 +2,8 @@ import type React from "react";
 
 export type Id = number | string;
 
+export type ClickType = "touch" | "click";
+
 export type TimelineItemEdge = "left" | "right";
 
 export type ResizeOptions = boolean | TimelineItemEdge | "both";
@@ -52,6 +54,7 @@ export type TimelineItemBase = {
     canMove?: boolean;
     canResize?: ResizeOptions;
     canChangeGroup?: boolean;
+    canSelect?: boolean;
     className?: string;
     style?: React.CSSProperties;
     itemProps?: React.HTMLAttributes<HTMLDivElement>;
@@ -140,4 +143,18 @@ export type ResizeStyles = {
     rightStyle?: React.CSSProperties;
     leftClassName?: string;
     rightClassName?: string;
+};
+
+export type MoveResizeValidator = (
+    action: "move" | "resize",
+    itemId: Id,
+    time: number,
+    resizeEdge: TimelineItemEdge,
+) => number;
+
+export type ReactCalendarItemRendererProps<TItem extends TimelineItemBase = TimelineItemBase> = {
+    item: TItem;
+    itemContext: ItemContext;
+    getItemProps: (props?: Partial<Omit<TimelineItemProps, "key" | "ref">>) => TimelineItemProps;
+    getResizeProps: (styles?: ResizeStyles) => ItemRendererResizeProps;
 };

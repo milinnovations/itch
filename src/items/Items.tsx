@@ -1,63 +1,70 @@
-import PropTypes from "prop-types";
 import React, { Component } from "react";
-import Item from "./Item";
-// import ItemGroup from './ItemGroup'
 
+import Item from "./Item";
+import type {
+    ClickType,
+    Id,
+    MoveResizeValidator,
+    ReactCalendarItemRendererProps,
+    ResizeOptions,
+    TimelineGroupBase,
+    TimelineItemBase,
+    TimelineItemEdge,
+} from "../types";
 import { arraysEqual, keyBy } from "../utility/generic";
 import { getGroupOrders, getVisibleItems } from "../utility/calendar";
+import type { ItemDimensions } from "../utility/calendar";
 
-const canResizeLeft = (item, canResize) => {
+const canResizeLeft = (item: TimelineItemBase, canResize: ResizeOptions | undefined) => {
     const value = item.canResize ?? canResize;
     return value === "left" || value === "both";
 };
 
-const canResizeRight = (item, canResize) => {
+const canResizeRight = (item: TimelineItemBase, canResize: ResizeOptions | undefined) => {
     const value = item.canResize ?? canResize;
     return value === "right" || value === "both" || value === true;
 };
 
-export default class Items extends Component {
-    static propTypes = {
-        groups: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
-        items: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
+type Props<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> = {
+    groups: TGroup[];
+    items: TItem[];
+    dimensionItems: ItemDimensions<TGroup>[];
 
-        canvasTimeStart: PropTypes.number.isRequired,
-        canvasTimeEnd: PropTypes.number.isRequired,
-        canvasWidth: PropTypes.number.isRequired,
+    canvasTimeStart: number;
+    canvasTimeEnd: number;
+    canvasWidth: number;
 
-        dragSnap: PropTypes.number,
-        minResizeWidth: PropTypes.number,
-        selectedItem: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    groupTops?: number[];
 
-        canChangeGroup: PropTypes.bool.isRequired,
-        canMove: PropTypes.bool.isRequired,
-        canResize: PropTypes.oneOf([true, false, "left", "right", "both"]),
-        canSelect: PropTypes.bool,
+    dragSnap?: number;
+    minResizeWidth?: number;
+    selectedItem?: Id | null;
+    selected?: Id[] | null;
 
-        moveResizeValidator: PropTypes.func,
-        itemSelect: PropTypes.func,
-        itemDrag: PropTypes.func,
-        itemDrop: PropTypes.func,
-        itemResizing: PropTypes.func,
-        itemResized: PropTypes.func,
+    canChangeGroup: boolean;
+    canMove: boolean;
+    canResize?: ResizeOptions;
+    canSelect?: boolean;
+    useResizeHandle?: boolean;
 
-        onItemDoubleClick: PropTypes.func,
-        onItemContextMenu: PropTypes.func,
+    moveResizeValidator?: MoveResizeValidator;
+    itemSelect?: (item: Id, clickType: ClickType, event: React.MouseEvent | React.TouchEvent) => void;
+    itemDrag?: (item: Id, dragTime: number, newGroup: Id) => void;
+    itemDrop?: (item: Id, dragTime: number, newGroup: Id) => void;
+    itemResizing?: (item: Id, resizeTime: number, edge: TimelineItemEdge) => void;
+    itemResized?: (item: Id, resizeTime: number, edge: TimelineItemEdge, timeDelta: number) => void;
 
-        itemRenderer: PropTypes.func,
-        selected: PropTypes.array,
+    onItemDoubleClick?: (item: Id, event: React.MouseEvent) => void;
+    onItemContextMenu?: (item: Id, event: React.MouseEvent) => void;
 
-        dimensionItems: PropTypes.array,
-        groupTops: PropTypes.array,
-        useResizeHandle: PropTypes.bool,
-        scrollRef: PropTypes.object,
-    };
+    itemRenderer?: (props: ReactCalendarItemRendererProps<TItem>) => React.ReactNode;
+    scrollRef?: React.Ref<HTMLDivElement>;
+};
 
-    static defaultProps = {
-        selected: [],
-    };
-
-    shouldComponentUpdate(nextProps) {
+export default class Items<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> extends Component<
+    Props<TGroup, TItem>
+> {
+    shouldComponentUpdate(nextProps: Props<TGroup, TItem>) {
         return !(
             arraysEqual(nextProps.groups, this.props.groups) &&
             arraysEqual(nextProps.items, this.props.items) &&
@@ -76,7 +83,7 @@ export default class Items extends Component {
         );
     }
 
-    isSelected(item) {
+    isSelected(item: TimelineItemBase) {
         if (!this.props.selected) {
             return this.props.selectedItem === item.id;
         } else {
@@ -84,17 +91,11 @@ export default class Items extends Component {
         }
     }
 
-    getVisibleItems(canvasTimeStart, canvasTimeEnd) {
-        const { items } = this.props;
-
-        return getVisibleItems(items, canvasTimeStart, canvasTimeEnd);
-    }
-
     render() {
-        const { canvasTimeStart, canvasTimeEnd, dimensionItems, groups } = this.props;
+        const { canvasTimeStart, canvasTimeEnd, dimensionItems, groups, items } = this.props;
 
         const groupOrders = getGroupOrders(groups);
-        const visibleItems = this.getVisibleItems(canvasTimeStart, canvasTimeEnd, groupOrders);
+        const visibleItems = getVisibleItems(items, canvasTimeStart, canvasTimeEnd);
         const sortedDimensionItems = keyBy(dimensionItems, item => item.id);
 
         return (

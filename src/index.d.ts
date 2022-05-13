@@ -17,6 +17,8 @@ import type {
     ItemRendererResizeProps as ItemRendererResizeProps_,
     ITimeSteps as ITimeSteps_,
     LabelFormat as LabelFormat_,
+    MoveResizeValidator,
+    ReactCalendarItemRendererProps as ReactCalendarItemRendererProps_,
     ResizeOptions as ResizeOptions_,
     ResizeStyles as ResizeStyles_,
     TimelineContext as TimelineContext_,
@@ -49,12 +51,8 @@ declare module "@mil/itch" {
     export type TimelineItem<CustomItemFields> = TimelineItemBase & CustomItemFields;
     export type TimelineGroup<CustomGroupFields> = TimelineGroupBase & CustomGroupFields;
 
-    export type ReactCalendarItemRendererProps<CustomItem extends TimelineItemBase = TimelineItemBase> = {
-        item: CustomItem;
-        itemContext: ItemContext;
-        getItemProps: (props?: Partial<Omit<TimelineItemProps, "key" | "ref">>) => TimelineItemProps;
-        getResizeProps: (styles?: ResizeStyles) => ItemRendererResizeProps;
-    };
+    export type ReactCalendarItemRendererProps<CustomItem extends TimelineItemBase = TimelineItemBase> =
+        ReactCalendarItemRendererProps_<CustomItem>;
 
     export type ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase = TimelineGroupBase> = {
         group: CustomGroup;
@@ -122,7 +120,7 @@ declare module "@mil/itch" {
         onCanvasDoubleClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
         onCanvasDrop?(groupId: Id, time: number, e: React.DragEvent): void;
         onZoom?(timelineContext: TimelineContext): void;
-        moveResizeValidator?(action: "move" | "resize", itemId: Id, time: number, resizeEdge: TimelineItemEdge): number;
+        moveResizeValidator?: MoveResizeValidator;
         onTimeChange?(
             visibleTimeStart: number,
             visibleTimeEnd: number,
