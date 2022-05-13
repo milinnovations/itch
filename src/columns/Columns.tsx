@@ -1,27 +1,26 @@
-import PropTypes from "prop-types";
 import React, { Component } from "react";
 
+import type { CompleteTimeSteps, TimeUnit } from "../types";
 import { iterateTimes } from "../utility/calendar";
 import { TimelineStateConsumer } from "../timeline/TimelineStateContext";
 
-const passThroughPropTypes = {
-    canvasTimeStart: PropTypes.number.isRequired,
-    canvasTimeEnd: PropTypes.number.isRequired,
-    canvasWidth: PropTypes.number.isRequired,
-    lineCount: PropTypes.number.isRequired,
-    minUnit: PropTypes.string.isRequired,
-    timeSteps: PropTypes.object.isRequired,
-    height: PropTypes.number.isRequired,
-    verticalLineClassNamesForTime: PropTypes.func,
+type BaseProps = {
+    canvasTimeStart: number;
+    canvasTimeEnd: number;
+    canvasWidth: number;
+    lineCount: number;
+    height: number;
+    minUnit: TimeUnit;
+    timeSteps: CompleteTimeSteps;
+    verticalLineClassNamesForTime: (start: number, end: number) => string[] | undefined;
 };
 
-class Columns extends Component {
-    static propTypes = {
-        ...passThroughPropTypes,
-        getLeftOffsetFromDate: PropTypes.func.isRequired,
-    };
+type Props = BaseProps & {
+    getLeftOffsetFromDate: (time: number) => number;
+};
 
-    shouldComponentUpdate(nextProps) {
+class Columns extends Component<Props> {
+    shouldComponentUpdate(nextProps: Props) {
         return !(
             nextProps.canvasTimeStart === this.props.canvasTimeStart &&
             nextProps.canvasTimeEnd === this.props.canvasTimeEnd &&
@@ -45,35 +44,30 @@ class Columns extends Component {
             verticalLineClassNamesForTime,
             getLeftOffsetFromDate,
         } = this.props;
-        const ratio = canvasWidth / (canvasTimeEnd - canvasTimeStart);
-
-        let lines = [];
+        const lines: React.ReactNode[] = [];
 
         iterateTimes(canvasTimeStart, canvasTimeEnd, minUnit, timeSteps, (time, nextTime) => {
             const minUnitValue = time.get(minUnit === "day" ? "date" : minUnit);
             const firstOfType = minUnitValue === (minUnit === "day" ? 1 : 0);
 
-            let classNamesForTime = [];
-            if (verticalLineClassNamesForTime) {
-                classNamesForTime = verticalLineClassNamesForTime(
-                    time.unix() * 1000, // turn into ms, which is what verticalLineClassNamesForTime expects
-                    nextTime.unix() * 1000 - 1,
-                );
-            }
-
-            // TODO: rename or remove class that has reference to vertical-line
-            const classNames =
-                "rct-vl" +
-                (firstOfType ? " rct-vl-first" : "") +
-                (minUnit === "day" || minUnit === "hour" || minUnit === "minute" ? ` rct-day-${time.day()} ` : "") +
-                classNamesForTime.join(" ");
+            const classNames: string[] = [
+                "rct-vl",
+                firstOfType ? " rct-vl-first" : "",
+                minUnit === "day" || minUnit === "hour" || minUnit === "minute" ? ` rct-day-${time.day()} ` : "",
+                ...(verticalLineClassNamesForTime
+                    ? verticalLineClassNamesForTime(
+                          time.unix() * 1000, // turn into ms, which is what verticalLineClassNamesForTime expects
+                          nextTime.unix() * 1000 - 1,
+                      ) ?? []
+                    : []),
+            ];
 
             const left = getLeftOffsetFromDate(time.valueOf());
             const right = getLeftOffsetFromDate(nextTime.valueOf());
             lines.push(
                 <div
                     key={`line-${time.valueOf()}`}
-                    className={classNames}
+                    className={classNames.join(" ")}
                     style={{
                         pointerEvents: "none",
                         top: "0px",
@@ -89,16 +83,12 @@ class Columns extends Component {
     }
 }
 
-const ColumnsWrapper = ({ ...props }) => {
+const ColumnsWrapper = (props: BaseProps) => {
     return (
         <TimelineStateConsumer>
             {({ getLeftOffsetFromDate }) => <Columns getLeftOffsetFromDate={getLeftOffsetFromDate} {...props} />}
         </TimelineStateConsumer>
     );
-};
-
-ColumnsWrapper.defaultProps = {
-    ...passThroughPropTypes,
 };
 
 export default ColumnsWrapper;

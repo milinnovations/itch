@@ -14,8 +14,9 @@ const defaultContextState = {
     getTimelineState: () => {
         console.warn('"getTimelineState" default func is being used');
     },
-    getLeftOffsetFromDate: () => {
+    getLeftOffsetFromDate: _time => {
         console.warn('"getLeftOffsetFromDate" default func is being used');
+        return 0;
     },
     getDateFromLeftOffsetPosition: () => {
         console.warn('"getDateFromLeftOffsetPosition" default func is being used');
