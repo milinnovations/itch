@@ -95,7 +95,7 @@ export default class Items extends Component {
 
         const groupOrders = getGroupOrders(groups);
         const visibleItems = this.getVisibleItems(canvasTimeStart, canvasTimeEnd, groupOrders);
-        const sortedDimensionItems = keyBy(dimensionItems, "id");
+        const sortedDimensionItems = keyBy(dimensionItems, item => item.id);
 
         return (
             <div className="rct-items">
