@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { Component } from "react";
 
-import { _get, arraysEqual } from "../utility/generic";
+import { arraysEqual } from "../utility/generic";
 
 export default class Sidebar extends Component {
     static propTypes = {
@@ -29,7 +29,7 @@ export default class Sidebar extends Component {
                 isRightSidebar,
             });
         } else {
-            return _get(group, isRightSidebar ? groupRightTitleKey : groupTitleKey);
+            return group[isRightSidebar ? groupRightTitleKey : groupTitleKey];
         }
     }
 
@@ -53,7 +53,7 @@ export default class Sidebar extends Component {
 
             return (
                 <div
-                    key={_get(group, "id")}
+                    key={group.id}
                     className={"rct-sidebar-row rct-sidebar-row-" + (index % 2 === 0 ? "even" : "odd")}
                     style={elementStyle}
                 >

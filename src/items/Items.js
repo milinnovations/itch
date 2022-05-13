@@ -3,16 +3,16 @@ import React, { Component } from "react";
 import Item from "./Item";
 // import ItemGroup from './ItemGroup'
 
-import { _get, arraysEqual, keyBy } from "../utility/generic";
+import { arraysEqual, keyBy } from "../utility/generic";
 import { getGroupOrders, getVisibleItems } from "../utility/calendar";
 
 const canResizeLeft = (item, canResize) => {
-    const value = _get(item, "canResize") !== undefined ? _get(item, "canResize") : canResize;
+    const value = item.canResize ?? canResize;
     return value === "left" || value === "both";
 };
 
 const canResizeRight = (item, canResize) => {
-    const value = _get(item, "canResize") !== undefined ? _get(item, "canResize") : canResize;
+    const value = item.canResize ?? canResize;
     return value === "right" || value === "both" || value === true;
 };
 
@@ -78,10 +78,9 @@ export default class Items extends Component {
 
     isSelected(item) {
         if (!this.props.selected) {
-            return this.props.selectedItem === _get(item, "id");
+            return this.props.selectedItem === item.id;
         } else {
-            let target = _get(item, "id");
-            return this.props.selected.includes(target);
+            return this.props.selected.includes(item.id);
         }
     }
 
@@ -101,25 +100,21 @@ export default class Items extends Component {
         return (
             <div className="rct-items">
                 {visibleItems
-                    .filter(item => sortedDimensionItems[_get(item, "id")])
+                    .filter(item => sortedDimensionItems[item.id])
                     .map(item => (
                         <Item
-                            key={_get(item, "id")}
+                            key={item.id}
                             item={item}
-                            order={groupOrders[_get(item, "group")]}
-                            dimensions={sortedDimensionItems[_get(item, "id")].dimensions}
+                            order={groupOrders[item.group]}
+                            dimensions={sortedDimensionItems[item.id].dimensions}
                             selected={this.isSelected(item)}
                             canChangeGroup={
-                                _get(item, "canChangeGroup") !== undefined
-                                    ? _get(item, "canChangeGroup")
-                                    : this.props.canChangeGroup
+                                item.canChangeGroup !== undefined ? item.canChangeGroup : this.props.canChangeGroup
                             }
-                            canMove={_get(item, "canMove") !== undefined ? _get(item, "canMove") : this.props.canMove}
+                            canMove={item.canMove !== undefined ? item.canMove : this.props.canMove}
                             canResizeLeft={canResizeLeft(item, this.props.canResize)}
                             canResizeRight={canResizeRight(item, this.props.canResize)}
-                            canSelect={
-                                _get(item, "canSelect") !== undefined ? _get(item, "canSelect") : this.props.canSelect
-                            }
+                            canSelect={item.canSelect !== undefined ? item.canSelect : this.props.canSelect}
                             useResizeHandle={this.props.useResizeHandle}
                             groupTops={this.props.groupTops}
                             canvasTimeStart={this.props.canvasTimeStart}

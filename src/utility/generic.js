@@ -1,26 +1,5 @@
-import isEqual from "lodash.isequal";
-
-// so we could use both immutable.js objects and regular objects
-
-export function _get(object, key) {
-    return typeof object.get === "function" ? object.get(key) : object[key];
-}
-
-export function _length(object) {
-    return typeof object.count === "function" ? object.count() : object.length;
-}
-
 export function arraysEqual(array1, array2) {
-    return (
-        _length(array1) === _length(array2) &&
-        array1.every((element, index) => {
-            return element === _get(array2, index);
-        })
-    );
-}
-
-export function deepObjectCompare(obj1, obj2) {
-    return isEqual(obj1, obj2);
+    return array1.length === array2.length && array1.every((element, index) => element === array2[index]);
 }
 
 export function keyBy(value, key) {
@@ -33,4 +12,6 @@ export function keyBy(value, key) {
     return obj;
 }
 
-export function noop() {}
+export function noop() {
+    // No linter warning
+}

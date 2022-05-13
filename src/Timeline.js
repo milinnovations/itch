@@ -19,7 +19,6 @@ import {
     getCanvasWidth,
     stackTimelineItems,
 } from "./utility/calendar";
-import { _get, _length } from "./utility/generic";
 import { defaultTimeSteps, defaultHeaderLabelFormats, defaultSubHeaderLabelFormats } from "./default-config";
 import { TimelineStateProvider } from "./timeline/TimelineStateContext";
 import { TimelineMarkersProvider } from "./markers/TimelineMarkersContext";
@@ -583,7 +582,7 @@ export default class ReactCalendarTimeline extends Component {
             draggingItem: item,
             dragTime: dragTime,
             newGroupOrder: newGroupOrder,
-            dragGroupTitle: newGroup ? _get(newGroup, "title") : "",
+            dragGroupTitle: newGroup ? newGroup.title : "",
         });
 
         this.updatingItem({
@@ -635,7 +634,7 @@ export default class ReactCalendarTimeline extends Component {
                 canvasTimeStart={canvasTimeStart}
                 canvasTimeEnd={canvasTimeEnd}
                 canvasWidth={canvasWidth}
-                lineCount={_length(this.props.groups)}
+                lineCount={this.props.groups.length}
                 minUnit={minUnit}
                 timeSteps={timeSteps}
                 height={height}
@@ -653,7 +652,7 @@ export default class ReactCalendarTimeline extends Component {
         if (this.props.onCanvasClick == null) return;
 
         const time = this.getTimeFromRowClickEvent(e);
-        const groupId = _get(this.props.groups[rowIndex], "id");
+        const groupId = this.props.groups[rowIndex].id;
         this.props.onCanvasClick(groupId, time, e);
     };
 
@@ -661,7 +660,7 @@ export default class ReactCalendarTimeline extends Component {
         if (this.props.onCanvasDoubleClick == null) return;
 
         const time = this.getTimeFromRowClickEvent(e);
-        const groupId = _get(this.props.groups[rowIndex], "id");
+        const groupId = this.props.groups[rowIndex].id;
         this.props.onCanvasDoubleClick(groupId, time, e);
     };
 
@@ -670,7 +669,7 @@ export default class ReactCalendarTimeline extends Component {
 
         const timePosition = this.getTimeFromRowClickEvent(e);
 
-        const groupId = _get(this.props.groups[rowIndex], "id");
+        const groupId = this.props.groups[rowIndex].id;
 
         if (this.props.onCanvasContextMenu) {
             e.preventDefault();
@@ -682,7 +681,7 @@ export default class ReactCalendarTimeline extends Component {
         if (this.props.onCanvasDrop === undefined) return;
 
         const time = this.getTimeFromRowClickEvent(e);
-        const groupId = _get(this.props.groups[rowIndex], "id");
+        const groupId = this.props.groups[rowIndex].id;
         this.props.onCanvasDrop(groupId, time, e);
     };
 
@@ -691,7 +690,7 @@ export default class ReactCalendarTimeline extends Component {
             <GroupRows
                 groups={groups}
                 canvasWidth={canvasWidth}
-                lineCount={_length(this.props.groups)}
+                lineCount={this.props.groups.length}
                 groupHeights={groupHeights}
                 clickTolerance={this.props.clickTolerance}
                 onRowClick={this.handleRowClick}

@@ -1,6 +1,6 @@
 import moment from "moment";
 import type { Moment } from "moment";
-import { _get } from "./generic";
+
 import type { CompleteTimeSteps, Id, ITimeSteps, TimelineGroupBase, TimelineItemBase, TimeUnit } from "../types";
 
 export type GroupOrder<TGroup extends TimelineGroupBase> = { index: number; group: TGroup };
@@ -301,7 +301,7 @@ export function getGroupOrders<TGroup extends TimelineGroupBase>(groups: TGroup[
     const groupOrders: GroupOrders<TGroup> = {};
 
     for (let i = 0; i < groups.length; i++) {
-        groupOrders[_get(groups[i], "id")] = { index: i, group: groups[i] };
+        groupOrders[groups[i].id] = { index: i, group: groups[i] };
     }
 
     return groupOrders;
@@ -357,7 +357,7 @@ export function getVisibleItems<TItem extends TimelineItemBase>(
     canvasTimeEnd: number,
 ) {
     return items.filter(item => {
-        return _get(item, "start_time") <= canvasTimeEnd && _get(item, "end_time") >= canvasTimeStart;
+        return item.start_time <= canvasTimeEnd && item.end_time >= canvasTimeStart;
     });
 }
 
@@ -677,10 +677,10 @@ function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends Timel
     lineHeight: number;
     itemHeightRatio: number;
 }): { id: Id; dimensions: Dimensions<TGroup> } {
-    const itemId = _get(item, "id");
+    const itemId = item.id;
     const verticalDimensions: VerticalDimensions = calculateDimensions({
-        itemTimeStart: _get(item, "start_time"),
-        itemTimeEnd: _get(item, "end_time"),
+        itemTimeStart: item.start_time,
+        itemTimeEnd: item.end_time,
         canvasTimeStart,
         canvasTimeEnd,
         canvasWidth,
@@ -689,7 +689,7 @@ function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends Timel
     const dimensions = {
         ...verticalDimensions,
         top: null,
-        order: groupOrders[_get(item, "group")],
+        order: groupOrders[item.group],
         // Disabled the undocumented magic that if an item has an isOverlay=true property we won't stack it.
         // stack: !item.isOverlay;
         stack: true,
@@ -736,12 +736,12 @@ function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends
     newGroupOrder: number;
 }) {
     if (!resizingItem && !draggingItem) return item;
-    const itemId = _get(item, "id");
+    const itemId = item.id;
     const isDragging = itemId === draggingItem;
     const isResizing = itemId === resizingItem;
     const [itemTimeStart, itemTimeEnd] = calculateInteractionNewTimes({
-        itemTimeStart: _get(item, "start_time"),
-        itemTimeEnd: _get(item, "end_time"),
+        itemTimeStart: item.start_time,
+        itemTimeEnd: item.end_time,
         isDragging,
         isResizing,
         dragTime,
@@ -752,7 +752,7 @@ function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends
         ...item,
         start_time: itemTimeStart,
         end_time: itemTimeEnd,
-        group: isDragging ? _get(groups[newGroupOrder], "group") : _get(item, "group"),
+        group: isDragging ? groups[newGroupOrder].id : item.group,
     };
     return newItem;
 }
