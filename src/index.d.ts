@@ -49,38 +49,38 @@ declare module "@mil/itch" {
     export type TimelineItem<CustomItemFields> = TimelineItemBase & CustomItemFields;
     export type TimelineGroup<CustomGroupFields> = TimelineGroupBase & CustomGroupFields;
 
-    export interface ReactCalendarItemRendererProps<CustomItem extends TimelineItemBase = TimelineItemBase> {
+    export type ReactCalendarItemRendererProps<CustomItem extends TimelineItemBase = TimelineItemBase> = {
         item: CustomItem;
         itemContext: ItemContext;
         getItemProps: (props?: Partial<Omit<TimelineItemProps, "key" | "ref">>) => TimelineItemProps;
         getResizeProps: (styles?: ResizeStyles) => ItemRendererResizeProps;
-    }
+    };
 
-    export interface ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase = TimelineGroupBase> {
+    export type ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase = TimelineGroupBase> = {
         group: CustomGroup;
         isRightSidebar?: boolean;
-    }
+    };
 
-    export interface OnItemDragObjectBase {
+    export type OnItemDragObjectBase = {
         eventType: "move" | "resize";
         itemId: Id;
         time: number;
-    }
+    };
 
-    export interface OnItemDragObjectMove extends OnItemDragObjectBase {
+    export type OnItemDragObjectMove = OnItemDragObjectBase & {
         eventType: "move";
         newGroupOrder: number;
-    }
+    };
 
-    export interface OnItemDragObjectResize extends OnItemDragObjectBase {
+    export type OnItemDragObjectResize = OnItemDragObjectBase & {
         eventType: "resize";
         edge?: TimelineItemEdge;
-    }
+    };
 
-    export interface ReactCalendarTimelineProps<
+    export type ReactCalendarTimelineProps<
         CustomItem extends TimelineItemBase = TimelineItemBase,
         CustomGroup extends TimelineGroupBase = TimelineGroupBase,
-    > {
+    > = {
         groups: CustomGroup[];
         items: CustomItem[];
         className?: string;
@@ -137,24 +137,24 @@ declare module "@mil/itch" {
 
         // Fields that are in propTypes but not documented
         headerRef?: React.Ref<any>;
-    }
+    };
 
     export class TimelineMarkers extends React.Component {}
 
-    export interface CustomMarkerChildrenProps {
+    export type CustomMarkerChildrenProps = {
         styles: React.CSSProperties;
         date: number;
-    }
-    export interface MarkerProps {
+    };
+    export type MarkerProps = {
         date: Date | number;
         children?: (props: CustomMarkerChildrenProps) => React.ReactNode;
-    }
+    };
 
     export class CustomMarker extends React.Component<MarkerProps> {}
 
-    export interface TodayMarkerProps extends MarkerProps {
+    export type TodayMarkerProps = MarkerProps & {
         interval?: number;
-    }
+    };
     export class TodayMarker extends React.Component<TodayMarkerProps> {}
 
     export type CursorMarkerProps = Omit<MarkerProps, "date">;
@@ -162,33 +162,33 @@ declare module "@mil/itch" {
 
     export class TimelineHeaders extends React.Component<TimelineHeaderProps> {}
 
-    export interface SidebarHeaderChildrenFnProps<Data> {
+    export type SidebarHeaderChildrenFnProps<Data> = {
         getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
         data: Data;
-    }
+    };
 
-    export interface SidebarHeaderProps<Data> {
+    export type SidebarHeaderProps<Data> = {
         variant?: "left" | "right";
         headerData?: Data;
         children: (props: SidebarHeaderChildrenFnProps<Data>) => React.ReactNode;
-    }
+    };
     export class SidebarHeader<Data = any> extends React.Component<SidebarHeaderProps<Data>> {}
 
-    export interface IntervalContext {
+    export type IntervalContext = {
         interval: { startTime: number; endTime: number; labelWidth: number; left: number };
         intervalText: string;
-    }
-    export interface GetIntervalProps {
+    };
+    export type GetIntervalProps = {
         interval?: Interval;
         style?: React.CSSProperties;
         onClick?: React.MouseEventHandler;
-    }
-    export interface IntervalRenderer<Data> {
+    };
+    export type IntervalRenderer<Data> = {
         intervalContext: IntervalContext;
         getIntervalProps: (props?: GetIntervalProps) => Required<GetIntervalProps> & { key: string | number };
         data?: Data;
-    }
-    export interface DateHeaderProps<Data> {
+    };
+    export type DateHeaderProps<Data> = {
         style?: React.CSSProperties;
         className?: string;
         unit?: TimeUnit | "primaryHeader";
@@ -197,30 +197,30 @@ declare module "@mil/itch" {
         headerData?: Data;
         children?: (props: SidebarHeaderChildrenFnProps<Data>) => React.ReactNode;
         height?: number;
-    }
+    };
     export class DateHeader<Data = any> extends React.Component<DateHeaderProps<Data>> {}
-    export interface Interval {
+    export type Interval = {
         startTime: Moment;
         endTime: Moment;
-    }
-    export interface HeaderContext {
+    };
+    export type HeaderContext = {
         intervals: { startTime: Moment; endTime: Moment }[];
         unit: string;
-    }
-    export interface CustomHeaderPropsChildrenFnProps<Data> {
+    };
+    export type CustomHeaderPropsChildrenFnProps<Data> = {
         timelineContext: TimelineContext;
         headerContext: HeaderContext;
         getIntervalProps: (props?: GetIntervalProps) => Required<GetIntervalProps> & { key: string | number };
         getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
         showPeriod: (startDate: Moment | number, endDate: Moment | number) => void;
         data: Data;
-    }
-    export interface CustomHeaderProps<Data> {
+    };
+    export type CustomHeaderProps<Data> = {
         unit?: TimeUnit;
         headerData?: Data;
         height?: number;
         children: (props?: CustomHeaderPropsChildrenFnProps<Data>) => React.ReactNode;
-    }
+    };
     export class CustomHeader<Data = any> extends React.Component<CustomHeaderProps<Data>> {}
 
     export const defaultTimeSteps: CompleteTimeSteps;
