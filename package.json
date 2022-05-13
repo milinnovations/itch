@@ -10,7 +10,7 @@
     },
     "main": "./lib/index.js",
     "scripts": {
-        "build": "npx rimraf ./lib && tsc && tsc-alias sass src/Timeline.scss lib/Timeline.css",
+        "build": "npx rimraf ./lib && tsc && tsc-alias && sass src/Timeline.scss lib/Timeline.css",
         "prepare": "npm run build",
         "build-to": "npm run build && mkdir -p $npm_config_destination/node_modules/@mil/itch && cp -rf ./lib ./src ./package.json ./LICENSE ./README.md $npm_config_destination/node_modules/@mil/itch",
         "lint": "eslint \"./**/*.ts\" \"./**/*.tsx\" --ignore-pattern \"node_modules/\" --ignore-pattern \"./lib/\" ",
