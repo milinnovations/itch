@@ -1,6 +1,22 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { calculateXPositionForTime, calculateTimeForXPosition } from "../utility/calendar";
+import { Moment } from "moment";
+import { TimeUnit } from "../types";
+
+type ProvidedTimelineContext = {
+    getTimelineState: () => {
+        visibleTimeStart: number;
+        visibleTimeEnd: number;
+        canvasTimeStart: number;
+        canvasTimeEnd: number;
+        canvasWidth: number;
+        timelineUnit: TimeUnit;
+        timelineWidth: number;
+    };
+    getLeftOffsetFromDate: (date: number) => number;
+    getDateFromLeftOffsetPosition: (leftOffset: number) => number;
+    showPeriod: (startDate: number | Moment, endDate: number | Moment) => void;
+};
 
 /* this context will hold all information regarding timeline state:
   1. timeline width
@@ -10,40 +26,46 @@ import { calculateXPositionForTime, calculateTimeForXPosition } from "../utility
 */
 
 /* eslint-disable no-console */
-const defaultContextState = {
+const defaultContextState: ProvidedTimelineContext = {
     getTimelineState: () => {
         console.warn('"getTimelineState" default func is being used');
+        throw new Error(`Timeline context is not initialized: getTimelineState is not available`);
     },
-    getLeftOffsetFromDate: _time => {
+    getLeftOffsetFromDate: (_time: number) => {
         console.warn('"getLeftOffsetFromDate" default func is being used');
-        return 0;
+        throw new Error(`Timeline context is not initialized: getLeftOffsetFromDate is not available`);
     },
     getDateFromLeftOffsetPosition: () => {
         console.warn('"getDateFromLeftOffsetPosition" default func is being used');
+        throw new Error(`Timeline context is not initialized: getDateFromLeftOffsetPosition is not available`);
     },
     showPeriod: () => {
         console.warn('"showPeriod" default func is being used');
+        throw new Error(`Timeline context is not initialized: showPeriod is not available`);
     },
 };
 /* eslint-enable */
 
-const { Consumer, Provider } = React.createContext(defaultContextState);
+const { Consumer, Provider } = React.createContext<ProvidedTimelineContext>(defaultContextState);
 
-export class TimelineStateProvider extends React.Component {
-    /* eslint-disable react/no-unused-prop-types */
-    static propTypes = {
-        children: PropTypes.element.isRequired,
-        visibleTimeStart: PropTypes.number.isRequired,
-        visibleTimeEnd: PropTypes.number.isRequired,
-        canvasTimeStart: PropTypes.number.isRequired,
-        canvasTimeEnd: PropTypes.number.isRequired,
-        canvasWidth: PropTypes.number.isRequired,
-        showPeriod: PropTypes.func.isRequired,
-        timelineUnit: PropTypes.string.isRequired,
-        timelineWidth: PropTypes.number.isRequired,
-    };
+type TimelineStateProviderProps = {
+    children: React.ReactElement;
+    visibleTimeStart: number;
+    visibleTimeEnd: number;
+    canvasTimeStart: number;
+    canvasTimeEnd: number;
+    canvasWidth: number;
+    showPeriod: (startDate: Moment | number, endDate: Moment | number) => void;
+    timelineUnit: TimeUnit;
+    timelineWidth: number;
+};
 
-    constructor(props) {
+type TimelineStateProviderState = {
+    timelineContext: ProvidedTimelineContext;
+};
+
+export class TimelineStateProvider extends React.Component<TimelineStateProviderProps, TimelineStateProviderState> {
+    constructor(props: TimelineStateProviderProps) {
         super(props);
 
         this.state = {
@@ -77,12 +99,12 @@ export class TimelineStateProvider extends React.Component {
         }; // REVIEW,
     };
 
-    getLeftOffsetFromDate = date => {
+    getLeftOffsetFromDate = (date: number) => {
         const { canvasTimeStart, canvasTimeEnd, canvasWidth } = this.props;
         return calculateXPositionForTime(canvasTimeStart, canvasTimeEnd, canvasWidth, date);
     };
 
-    getDateFromLeftOffsetPosition = leftOffset => {
+    getDateFromLeftOffsetPosition = (leftOffset: number) => {
         const { canvasTimeStart, canvasTimeEnd, canvasWidth } = this.props;
         return calculateTimeForXPosition(canvasTimeStart, canvasTimeEnd, canvasWidth, leftOffset);
     };
