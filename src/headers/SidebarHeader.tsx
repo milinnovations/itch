@@ -3,19 +3,20 @@ import { TimelineHeadersConsumer } from "./HeadersContext";
 
 export interface ISidebarHeaderChildrenFnProps<T> {
     getRootProps: (propsToOverride: { style: React.CSSProperties }) => { style: React.CSSProperties };
-    data: T;
+    data?: T; // TODO: I had to make this optional, please check it later
 }
 
 export interface ISidebarWrapperProps<T> {
-    variant: "left" | "right";
-    headerData: T;
-    children: (props: ISidebarHeaderChildrenFnProps<T>) => JSX.Element;
+    variant?: "left" | "right";
+    headerData?: T;
+    children?: (props: ISidebarHeaderChildrenFnProps<T>) => JSX.Element;
 }
 
 export interface ISidebarHeaderProps<T> extends ISidebarWrapperProps<T> {
     rightSidebarWidth?: number;
     leftSidebarWidth: number;
     style?: React.CSSProperties;
+    children: (props: ISidebarHeaderChildrenFnProps<T>) => JSX.Element;
 }
 
 class SidebarHeader<T> extends React.PureComponent<ISidebarHeaderProps<T>> {
@@ -30,7 +31,7 @@ class SidebarHeader<T> extends React.PureComponent<ISidebarHeaderProps<T>> {
         };
     };
 
-    getStateAndHelpers = () => {
+    getStateAndHelpers = (): ISidebarHeaderChildrenFnProps<T> => {
         return {
             getRootProps: this.getRootProps,
             data: this.props.headerData,
@@ -39,8 +40,8 @@ class SidebarHeader<T> extends React.PureComponent<ISidebarHeaderProps<T>> {
 
     render() {
         const renderProps = this.getStateAndHelpers();
-        const Renderer = this.props.children;
-        return <Renderer {...renderProps} />;
+        const renderer = this.props.children;
+        return renderer(renderProps);
     }
 }
 
@@ -48,7 +49,7 @@ const defaultSidebarHeaderChildren = ({ getRootProps }: ISidebarHeaderChildrenFn
     <div data-testid="sidebarHeader" {...getRootProps({ style: {} })} />
 );
 
-function SidebarWrapper<T>(props: ISidebarWrapperProps<T>): React.ReactNode {
+function SidebarWrapper<T>(props: ISidebarWrapperProps<T>): JSX.Element {
     const { children = defaultSidebarHeaderChildren, variant = "left", headerData } = props;
     return (
         <TimelineHeadersConsumer>
@@ -57,7 +58,8 @@ function SidebarWrapper<T>(props: ISidebarWrapperProps<T>): React.ReactNode {
                     <SidebarHeader
                         leftSidebarWidth={leftSidebarWidth}
                         rightSidebarWidth={rightSidebarWidth}
-                        children={children}
+                        // eslint-disable-next-line react/no-children-prop
+                        children={children} // TODO: This seems a bad programming practice, it should be refactored
                         variant={variant}
                         headerData={headerData}
                     />
