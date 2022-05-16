@@ -142,7 +142,6 @@ declare module "@mil/itch" {
         onBoundsChange?(canvasTimeStart: number, canvasTimeEnd: number): any;
         itemRenderer?: (props: ReactCalendarItemRendererProps<CustomItem>) => React.ReactNode;
         groupRenderer?: (props: ReactCalendarGroupRendererProps<CustomGroup>) => React.ReactNode;
-        resizeDetector?: (containerResizeDetector: any) => void;
         verticalLineClassNamesForTime?: (start: number, end: number) => string[] | undefined;
         horizontalLineClassNamesForGroup?: (group: CustomGroup) => string[];
 

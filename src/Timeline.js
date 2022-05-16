@@ -8,7 +8,6 @@ import Columns from "./columns/Columns";
 import { GroupRows } from "./row/GroupRows";
 import ScrollElement from "./scroll/ScrollElement";
 import MarkerCanvas from "./markers/MarkerCanvas";
-import windowResizeDetector from "./resizeDetector/window";
 
 import {
     getMinUnit,
@@ -166,11 +165,6 @@ export default class ReactCalendarTimeline extends Component {
             minuteLong: PropTypes.string,
         }),
 
-        resizeDetector: PropTypes.shape({
-            addListener: PropTypes.func,
-            removeListener: PropTypes.func,
-        }),
-
         verticalLineClassNamesForTime: PropTypes.func,
 
         zoomSpeed: PropTypes.object,
@@ -282,7 +276,26 @@ export default class ReactCalendarTimeline extends Component {
         // the 'this' inside the function would point directly to the container. Note that we can
         // still reach the container as well if the listener is bound because the Timeline keeps a
         // reference to it.
-        this.containerScrollListener = this.containerScrollListener.bind(this);
+        this.containerScrollOrResizeListener = this.containerScrollOrResizeListener.bind(this);
+
+        // Keep track of the current height and width of the container.
+        this.containerHeight = 0;
+        this.containerWidth = 0;
+        this.resizeObserver = new ResizeObserver(entries => {
+            const { height, width } = entries[0].contentRect;
+
+            if (this.containerHeight !== height) {
+                this.containerHeight = height;
+                // The height changed, update the vertical scroll canvas
+                this.containerScrollOrResizeListener();
+            }
+
+            if (this.containerWidth !== width) {
+                this.containerWidth = width;
+                // The width changed, update the horizontal scroll canvas
+                this.resize();
+            }
+        });
 
         let visibleTimeStart = null;
         let visibleTimeEnd = null;
@@ -347,45 +360,35 @@ export default class ReactCalendarTimeline extends Component {
     }
 
     /**
-     * Event listener that is called when the Timeline container div is scrolled (vertically). Checks
-     * whether the current vertical canvas still comfortably covers the visible area and sets the new
-     * canvas position if it doesn't. Triggers a rerender if and only if a new vertical canvas is needed.
+     * Event listener that is called when the Timeline container div is scrolled (vertically) or is
+     * resized. Checks whether the current vertical canvas still comfortably covers the visible area
+     * and sets the new canvas position if it doesn't. Triggers a rerender if and only if a new vertical
+     * canvas is needed.
      */
-    containerScrollListener() {
-        const scrollTop = this.container.scrollTop;
-        const { height: containerHeight } = this.container.getBoundingClientRect();
+    containerScrollOrResizeListener() {
+        const visibleTop = this.container.scrollTop;
+        const visibleHeight = this.containerHeight;
 
-        if (needNewVerticalCanvas(scrollTop, containerHeight, this.state.canvasTop, this.state.canvasBottom)) {
-            const { top, bottom } = getNewVerticalCanvasDimensions(scrollTop, containerHeight);
+        if (needNewVerticalCanvas(visibleTop, visibleHeight, this.state.canvasTop, this.state.canvasBottom)) {
+            const { top, bottom } = getNewVerticalCanvasDimensions(visibleTop, visibleHeight);
             this.setState({ canvasTop: top, canvasBottom: bottom });
         }
     }
 
     componentDidMount() {
-        this.resize(this.props);
-
-        if (this.props.resizeDetector && this.props.resizeDetector.addListener) {
-            this.props.resizeDetector.addListener(this);
-        }
-
-        windowResizeDetector.addListener(this);
-
         this.lastTouchDistance = null;
 
-        // Listen for vertical scrolling on the container div. Also call the listener immediately
-        // after mounting to set a proper canvas size.
-        this.container.addEventListener("scroll", this.containerScrollListener);
-        this.containerScrollListener();
+        // Listen for vertical scrolling on the container div.
+        this.container.addEventListener("scroll", this.containerScrollOrResizeListener);
+
+        // Starting the observation will call the listeners once. That initial call will
+        // set up the initial horizontal and vertical canvas properly.
+        this.resizeObserver.observe(this.container);
     }
 
     componentWillUnmount() {
-        if (this.props.resizeDetector && this.props.resizeDetector.addListener) {
-            this.props.resizeDetector.removeListener(this);
-        }
-
-        windowResizeDetector.removeListener(this);
-
-        this.container.removeEventListener("scroll", this.containerScrollListener);
+        this.container.removeEventListener("scroll", this.containerScrollOrResizeListener);
+        this.resizeObserver.unobserve(this.container);
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -468,9 +471,7 @@ export default class ReactCalendarTimeline extends Component {
     }
 
     resize = (props = this.props) => {
-        const { width: containerWidth } = this.container.getBoundingClientRect();
-
-        let width = containerWidth - props.sidebarWidth - props.rightSidebarWidth;
+        let width = this.containerWidth - props.sidebarWidth - props.rightSidebarWidth;
         const canvasWidth = getCanvasWidth(width);
         const { dimensionItems, height, groupHeights, groupTops } = stackTimelineItems(
             props.items,
