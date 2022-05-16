@@ -1,26 +1,31 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { TimelineMarkersConsumer } from "../TimelineMarkersContext";
 import { TimelineMarkerType } from "../markerType";
+import { Marker, MarkerWithoutId } from "markers/Marker";
+import { CursorMarkerProps } from "../../types";
 
-class CursorMarker extends React.Component {
-    static propTypes = {
-        subscribeMarker: PropTypes.func.isRequired,
-        children: PropTypes.func,
+type WrappedCursorMarkerProps = CursorMarkerProps & {
+    subscribeMarker: (marker: MarkerWithoutId) => {
+        unsubscribe: () => void;
+        getMarker: () => Marker;
     };
+};
+
+class CursorMarker extends React.Component<WrappedCursorMarkerProps> {
+    private _unsubscribe: null | (() => void) = null;
 
     componentDidMount() {
         const { unsubscribe } = this.props.subscribeMarker({
             type: TimelineMarkerType.Cursor,
             renderer: this.props.children,
         });
-        this.unsubscribe = unsubscribe;
+        this._unsubscribe = unsubscribe;
     }
 
     componentWillUnmount() {
-        if (this.unsubscribe != null) {
-            this.unsubscribe();
-            this.unsubscribe = null;
+        if (this._unsubscribe !== null) {
+            this._unsubscribe();
+            this._unsubscribe = null;
         }
     }
     render() {
@@ -29,7 +34,7 @@ class CursorMarker extends React.Component {
 }
 
 // TODO: turn into HOC?
-const CursorMarkerWrapper = props => {
+const CursorMarkerWrapper = (props: CursorMarkerProps) => {
     return (
         <TimelineMarkersConsumer>
             {({ subscribeMarker }) => <CursorMarker subscribeMarker={subscribeMarker} {...props} />}

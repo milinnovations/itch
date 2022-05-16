@@ -221,3 +221,19 @@ export type DateHeaderProps<Data> = {
     height?: number;
     children?: (props: SidebarHeaderChildrenFnProps<Data>) => React.ReactNode; // TODO: is this used anywhere???
 };
+
+export type CustomMarkerChildrenProps = {
+    styles: React.CSSProperties;
+    date: number;
+};
+
+export type MarkerProps = {
+    date: number; // Originally this was `number | Date` but we can not use `Date` for markers
+    children?: (props: CustomMarkerChildrenProps) => React.ReactNode;
+};
+
+export type TodayMarkerProps = MarkerProps & {
+    interval?: number;
+};
+
+export type CursorMarkerProps = Omit<MarkerProps, "date">;

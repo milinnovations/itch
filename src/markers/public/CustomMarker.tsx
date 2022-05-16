@@ -1,19 +1,24 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { TimelineMarkersConsumer } from "../TimelineMarkersContext";
 import { TimelineMarkerType } from "../markerType";
+import { Marker, MarkerWithoutId } from "markers/Marker";
+import { MarkerProps } from "types";
 
-class CustomMarker extends React.Component {
-    static propTypes = {
-        subscribeMarker: PropTypes.func.isRequired,
-        updateMarker: PropTypes.func.isRequired,
-        children: PropTypes.func,
-        date: PropTypes.number.isRequired,
+type WrappedTodayMarkerProps = MarkerProps & {
+    subscribeMarker: (marker: MarkerWithoutId) => {
+        unsubscribe: () => void;
+        getMarker: () => Marker;
     };
+    updateMarker: (marker: Marker) => unknown;
+};
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.date !== this.props.date && this.getMarker) {
-            const marker = this.getMarker();
+class CustomMarker extends React.Component<WrappedTodayMarkerProps> {
+    private _unsubscribe: null | (() => void) = null;
+    private _getMarker: null | (() => Marker) = null;
+
+    componentDidUpdate(prevProps: Readonly<WrappedTodayMarkerProps>) {
+        if (prevProps.date !== this.props.date && this._getMarker) {
+            const marker = this._getMarker();
             this.props.updateMarker({ ...marker, date: this.props.date });
         }
     }
@@ -24,14 +29,14 @@ class CustomMarker extends React.Component {
             renderer: this.props.children,
             date: this.props.date,
         });
-        this.unsubscribe = unsubscribe;
-        this.getMarker = getMarker;
+        this._unsubscribe = unsubscribe;
+        this._getMarker = getMarker;
     }
 
     componentWillUnmount() {
-        if (this.unsubscribe != null) {
-            this.unsubscribe();
-            this.unsubscribe = null;
+        if (this._unsubscribe !== null) {
+            this._unsubscribe();
+            this._unsubscribe = null;
         }
     }
 
@@ -41,7 +46,7 @@ class CustomMarker extends React.Component {
 }
 
 // TODO: turn into HOC?
-const CustomMarkerWrapper = props => {
+const CustomMarkerWrapper = (props: MarkerProps) => {
     return (
         <TimelineMarkersConsumer>
             {({ subscribeMarker, updateMarker }) => (

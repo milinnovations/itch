@@ -1,13 +1,15 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { noop } from "../utility/generic";
+// import PropTypes from "prop-types";
+// import { noop } from "../utility/generic";
+import { Marker, MarkerWithoutId } from "./Marker";
 
-const defaultContextState = {
+const defaultContextState: TimelineMarkersProviderState = {
     markers: [],
     subscribeMarker: () => {
-        // eslint-disable-next-line
-        console.warn("default subscribe marker used");
-        return noop;
+        throw new Error(`Default subscribe marker used`);
+    },
+    updateMarker: () => {
+        throw new Error(`Default update marker used`);
     },
 };
 
@@ -20,14 +22,35 @@ const createId = () => {
     return _id + 1;
 };
 
-export class TimelineMarkersProvider extends React.Component {
-    static propTypes = {
-        children: PropTypes.element.isRequired,
-    };
+type TimelineMarkersProviderProps = {
+    children: React.ReactElement; // Children is required
+};
 
-    handleSubscribeToMarker = newMarker => {
-        newMarker = {
-            ...newMarker,
+type TimelineMarkersProviderState = {
+    markers: Marker[];
+    subscribeMarker: (marker: MarkerWithoutId) => {
+        unsubscribe: () => void;
+        getMarker: () => Marker;
+    };
+    updateMarker: (marker: Marker) => void;
+};
+
+export class TimelineMarkersProvider extends React.Component<
+    TimelineMarkersProviderProps,
+    TimelineMarkersProviderState
+> {
+    constructor(props: TimelineMarkersProviderProps) {
+        super(props);
+        this.state = {
+            markers: [],
+            subscribeMarker: this.handleSubscribeToMarker,
+            updateMarker: this.handleUpdateMarker,
+        };
+    }
+
+    handleSubscribeToMarker = (newMarkerWithoutId: MarkerWithoutId) => {
+        const newMarker: Marker = {
+            ...newMarkerWithoutId,
             // REVIEW: in the event that we accept id to be passed to the Marker components, this line would override those
             id: createId(),
         };
@@ -51,7 +74,7 @@ export class TimelineMarkersProvider extends React.Component {
         };
     };
 
-    handleUpdateMarker = updateMarker => {
+    handleUpdateMarker = (updateMarker: Marker) => {
         const markerIndex = this.state.markers.findIndex(marker => marker.id === updateMarker.id);
         if (markerIndex < 0) return;
         this.setState(state => {
@@ -63,12 +86,6 @@ export class TimelineMarkersProvider extends React.Component {
                 ],
             };
         });
-    };
-
-    state = {
-        markers: [],
-        subscribeMarker: this.handleSubscribeToMarker,
-        updateMarker: this.handleUpdateMarker,
     };
 
     render() {

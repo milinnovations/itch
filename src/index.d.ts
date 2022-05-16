@@ -38,6 +38,10 @@ import type {
     SidebarHeaderChildrenFnProps as SidebarHeaderChildrenFnProps_,
     CustomHeaderProps as CustomHeaderProps_,
     DateHeaderProps as DateHeaderProps_,
+    CustomMarkerChildrenProps as CustomMarkerChildrenProps_,
+    MarkerProps as MarkerProps_,
+    TodayMarkerProps as TodayMarkerProps_,
+    CursorMarkerProps as CursorMarkerProps_,
 } from "./types";
 
 declare module "@mil/itch" {
@@ -147,24 +151,12 @@ declare module "@mil/itch" {
     };
 
     export class TimelineMarkers extends React.Component {}
-
-    export type CustomMarkerChildrenProps = {
-        styles: React.CSSProperties;
-        date: number;
-    };
-    export type MarkerProps = {
-        date: Date | number;
-        children?: (props: CustomMarkerChildrenProps) => React.ReactNode;
-    };
-
+    export type CustomMarkerChildrenProps = CustomMarkerChildrenProps_;
+    export type MarkerProps = MarkerProps_;
     export class CustomMarker extends React.Component<MarkerProps> {}
-
-    export type TodayMarkerProps = MarkerProps & {
-        interval?: number;
-    };
+    export type TodayMarkerProps = TodayMarkerProps_;
     export class TodayMarker extends React.Component<TodayMarkerProps> {}
-
-    export type CursorMarkerProps = Omit<MarkerProps, "date">;
+    export type CursorMarkerProps = CursorMarkerProps_;
     export class CursorMarker extends React.Component<CursorMarkerProps> {}
 
     export class TimelineHeaders extends React.Component<TimelineHeaderProps> {}

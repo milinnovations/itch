@@ -3,7 +3,7 @@ import React from "react";
 /**
  * Baseline styles to get the marker to render correctly
  */
-const criticalStyles = {
+const criticalStyles: React.CSSProperties = {
     position: "absolute",
     top: 0,
     bottom: 0,
@@ -17,14 +17,15 @@ const criticalStyles = {
 
 // FIXME: this creates a new object each time in render
 // might want to memoize this?
-export const createMarkerStylesWithLeftOffset = leftOffset => ({
+export const createMarkerStylesWithLeftOffset = (leftOffset: number): React.CSSProperties => ({
     ...criticalStyles,
     left: leftOffset,
 });
 
-export const createDefaultRenderer = dataTestidValue => {
+// TODO: find a better type for `dataTestidValue`
+export const createDefaultRenderer = (dataTestidValue: string) => {
     // eslint-disable-next-line
-    return function DefaultMarkerRenderer({ styles }) {
+    return function DefaultMarkerRenderer({ styles }: { styles: React.CSSProperties }) {
         return <div style={styles} data-testid={dataTestidValue} />;
     };
 };
