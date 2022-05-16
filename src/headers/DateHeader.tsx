@@ -7,49 +7,26 @@ import memoize from "memoize-one";
 import { CustomDateHeader } from "./CustomDateHeader";
 import { Moment } from "moment";
 import { TimeUnit } from "../types";
-
-type Interval = {
-    startTime: Moment;
-    endTime: Moment;
-    labelWidth: number; // TODO: do we need this?
-    left: number; // TODO: do we need this?
-};
-
-type IntervalContext = {
-    // TODO: I think the following original type was wrong, so I used `Interval` instead
-    // interval: { startTime: number; endTime: number; labelWidth: number; left: number };
-    interval: Interval;
-    intervalText: string;
-};
-
-type GetIntervalProps = {
-    interval?: Interval;
-    style?: React.CSSProperties;
-    onClick?: React.MouseEventHandler;
-};
-
-type IntervalRenderer<Data> = {
-    intervalContext: IntervalContext;
-    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number }; // TODO: I had to remove the Required
-    data?: Data;
-};
+import { IntervalRenderer } from "../types";
 
 type SidebarHeaderChildrenFnProps<Data> = {
     getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
     data: Data;
 };
 
-type DateHeaderProps<Data> = {
+type DateHeaderWrapperProps<Data> = {
     style?: React.CSSProperties;
     className?: string;
     unit?: TimeUnit | "primaryHeader";
     labelFormat?: string | (([startTime, endTime]: [Moment, Moment], unit: TimeUnit, labelWidth: number) => string);
     intervalRenderer?: (props?: IntervalRenderer<Data>) => React.ReactNode;
-    headerData?: Data; // TODO: I had to make this required
-    children?: (props: SidebarHeaderChildrenFnProps<Data>) => React.ReactNode;
+    headerData?: Data;
     height?: number;
+};
 
-    timelineUnit: TimeUnit; // TODO: this was a missing property
+type DateHeaderProps<Data> = DateHeaderWrapperProps<Data> & {
+    children?: (props: SidebarHeaderChildrenFnProps<Data>) => React.ReactNode; // TODO: is this used anywhere???
+    timelineUnit: TimeUnit;
 };
 
 class DateHeader<Data> extends React.Component<DateHeaderProps<Data>> {
@@ -103,7 +80,7 @@ class DateHeader<Data> extends React.Component<DateHeaderProps<Data>> {
 
     render() {
         const unit = this.getHeaderUnit();
-        const { /* headerData, */ height } = this.props;
+        const { height } = this.props;
         return (
             <CustomHeader
                 unit={unit}
@@ -122,16 +99,6 @@ class DateHeader<Data> extends React.Component<DateHeaderProps<Data>> {
         );
     }
 }
-
-type DateHeaderWrapperProps<Data> = {
-    style?: React.CSSProperties;
-    className?: string;
-    unit?: TimeUnit | "primaryHeader";
-    labelFormat?: string | (([startTime, endTime]: [Moment, Moment], unit: TimeUnit, labelWidth: number) => string);
-    intervalRenderer?: (props?: IntervalRenderer<Data>) => React.ReactNode;
-    headerData?: Data;
-    height?: number;
-};
 
 function DateHeaderWrapper<Data>({
     unit,

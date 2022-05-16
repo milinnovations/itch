@@ -1,33 +1,15 @@
 import React from "react";
 import { TimelineHeadersConsumer } from "./HeadersContext";
 import { TimelineStateConsumer } from "../timeline/TimelineStateContext";
-import { iterateTimes /*, calculateXPositionForTime */ } from "../utility/calendar";
+import { iterateTimes } from "../utility/calendar";
 import { Moment } from "moment";
 import { TimelineContext, TimeUnit } from "../types";
-
-type Interval = {
-    startTime: Moment;
-    endTime: Moment;
-    labelWidth: number; // TODO: do we need this?
-    left: number; // TODO: do we need this?
-};
-
-type GetIntervalProps = {
-    interval?: Interval;
-    style?: React.CSSProperties;
-    onClick?: React.MouseEventHandler;
-};
-
-type HeaderContext = {
-    // intervals: { startTime: Moment; endTime: Moment }[];
-    intervals: Interval[];
-    unit: TimeUnit;
-};
+import { GetIntervalProps, HeaderContext, Interval } from "../types";
 
 type CustomHeaderPropsChildrenFnProps<Data> = {
     timelineContext: TimelineContext;
     headerContext: HeaderContext;
-    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number }; // TODO: This can't be `Required<GetIntervalProps>`
+    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number };
     getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
     showPeriod: (startDate: Moment | number, endDate: Moment | number) => void;
     data: Data;
@@ -49,32 +31,31 @@ type WrappedCustomHeaderProps<Data> = {
     getLeftOffsetFromDate: (date: number) => number;
     height: number;
 
-    timelineUnit: TimeUnit; // TODO: This was originally missing
-    timelineWidth: number; // TODO: This was originally missing
+    timelineUnit: TimeUnit;
+    timelineWidth: number;
 };
 
 type WrappedCustomHeaderState = {
     intervals: Interval[];
 };
 
+type CustomHeaderProps<Data> = {
+    unit?: TimeUnit;
+    headerData: Data;
+    height?: number;
+    children: (props: CustomHeaderPropsChildrenFnProps<Data>) => JSX.Element;
+};
+
 export class CustomHeader<Data> extends React.Component<WrappedCustomHeaderProps<Data>, WrappedCustomHeaderState> {
     constructor(props: WrappedCustomHeaderProps<Data>) {
         super(props);
-        const {
-            canvasTimeStart,
-            canvasTimeEnd,
-            /* canvasWidth, */ unit,
-            timeSteps,
-            /* showPeriod, */ getLeftOffsetFromDate,
-        } = props;
+        const { canvasTimeStart, canvasTimeEnd, unit, timeSteps, getLeftOffsetFromDate } = props;
 
         const intervals = this.getHeaderIntervals({
             canvasTimeStart,
             canvasTimeEnd,
-            // canvasWidth, // TODO: Please remove this if it is really not necessary
             unit,
             timeSteps,
-            // showPeriod, // TODO: Please remove this if it is really not necessary
             getLeftOffsetFromDate,
         });
 
@@ -110,21 +91,13 @@ export class CustomHeader<Data> extends React.Component<WrappedCustomHeaderProps
             nextProps.timeSteps !== this.props.timeSteps ||
             nextProps.showPeriod !== this.props.showPeriod
         ) {
-            const {
-                canvasTimeStart,
-                canvasTimeEnd,
-                /* canvasWidth, */ unit,
-                timeSteps,
-                /* showPeriod, */ getLeftOffsetFromDate,
-            } = nextProps;
+            const { canvasTimeStart, canvasTimeEnd, unit, timeSteps, getLeftOffsetFromDate } = nextProps;
 
             const intervals = this.getHeaderIntervals({
                 canvasTimeStart,
                 canvasTimeEnd,
-                // canvasWidth, // TODO: Please remove this if it is really not necessary
                 unit,
                 timeSteps,
-                // showPeriod, // TODO: Please remove this if it is really not necessary
                 getLeftOffsetFromDate,
             });
 
@@ -175,10 +148,7 @@ export class CustomHeader<Data> extends React.Component<WrappedCustomHeaderProps
         return {
             style: this.getIntervalStyle({
                 style,
-                // startTime, // TODO: Remove if this is really not necessary
                 labelWidth,
-                // canvasTimeStart: this.props.canvasTimeStart, // TODO: Remove if this is really not necessary
-                // unit: this.props.unit, // TODO: Remove if this is really not necessary
                 left,
             }),
             key: `label-${startTime.valueOf()}`,
@@ -239,13 +209,6 @@ export class CustomHeader<Data> extends React.Component<WrappedCustomHeaderProps
         return <Renderer {...props} />;
     }
 }
-
-type CustomHeaderProps<Data> = {
-    unit?: TimeUnit;
-    headerData: Data;
-    height?: number;
-    children: (props: CustomHeaderPropsChildrenFnProps<Data>) => JSX.Element;
-};
 
 function CustomHeaderWrapper<Data>({ children, unit, headerData, height = 30 }: CustomHeaderProps<Data>) {
     return (

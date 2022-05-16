@@ -2,52 +2,21 @@ import React from "react";
 import IntervalComponent from "./Interval";
 import { Moment } from "moment";
 import { TimeUnit } from "../types";
-
-type Interval = {
-    startTime: Moment;
-    endTime: Moment;
-    labelWidth: number; // TODO: do we need this?
-    left: number; // TODO: do we need this?
-};
-
-type GetIntervalProps = {
-    interval?: Interval;
-    style?: React.CSSProperties;
-    onClick?: React.MouseEventHandler;
-};
-
-type HeaderContext = {
-    // intervals: { startTime: Moment; endTime: Moment }[];
-    intervals: Interval[];
-    unit: TimeUnit;
-};
-
-type IntervalContext = {
-    // TODO: I think the following original type was wrong, so I used `Interval` instead
-    // interval: { startTime: number; endTime: number; labelWidth: number; left: number };
-    interval: Interval;
-    intervalText: string;
-};
-
-type IntervalRenderer<Data> = {
-    intervalContext: IntervalContext;
-    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number }; // TODO: I had to remove the required
-    data?: Data;
-};
+import { GetIntervalProps, HeaderContext, IntervalRenderer } from "../types";
 
 type HeaderData<Data> = {
     style: React.CSSProperties;
     intervalRenderer?: ((props?: IntervalRenderer<Data> | undefined) => React.ReactNode) | undefined;
     className?: string | undefined;
     getLabelFormat: (interval: [Moment, Moment], unit: TimeUnit, labelWidth: number) => string;
-    unitProp?: TimeUnit | "primaryHeader"; // TODO: I had to make this optional
+    unitProp?: TimeUnit | "primaryHeader";
     headerData?: Data;
 };
 
 type CustomDateHeaderProps<Data> = {
     headerContext: HeaderContext;
     getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
-    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number }; // TODO: I had to remove the Required
+    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number };
     showPeriod: (startDate: Moment | number, endDate: Moment | number) => void;
     data: HeaderData<Data>;
 };

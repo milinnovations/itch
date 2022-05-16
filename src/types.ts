@@ -1,3 +1,4 @@
+import type { Moment } from "moment";
 import type React from "react";
 
 export type Id = number | string;
@@ -157,4 +158,34 @@ export type ReactCalendarItemRendererProps<TItem extends TimelineItemBase = Time
     itemContext: ItemContext;
     getItemProps: (props?: Partial<Omit<TimelineItemProps, "key" | "ref">>) => TimelineItemProps;
     getResizeProps: (styles?: ResizeStyles) => ItemRendererResizeProps;
+};
+
+export type Interval = {
+    startTime: Moment;
+    endTime: Moment;
+    labelWidth: number;
+    left: number;
+};
+
+export type GetIntervalProps = {
+    interval?: Interval;
+    style?: React.CSSProperties;
+    onClick?: React.MouseEventHandler;
+};
+
+export type HeaderContext = {
+    intervals: Interval[];
+    unit: TimeUnit;
+};
+
+// Only used internally for the IntervalRenderer but exported by the library
+export type IntervalContext = {
+    interval: Interval;
+    intervalText: string;
+};
+
+export type IntervalRenderer<Data> = {
+    intervalContext: IntervalContext;
+    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number };
+    data?: Data;
 };

@@ -3,32 +3,7 @@ import { getNextUnit } from "../utility/calendar";
 import { composeEvents } from "../utility/events";
 import { Moment } from "moment";
 import { TimeUnit } from "../types";
-
-type Interval = {
-    startTime: Moment;
-    endTime: Moment;
-    labelWidth: number; // TODO: do we need this?
-    left: number; // TODO: do we need this?
-};
-
-type IntervalContext = {
-    // TODO: I think the following original type was wrong, so I used `Interval` instead
-    // interval: { startTime: number; endTime: number; labelWidth: number; left: number };
-    interval: Interval;
-    intervalText: string;
-};
-
-type GetIntervalProps = {
-    interval?: Interval;
-    style?: React.CSSProperties;
-    onClick?: React.MouseEventHandler;
-};
-
-type IntervalRenderer<Data> = {
-    intervalContext: IntervalContext;
-    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number }; // TODO: I had to remove the Required
-    data?: Data;
-};
+import { GetIntervalProps, Interval, IntervalRenderer } from "../types";
 
 type IntervalProps<Data> = {
     intervalRenderer?: (props?: IntervalRenderer<Data>) => React.ReactNode;
@@ -37,7 +12,7 @@ type IntervalProps<Data> = {
     showPeriod: (startDate: Moment | number, endDate: Moment | number) => void;
     intervalText: string;
     primaryHeader: boolean;
-    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number }; // TODO: I had to remove the Required
+    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number };
     headerData?: Data;
 };
 

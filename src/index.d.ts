@@ -29,6 +29,11 @@ import type {
     TimelineItemProps as TimelineItemProps_,
     TimeFormat as TimeFormat_,
     TimeUnit as TimeUnit_,
+    Interval as Interval_,
+    GetIntervalProps as GetIntervalProps_,
+    HeaderContext as HeaderContext_,
+    IntervalContext as IntervalContext_,
+    IntervalRenderer as IntervalRenderer_,
 } from "./types";
 
 declare module "@mil/itch" {
@@ -172,20 +177,9 @@ declare module "@mil/itch" {
     };
     export class SidebarHeader<Data = any> extends React.Component<SidebarHeaderProps<Data>> {}
 
-    export type IntervalContext = {
-        interval: { startTime: number; endTime: number; labelWidth: number; left: number };
-        intervalText: string;
-    };
-    export type GetIntervalProps = {
-        interval?: Interval;
-        style?: React.CSSProperties;
-        onClick?: React.MouseEventHandler;
-    };
-    export type IntervalRenderer<Data> = {
-        intervalContext: IntervalContext;
-        getIntervalProps: (props?: GetIntervalProps) => Required<GetIntervalProps> & { key: string | number };
-        data?: Data;
-    };
+    export type IntervalContext = IntervalContext_;
+    export type GetIntervalProps = GetIntervalProps_;
+    export type IntervalRenderer<Data> = IntervalRenderer_<Data>;
     export type DateHeaderProps<Data> = {
         style?: React.CSSProperties;
         className?: string;
@@ -197,14 +191,8 @@ declare module "@mil/itch" {
         height?: number;
     };
     export class DateHeader<Data = any> extends React.Component<DateHeaderProps<Data>> {}
-    export type Interval = {
-        startTime: Moment;
-        endTime: Moment;
-    };
-    export type HeaderContext = {
-        intervals: { startTime: Moment; endTime: Moment }[];
-        unit: string;
-    };
+    export type Interval = Interval_;
+    export type HeaderContext = HeaderContext_;
     export type CustomHeaderPropsChildrenFnProps<Data> = {
         timelineContext: TimelineContext;
         headerContext: HeaderContext;
