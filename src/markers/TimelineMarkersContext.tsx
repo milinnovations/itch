@@ -1,7 +1,5 @@
 import React from "react";
-// import PropTypes from "prop-types";
-// import { noop } from "../utility/generic";
-import { Marker, MarkerWithoutId } from "./Marker";
+import { Marker } from "./Marker";
 
 const defaultContextState: TimelineMarkersProviderState = {
     markers: [],
@@ -28,7 +26,7 @@ type TimelineMarkersProviderProps = {
 
 type TimelineMarkersProviderState = {
     markers: Marker[];
-    subscribeMarker: (marker: MarkerWithoutId) => {
+    subscribeMarker: (marker: Marker) => {
         unsubscribe: () => void;
         getMarker: () => Marker;
     };
@@ -48,7 +46,7 @@ export class TimelineMarkersProvider extends React.Component<
         };
     }
 
-    handleSubscribeToMarker = (newMarkerWithoutId: MarkerWithoutId) => {
+    handleSubscribeToMarker = (newMarkerWithoutId: Marker) => {
         const newMarker: Marker = {
             ...newMarkerWithoutId,
             // REVIEW: in the event that we accept id to be passed to the Marker components, this line would override those

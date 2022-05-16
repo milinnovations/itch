@@ -1,11 +1,11 @@
 import React from "react";
 import { TimelineMarkersConsumer } from "../TimelineMarkersContext";
 import { TimelineMarkerType } from "../markerType";
-import { Marker, MarkerWithoutId } from "markers/Marker";
-import { MarkerProps } from "types";
+import { Marker } from "markers/Marker";
+import { MarkerProps } from "../../types";
 
 type WrappedTodayMarkerProps = MarkerProps & {
-    subscribeMarker: (marker: MarkerWithoutId) => {
+    subscribeMarker: (marker: Marker) => {
         unsubscribe: () => void;
         getMarker: () => Marker;
     };
@@ -19,7 +19,10 @@ class CustomMarker extends React.Component<WrappedTodayMarkerProps> {
     componentDidUpdate(prevProps: Readonly<WrappedTodayMarkerProps>) {
         if (prevProps.date !== this.props.date && this._getMarker) {
             const marker = this._getMarker();
-            this.props.updateMarker({ ...marker, date: this.props.date });
+            if (marker.type === TimelineMarkerType.Custom) {
+                // We can only update date for custom marker
+                this.props.updateMarker({ ...marker, date: this.props.date });
+            }
         }
     }
 

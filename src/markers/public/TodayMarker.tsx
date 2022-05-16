@@ -1,11 +1,11 @@
 import React from "react";
 import { TimelineMarkersConsumer } from "../TimelineMarkersContext";
 import { TimelineMarkerType } from "../markerType";
-import { Marker, MarkerWithoutId } from "markers/Marker";
+import { Marker } from "markers/Marker";
 import { TodayMarkerProps } from "../../types";
 
 type WrappedTodayMarkerProps = TodayMarkerProps & {
-    subscribeMarker: (marker: MarkerWithoutId) => {
+    subscribeMarker: (marker: Marker) => {
         unsubscribe: () => void;
         getMarker: () => Marker;
     };
@@ -38,10 +38,13 @@ class TodayMarker extends React.Component<WrappedTodayMarkerProps> {
     componentDidUpdate(prevProps: Readonly<WrappedTodayMarkerProps>) {
         if (prevProps.interval !== this.props.interval && this._getMarker) {
             const marker = this._getMarker();
-            this.props.updateMarker({
-                ...marker,
-                interval: this.props.interval ?? defaultInterval,
-            });
+            if (marker.type === TimelineMarkerType.Today) {
+                // We can only update interval for today marker
+                this.props.updateMarker({
+                    ...marker,
+                    interval: this.props.interval ?? defaultInterval,
+                });
+            }
         }
     }
 

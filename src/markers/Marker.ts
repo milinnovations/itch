@@ -8,28 +8,23 @@ type CustomMarkerChildrenProps = {
 };
 
 type TodayMarker = {
+    id?: number;
     type: TimelineMarkerType.Today;
     renderer?: (props: CustomMarkerChildrenProps) => React.ReactNode;
     interval: number;
-
-    date?: number; // Just to skip some casts
 };
 
 type CursorMarker = {
+    id?: number;
     type: TimelineMarkerType.Cursor;
     renderer?: (props: CustomMarkerChildrenProps) => React.ReactNode;
-
-    interval?: number;
-    date?: number;
 };
 
 type CustomMarker = {
+    id?: number;
     type: TimelineMarkerType.Custom;
     renderer?: (props: CustomMarkerChildrenProps) => React.ReactNode;
-    interval?: number;
     date: number;
 };
 
-export type MarkerWithoutId = TodayMarker | CursorMarker | CustomMarker;
-
-export type Marker = MarkerWithoutId & { id: number };
+export type Marker = TodayMarker | CursorMarker | CustomMarker;

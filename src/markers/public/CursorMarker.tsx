@@ -1,11 +1,11 @@
 import React from "react";
 import { TimelineMarkersConsumer } from "../TimelineMarkersContext";
 import { TimelineMarkerType } from "../markerType";
-import { Marker, MarkerWithoutId } from "markers/Marker";
+import { Marker } from "markers/Marker";
 import { CursorMarkerProps } from "../../types";
 
 type WrappedCursorMarkerProps = CursorMarkerProps & {
-    subscribeMarker: (marker: MarkerWithoutId) => {
+    subscribeMarker: (marker: Marker) => {
         unsubscribe: () => void;
         getMarker: () => Marker;
     };
