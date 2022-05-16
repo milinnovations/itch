@@ -189,3 +189,35 @@ export type IntervalRenderer<Data> = {
     getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number };
     data?: Data;
 };
+
+export type CustomHeaderPropsChildrenFnProps<Data> = {
+    timelineContext: TimelineContext;
+    headerContext: HeaderContext;
+    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number };
+    getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
+    showPeriod: (startDate: Moment | number, endDate: Moment | number) => void;
+    data: Data;
+};
+
+export type SidebarHeaderChildrenFnProps<Data> = {
+    getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
+    data: Data;
+};
+
+export type CustomHeaderProps<Data> = {
+    unit?: TimeUnit;
+    headerData: Data;
+    height?: number;
+    children: (props: CustomHeaderPropsChildrenFnProps<Data>) => JSX.Element;
+};
+
+export type DateHeaderProps<Data> = {
+    style?: React.CSSProperties;
+    className?: string;
+    unit?: TimeUnit | "primaryHeader";
+    labelFormat?: string | (([startTime, endTime]: [Moment, Moment], unit: TimeUnit, labelWidth: number) => string);
+    intervalRenderer?: (props?: IntervalRenderer<Data>) => React.ReactNode;
+    headerData?: Data;
+    height?: number;
+    children?: (props: SidebarHeaderChildrenFnProps<Data>) => React.ReactNode; // TODO: is this used anywhere???
+};

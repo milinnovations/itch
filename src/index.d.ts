@@ -34,6 +34,10 @@ import type {
     HeaderContext as HeaderContext_,
     IntervalContext as IntervalContext_,
     IntervalRenderer as IntervalRenderer_,
+    CustomHeaderPropsChildrenFnProps as CustomHeaderPropsChildrenFnProps_,
+    SidebarHeaderChildrenFnProps as SidebarHeaderChildrenFnProps_,
+    CustomHeaderProps as CustomHeaderProps_,
+    DateHeaderProps as DateHeaderProps_,
 } from "./types";
 
 declare module "@mil/itch" {
@@ -165,10 +169,7 @@ declare module "@mil/itch" {
 
     export class TimelineHeaders extends React.Component<TimelineHeaderProps> {}
 
-    export type SidebarHeaderChildrenFnProps<Data> = {
-        getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
-        data: Data;
-    };
+    export type SidebarHeaderChildrenFnProps<Data> = SidebarHeaderChildrenFnProps_<Data>;
 
     export type SidebarHeaderProps<Data> = {
         variant?: "left" | "right";
@@ -180,33 +181,12 @@ declare module "@mil/itch" {
     export type IntervalContext = IntervalContext_;
     export type GetIntervalProps = GetIntervalProps_;
     export type IntervalRenderer<Data> = IntervalRenderer_<Data>;
-    export type DateHeaderProps<Data> = {
-        style?: React.CSSProperties;
-        className?: string;
-        unit?: TimeUnit | "primaryHeader";
-        labelFormat?: string | (([startTime, endTime]: [Moment, Moment], unit: TimeUnit, labelWidth: number) => string);
-        intervalRenderer?: (props?: IntervalRenderer<Data>) => React.ReactNode;
-        headerData?: Data;
-        children?: (props: SidebarHeaderChildrenFnProps<Data>) => React.ReactNode;
-        height?: number;
-    };
+    export type DateHeaderProps<Data> = DateHeaderProps_<Data>;
     export class DateHeader<Data = any> extends React.Component<DateHeaderProps<Data>> {}
     export type Interval = Interval_;
     export type HeaderContext = HeaderContext_;
-    export type CustomHeaderPropsChildrenFnProps<Data> = {
-        timelineContext: TimelineContext;
-        headerContext: HeaderContext;
-        getIntervalProps: (props?: GetIntervalProps) => Required<GetIntervalProps> & { key: string | number };
-        getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
-        showPeriod: (startDate: Moment | number, endDate: Moment | number) => void;
-        data: Data;
-    };
-    export type CustomHeaderProps<Data> = {
-        unit?: TimeUnit;
-        headerData?: Data;
-        height?: number;
-        children: (props?: CustomHeaderPropsChildrenFnProps<Data>) => React.ReactNode;
-    };
+    export type CustomHeaderPropsChildrenFnProps<Data> = CustomHeaderPropsChildrenFnProps_<Data>;
+    export type CustomHeaderProps<Data> = CustomHeaderProps_<Data>;
     export class CustomHeader<Data = any> extends React.Component<CustomHeaderProps<Data>> {}
 
     export const defaultTimeSteps: CompleteTimeSteps;

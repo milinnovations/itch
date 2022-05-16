@@ -6,30 +6,13 @@ import { defaultHeaderFormats } from "../default-config";
 import memoize from "memoize-one";
 import { CustomDateHeader } from "./CustomDateHeader";
 import { Moment } from "moment";
-import { TimeUnit } from "../types";
-import { IntervalRenderer } from "../types";
+import { TimeUnit, IntervalRenderer, DateHeaderProps } from "../types";
 
-type SidebarHeaderChildrenFnProps<Data> = {
-    getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
-    data: Data;
-};
-
-type DateHeaderWrapperProps<Data> = {
-    style?: React.CSSProperties;
-    className?: string;
-    unit?: TimeUnit | "primaryHeader";
-    labelFormat?: string | (([startTime, endTime]: [Moment, Moment], unit: TimeUnit, labelWidth: number) => string);
-    intervalRenderer?: (props?: IntervalRenderer<Data>) => React.ReactNode;
-    headerData?: Data;
-    height?: number;
-};
-
-type DateHeaderProps<Data> = DateHeaderWrapperProps<Data> & {
-    children?: (props: SidebarHeaderChildrenFnProps<Data>) => React.ReactNode; // TODO: is this used anywhere???
+type WrappedDateHeaderProps<Data> = DateHeaderProps<Data> & {
     timelineUnit: TimeUnit;
 };
 
-class DateHeader<Data> extends React.Component<DateHeaderProps<Data>> {
+class DateHeader<Data> extends React.Component<WrappedDateHeaderProps<Data>> {
     getHeaderUnit = () => {
         if (this.props.unit === "primaryHeader") {
             return getNextUnit(this.props.timelineUnit);
@@ -108,7 +91,7 @@ function DateHeaderWrapper<Data>({
     intervalRenderer,
     headerData,
     height,
-}: DateHeaderWrapperProps<Data>) {
+}: DateHeaderProps<Data>) {
     return (
         <TimelineStateConsumer>
             {({ getTimelineState }) => {

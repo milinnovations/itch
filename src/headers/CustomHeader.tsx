@@ -3,17 +3,7 @@ import { TimelineHeadersConsumer } from "./HeadersContext";
 import { TimelineStateConsumer } from "../timeline/TimelineStateContext";
 import { iterateTimes } from "../utility/calendar";
 import { Moment } from "moment";
-import { TimelineContext, TimeUnit } from "../types";
-import { GetIntervalProps, HeaderContext, Interval } from "../types";
-
-type CustomHeaderPropsChildrenFnProps<Data> = {
-    timelineContext: TimelineContext;
-    headerContext: HeaderContext;
-    getIntervalProps: (props?: GetIntervalProps) => GetIntervalProps & { key: string | number };
-    getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
-    showPeriod: (startDate: Moment | number, endDate: Moment | number) => void;
-    data: Data;
-};
+import { CustomHeaderPropsChildrenFnProps, TimeUnit, GetIntervalProps, Interval, CustomHeaderProps } from "../types";
 
 type WrappedCustomHeaderProps<Data> = {
     //component props
@@ -37,13 +27,6 @@ type WrappedCustomHeaderProps<Data> = {
 
 type WrappedCustomHeaderState = {
     intervals: Interval[];
-};
-
-type CustomHeaderProps<Data> = {
-    unit?: TimeUnit;
-    headerData: Data;
-    height?: number;
-    children: (props: CustomHeaderPropsChildrenFnProps<Data>) => JSX.Element;
 };
 
 export class CustomHeader<Data> extends React.Component<WrappedCustomHeaderProps<Data>, WrappedCustomHeaderState> {

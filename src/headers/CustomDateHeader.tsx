@@ -1,8 +1,7 @@
 import React from "react";
 import IntervalComponent from "./Interval";
 import { Moment } from "moment";
-import { TimeUnit } from "../types";
-import { GetIntervalProps, HeaderContext, IntervalRenderer } from "../types";
+import { TimeUnit, GetIntervalProps, HeaderContext, IntervalRenderer } from "../types";
 
 type HeaderData<Data> = {
     style: React.CSSProperties;
