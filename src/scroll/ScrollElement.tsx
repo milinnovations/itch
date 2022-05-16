@@ -47,6 +47,12 @@ export default class ScrollElement extends Component<Props, { isDragging: boolea
         };
     }
 
+    componentWillUnmount() {
+        if (this._scrollComponent) {
+            this._scrollComponent.removeEventListener("wheel", this.handleWheel);
+        }
+    }
+
     handleScroll = () => {
         if (!this._scrollComponent) return;
 
@@ -57,9 +63,12 @@ export default class ScrollElement extends Component<Props, { isDragging: boolea
     refHandler = (el: HTMLDivElement) => {
         this._scrollComponent = el;
         this.props.scrollRef(el);
+        if (el) {
+            el.addEventListener("wheel", this.handleWheel, { passive: false });
+        }
     };
 
-    handleWheel = (e: React.WheelEvent) => {
+    handleWheel = (e: WheelEvent) => {
         // zoom in the time dimension
         if (e.ctrlKey || e.metaKey || e.altKey) {
             e.preventDefault();
@@ -202,7 +211,6 @@ export default class ScrollElement extends Component<Props, { isDragging: boolea
                 onTouchMove={this.handleTouchMove}
                 onTouchEnd={this.handleTouchEnd}
                 onScroll={this.handleScroll}
-                onWheel={this.handleWheel}
             >
                 {children}
             </div>
