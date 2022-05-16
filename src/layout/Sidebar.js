@@ -7,7 +7,8 @@ export default class Sidebar extends Component {
     static propTypes = {
         groups: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
         width: PropTypes.number.isRequired,
-        height: PropTypes.number.isRequired,
+        canvasTop: PropTypes.number.isRequired,
+        canvasBottom: PropTypes.number.isRequired,
         groupHeights: PropTypes.array.isRequired,
         groupRenderer: PropTypes.func,
         isRightSidebar: PropTypes.bool,
@@ -16,7 +17,8 @@ export default class Sidebar extends Component {
     shouldComponentUpdate(nextProps) {
         return !(
             nextProps.width === this.props.width &&
-            nextProps.height === this.props.height &&
+            nextProps.canvasTop === this.props.canvasTop &&
+            nextProps.canvasBottom === this.props.canvasBottom &&
             arraysEqual(nextProps.groups, this.props.groups) &&
             arraysEqual(nextProps.groupHeights, this.props.groupHeights)
         );
@@ -34,19 +36,38 @@ export default class Sidebar extends Component {
     }
 
     render() {
-        const { width, groupHeights, height, isRightSidebar } = this.props;
+        const { width, groupHeights, isRightSidebar, canvasTop, canvasBottom } = this.props;
 
         const sidebarStyle = {
+            top: `${canvasTop}px`,
             width: `${width}px`,
-            height: `${height}px`,
+            height: `${canvasBottom - canvasTop}px`,
         };
 
         const groupsStyle = {
             width: `${width}px`,
         };
 
+        let currentGroupTop = 0;
+        let currentGroupBottom = 0;
+        let totalSkippedGroupHeight = 0;
+
         let groupLines = this.props.groups.map((group, index) => {
+            const groupHeight = groupHeights[index];
+
+            // Go to the next group
+            currentGroupTop = currentGroupBottom;
+            currentGroupBottom += groupHeight;
+
+            // Skip if the group is not on the canvas
+            if (currentGroupBottom < canvasTop || currentGroupTop > canvasBottom) {
+                totalSkippedGroupHeight += groupHeight;
+                return undefined;
+            }
+
             const elementStyle = {
+                position: "relative",
+                top: `${totalSkippedGroupHeight - canvasTop}px`,
                 height: `${groupHeights[index]}px`,
                 lineHeight: `${groupHeights[index]}px`,
             };

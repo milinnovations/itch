@@ -33,6 +33,8 @@ type Props<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> = {
     canvasTimeStart: number;
     canvasTimeEnd: number;
     canvasWidth: number;
+    canvasTop: number;
+    canvasBottom: number;
 
     groupTops?: number[];
 
@@ -72,6 +74,8 @@ export default class Items<TGroup extends TimelineGroupBase, TItem extends Timel
             nextProps.canvasTimeStart === this.props.canvasTimeStart &&
             nextProps.canvasTimeEnd === this.props.canvasTimeEnd &&
             nextProps.canvasWidth === this.props.canvasWidth &&
+            nextProps.canvasTop === this.props.canvasTop &&
+            nextProps.canvasBottom === this.props.canvasBottom &&
             nextProps.selectedItem === this.props.selectedItem &&
             nextProps.selected === this.props.selected &&
             nextProps.dragSnap === this.props.dragSnap &&
@@ -92,7 +96,7 @@ export default class Items<TGroup extends TimelineGroupBase, TItem extends Timel
     }
 
     render() {
-        const { canvasTimeStart, canvasTimeEnd, dimensionItems, groups, items } = this.props;
+        const { canvasTimeStart, canvasTimeEnd, canvasTop, canvasBottom, dimensionItems, groups, items } = this.props;
 
         const groupOrders = getGroupOrders(groups);
         const visibleItems = getVisibleItems(items, canvasTimeStart, canvasTimeEnd);
@@ -101,40 +105,62 @@ export default class Items<TGroup extends TimelineGroupBase, TItem extends Timel
         return (
             <div className="rct-items">
                 {visibleItems
-                    .filter(item => sortedDimensionItems[item.id])
-                    .map(item => (
-                        <Item
-                            key={item.id}
-                            item={item}
-                            order={groupOrders[item.group]}
-                            dimensions={sortedDimensionItems[item.id].dimensions}
-                            selected={this.isSelected(item)}
-                            canChangeGroup={
-                                item.canChangeGroup !== undefined ? item.canChangeGroup : this.props.canChangeGroup
-                            }
-                            canMove={item.canMove !== undefined ? item.canMove : this.props.canMove}
-                            canResizeLeft={canResizeLeft(item, this.props.canResize)}
-                            canResizeRight={canResizeRight(item, this.props.canResize)}
-                            canSelect={item.canSelect !== undefined ? item.canSelect : this.props.canSelect}
-                            useResizeHandle={this.props.useResizeHandle}
-                            groupTops={this.props.groupTops}
-                            canvasTimeStart={this.props.canvasTimeStart}
-                            canvasTimeEnd={this.props.canvasTimeEnd}
-                            canvasWidth={this.props.canvasWidth}
-                            dragSnap={this.props.dragSnap}
-                            minResizeWidth={this.props.minResizeWidth}
-                            onResizing={this.props.itemResizing}
-                            onResized={this.props.itemResized}
-                            moveResizeValidator={this.props.moveResizeValidator}
-                            onDrag={this.props.itemDrag}
-                            onDrop={this.props.itemDrop}
-                            onItemDoubleClick={this.props.onItemDoubleClick}
-                            onContextMenu={this.props.onItemContextMenu}
-                            onSelect={this.props.itemSelect}
-                            itemRenderer={this.props.itemRenderer}
-                            scrollRef={this.props.scrollRef}
-                        />
-                    ))}
+                    .filter(item => {
+                        const dimensions = sortedDimensionItems[item.id]?.dimensions;
+                        // Don't show the item if we don't know its dimensions or it is completely outside
+                        // the vertical canvas.
+                        return !(
+                            dimensions === undefined ||
+                            dimensions.top === null ||
+                            dimensions.top + dimensions.height < canvasTop ||
+                            dimensions.top > canvasBottom
+                        );
+                    })
+                    .map(item => {
+                        const dimensions = sortedDimensionItems[item.id].dimensions;
+
+                        if (dimensions.top === null) {
+                            // This should never happen, we just checked it in the filter above.
+                            return undefined;
+                        }
+
+                        // Adjust the item top position as we need to place it on the canvas which might not
+                        // start at position 0.
+                        const adjustedDimensions = { ...dimensions, ...{ top: dimensions.top - canvasTop } };
+                        return (
+                            <Item
+                                key={item.id}
+                                item={item}
+                                order={groupOrders[item.group]}
+                                dimensions={adjustedDimensions}
+                                selected={this.isSelected(item)}
+                                canChangeGroup={
+                                    item.canChangeGroup !== undefined ? item.canChangeGroup : this.props.canChangeGroup
+                                }
+                                canMove={item.canMove !== undefined ? item.canMove : this.props.canMove}
+                                canResizeLeft={canResizeLeft(item, this.props.canResize)}
+                                canResizeRight={canResizeRight(item, this.props.canResize)}
+                                canSelect={item.canSelect !== undefined ? item.canSelect : this.props.canSelect}
+                                useResizeHandle={this.props.useResizeHandle}
+                                groupTops={this.props.groupTops}
+                                canvasTimeStart={this.props.canvasTimeStart}
+                                canvasTimeEnd={this.props.canvasTimeEnd}
+                                canvasWidth={this.props.canvasWidth}
+                                dragSnap={this.props.dragSnap}
+                                minResizeWidth={this.props.minResizeWidth}
+                                onResizing={this.props.itemResizing}
+                                onResized={this.props.itemResized}
+                                moveResizeValidator={this.props.moveResizeValidator}
+                                onDrag={this.props.itemDrag}
+                                onDrop={this.props.itemDrop}
+                                onItemDoubleClick={this.props.onItemDoubleClick}
+                                onContextMenu={this.props.onItemContextMenu}
+                                onSelect={this.props.itemSelect}
+                                itemRenderer={this.props.itemRenderer}
+                                scrollRef={this.props.scrollRef}
+                            />
+                        );
+                    })}
             </div>
         );
     }

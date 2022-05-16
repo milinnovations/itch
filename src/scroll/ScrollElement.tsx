@@ -24,6 +24,7 @@ type Props = {
     children: React.ReactChild;
     width: number;
     height: number;
+    top: number;
     scrollRef: React.RefCallback<unknown>; // TODO
     isInteractingWithItem: boolean;
     onZoom: (scale: number, offset: number) => void; // TODO
@@ -187,12 +188,13 @@ export default class ScrollElement extends Component<Props, { isDragging: boolea
     };
 
     render() {
-        const { width, height, children } = this.props;
+        const { width, height, top, children } = this.props;
         const { isDragging } = this.state;
 
         const scrollComponentStyle: React.CSSProperties = {
             width: `${width}px`,
             height: `${height + 20}px`, //20px to push the scroll element down off screen...?
+            top: `${top}px`,
             cursor: isDragging ? "move" : "default",
             position: "relative",
         };
