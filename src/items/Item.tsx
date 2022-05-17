@@ -71,7 +71,7 @@ type ItemProps<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>
     useResizeHandle: boolean;
     moveResizeValidator?: MoveResizeValidator<TItem>;
     onItemDoubleClick: (item: Id, event: React.MouseEvent) => void;
-    scrollRef: React.Ref<HTMLDivElement>;
+    scrollRef: HTMLDivElement | null;
 };
 
 type ItemState = {

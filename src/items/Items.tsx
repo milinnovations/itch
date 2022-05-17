@@ -60,7 +60,7 @@ type Props<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> = {
     onItemContextMenu: (item: Id, event: React.MouseEvent) => void;
 
     itemRenderer?: (props: ReactCalendarItemRendererProps<TGroup, TItem>) => React.ReactNode;
-    scrollRef: React.Ref<HTMLDivElement>;
+    scrollRef: HTMLDivElement | null;
 };
 
 export default class Items<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> extends Component<
