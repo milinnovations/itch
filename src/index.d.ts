@@ -46,7 +46,7 @@ import type {
 
 declare module "@mil/itch" {
     export type Id = Id_;
-    export type ItemContext = ItemContext_;
+    export type ItemContext<TGroup extends TimelineGroupBase> = ItemContext_<TGroup>;
     export type ItemRendererResizeProps = ItemRendererResizeProps_;
     export type ITimeSteps = ITimeSteps_;
     export type LabelFormat = LabelFormat_;
@@ -64,8 +64,10 @@ declare module "@mil/itch" {
     export type TimelineItem<CustomItemFields> = TimelineItemBase & CustomItemFields;
     export type TimelineGroup<CustomGroupFields> = TimelineGroupBase & CustomGroupFields;
 
-    export type ReactCalendarItemRendererProps<CustomItem extends TimelineItemBase = TimelineItemBase> =
-        ReactCalendarItemRendererProps_<CustomItem>;
+    export type ReactCalendarItemRendererProps<
+        CustomGroup extends TimelineGroupBase = TimelineGroupBase,
+        CustomItem extends TimelineItemBase = TimelineItemBase,
+    > = ReactCalendarItemRendererProps_<CustomGroup, CustomItem>;
 
     export type ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase = TimelineGroupBase> = {
         group: CustomGroup;
@@ -133,14 +135,14 @@ declare module "@mil/itch" {
         onCanvasDoubleClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
         onCanvasDrop?(groupId: Id, time: number, e: React.DragEvent): void;
         onZoom?(timelineContext: TimelineContext): void;
-        moveResizeValidator?: MoveResizeValidator;
+        moveResizeValidator?: MoveResizeValidator<CustomItem>;
         onTimeChange?(
             visibleTimeStart: number,
             visibleTimeEnd: number,
             updateScrollCanvas: (start: number, end: number) => void,
         ): any;
         onBoundsChange?(canvasTimeStart: number, canvasTimeEnd: number): any;
-        itemRenderer?: (props: ReactCalendarItemRendererProps<CustomItem>) => React.ReactNode;
+        itemRenderer?: (props: ReactCalendarItemRendererProps<CustomGroup, CustomItem>) => React.ReactNode;
         groupRenderer?: (props: ReactCalendarGroupRendererProps<CustomGroup>) => React.ReactNode;
         verticalLineClassNamesForTime?: (start: number, end: number) => string[] | undefined;
         horizontalLineClassNamesForGroup?: (group: CustomGroup) => string[];
