@@ -1,24 +1,15 @@
 import React from "react";
 
-import type {
-    ItemContext,
-    ItemRendererResizeProps,
-    ResizeStyles,
-    TimelineGroupBase,
-    TimelineItemBase,
-    TimelineItemProps,
-} from "../types";
+import type { ItemContext, ItemRendererResizeProps, ResizeStyles, TimelineItemBase, TimelineItemProps } from "../types";
 
-type Props<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> = {
+type Props<TItem extends TimelineItemBase> = {
     item: TItem;
-    itemContext: ItemContext<TGroup>;
+    itemContext: ItemContext;
     getItemProps: (itemProps?: Partial<Omit<TimelineItemProps, "key" | "ref">>) => TimelineItemProps;
     getResizeProps: (styles?: ResizeStyles) => ItemRendererResizeProps;
 };
 
-export function defaultItemRenderer<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>(
-    props: Props<TGroup, TItem>,
-) {
+export function defaultItemRenderer<TItem extends TimelineItemBase>(props: Props<TItem>) {
     const { item, itemContext, getItemProps, getResizeProps } = props;
     const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
     return (

@@ -1,14 +1,12 @@
-import React from "react";
 import { Component } from "react";
 import PropTypes from "prop-types";
 import interact from "interactjs";
-import { DragEvent, ResizeEvent, PointerEvent } from "@interactjs/types";
 import moment from "moment";
 import isEqual from "lodash.isequal";
 
 import { composeEvents } from "../utility/events";
 import { defaultItemRenderer } from "./defaultItemRenderer";
-import { GroupOrder, millisecondsInPixel } from "../utility/calendar";
+import { millisecondsInPixel } from "../utility/calendar";
 import { getSumScroll, getSumOffset } from "../utility/dom-helpers";
 import {
     overridableStyles,
@@ -21,133 +19,56 @@ import {
     leftResizeStyle,
     rightResizeStyle,
 } from "./styles";
-import {
-    ClickType,
-    Id,
-    ItemContext,
-    MoveResizeValidator,
-    ReactCalendarItemRendererProps,
-    ResizeStyles,
-    TimelineContext,
-    TimelineGroupBase,
-    TimelineItemBase,
-    TimelineItemEdge,
-    TimelineItemProps,
-} from "../types";
-
-type ItemProps<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> = {
-    canvasTimeStart: number;
-    canvasTimeEnd: number;
-    canvasWidth: number;
-    order: GroupOrder<TGroup>; // Maybe this can be empty... But it seems defined where we use it.
-    dragSnap: number;
-    minResizeWidth: number;
-    selected: boolean; // This had a default value but never would be empty, so I removed the default value completely
-    canChangeGroup: boolean;
-    canMove: boolean;
-    canResizeLeft: boolean;
-    canResizeRight: boolean;
-    item: TItem;
-    onSelect: (item: Id, clickType: ClickType, event: React.MouseEvent | React.TouchEvent) => void;
-    onDrag: (item: Id, dragTime: number, newGroup: Id) => void;
-    onDrop: (item: Id, dragTime: number, newGroup: Id) => void;
-    onResizing: (item: Id, resizeTime: number, edge: TimelineItemEdge) => void;
-    onResized: (item: Id, resizeTime: number, edge: TimelineItemEdge, timeDelta: number) => void;
-    onContextMenu: (item: Id, event: React.MouseEvent) => void;
-    itemRenderer?: (props: ReactCalendarItemRendererProps<TGroup, TItem>) => React.ReactNode;
-    itemProps?: object; // Is this used anywhere???
-    canSelect: boolean;
-    dimensions: {
-        top: number;
-        left: number;
-        width: number;
-        collisionLeft: number;
-        collisionWidth: number;
-        order: GroupOrder<TGroup>;
-        stack: boolean;
-        height: number;
-    };
-    groupTops: number[];
-    useResizeHandle: boolean;
-    moveResizeValidator?: MoveResizeValidator<TItem>;
-    onItemDoubleClick: (item: Id, event: React.MouseEvent) => void;
-    scrollRef: React.Ref<HTMLDivElement>;
-};
-
-type ItemState = {
-    interactMounted: boolean;
-
-    // Wheter a dragging is active
-    dragging: boolean | null; // TODO: this could be false instead of null
-    dragStart: {
-        x: number;
-        y: number;
-        offset: number; // This was a hidden value...
-    } | null;
-    preDragPosition: { x: number; y: number } | null;
-    dragTime: number | null;
-    dragGroupDelta: number | null;
-
-    // Wheter a resizing is active
-    resizing: boolean | null; // TODO: this could be false instead of null
-    resizeEdge: TimelineItemEdge | null;
-    resizeStart: number | null;
-    resizeTime: number | null;
-};
-
-export default class Item<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> extends Component<
-    ItemProps<TGroup, TItem>,
-    ItemState
-> {
+export default class Item extends Component {
     // removed prop type check for SPEED!
     // they are coming from a trusted component anyway
     // (this complicates performance debugging otherwise)
-    // static propTypes = {
-    //     canvasTimeStart: PropTypes.number.isRequired,
-    //     canvasTimeEnd: PropTypes.number.isRequired,
-    //     canvasWidth: PropTypes.number.isRequired,
-    //     order: PropTypes.object,
+    static propTypes = {
+        canvasTimeStart: PropTypes.number.isRequired,
+        canvasTimeEnd: PropTypes.number.isRequired,
+        canvasWidth: PropTypes.number.isRequired,
+        order: PropTypes.object,
 
-    //     dragSnap: PropTypes.number,
-    //     minResizeWidth: PropTypes.number,
-    //     selected: PropTypes.bool,
+        dragSnap: PropTypes.number,
+        minResizeWidth: PropTypes.number,
+        selected: PropTypes.bool,
 
-    //     canChangeGroup: PropTypes.bool.isRequired,
-    //     canMove: PropTypes.bool.isRequired,
-    //     canResizeLeft: PropTypes.bool.isRequired,
-    //     canResizeRight: PropTypes.bool.isRequired,
+        canChangeGroup: PropTypes.bool.isRequired,
+        canMove: PropTypes.bool.isRequired,
+        canResizeLeft: PropTypes.bool.isRequired,
+        canResizeRight: PropTypes.bool.isRequired,
 
-    //     item: PropTypes.object.isRequired,
+        item: PropTypes.object.isRequired,
 
-    //     onSelect: PropTypes.func,
-    //     onDrag: PropTypes.func,
-    //     onDrop: PropTypes.func,
-    //     onResizing: PropTypes.func,
-    //     onResized: PropTypes.func,
-    //     onContextMenu: PropTypes.func,
-    //     itemRenderer: PropTypes.func,
+        onSelect: PropTypes.func,
+        onDrag: PropTypes.func,
+        onDrop: PropTypes.func,
+        onResizing: PropTypes.func,
+        onResized: PropTypes.func,
+        onContextMenu: PropTypes.func,
+        itemRenderer: PropTypes.func,
 
-    //     itemProps: PropTypes.object,
-    //     canSelect: PropTypes.bool,
-    //     dimensions: PropTypes.object,
-    //     groupTops: PropTypes.array,
-    //     useResizeHandle: PropTypes.bool,
-    //     moveResizeValidator: PropTypes.func,
-    //     onItemDoubleClick: PropTypes.func,
+        itemProps: PropTypes.object,
+        canSelect: PropTypes.bool,
+        dimensions: PropTypes.object,
+        groupTops: PropTypes.array,
+        useResizeHandle: PropTypes.bool,
+        moveResizeValidator: PropTypes.func,
+        onItemDoubleClick: PropTypes.func,
 
-    //     scrollRef: PropTypes.object,
-    // };
+        scrollRef: PropTypes.object,
+    };
 
-    // static defaultProps = {
-    //     selected: false,
-    //     // itemRenderer: defaultItemRenderer,
-    // };
+    static defaultProps = {
+        selected: false,
+        itemRenderer: defaultItemRenderer,
+    };
 
     static contextTypes = {
         getTimelineContext: PropTypes.func,
     };
 
-    constructor(props: ItemProps<TGroup, TItem>) {
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -166,8 +87,8 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         };
     }
 
-    shouldComponentUpdate(nextProps: Readonly<ItemProps<TGroup, TItem>>, nextState: Readonly<ItemState>) {
-        const shouldUpdate =
+    shouldComponentUpdate(nextProps, nextState) {
+        var shouldUpdate =
             nextState.dragging !== this.state.dragging ||
             nextState.dragTime !== this.state.dragTime ||
             nextState.dragGroupDelta !== this.state.dragGroupDelta ||
@@ -197,8 +118,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         return millisecondsInPixel(canvasTimeStart, canvasTimeEnd, canvasWidth);
     }
 
-    // TODO: Please make the optional `considerOffset` parameter required!
-    dragTimeSnap(dragTime: number, considerOffset?: boolean) {
+    dragTimeSnap(dragTime, considerOffset) {
         const { dragSnap } = this.props;
         if (dragSnap) {
             const offset = considerOffset ? moment().utcOffset() * 60 * 1000 : 0;
@@ -208,7 +128,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         }
     }
 
-    resizeTimeSnap(dragTime: number) {
+    resizeTimeSnap(dragTime) {
         const { dragSnap } = this.props;
         if (dragSnap) {
             const endTime = this.props.item.end_time % dragSnap;
@@ -218,23 +138,17 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         }
     }
 
-    dragTime(e: DragEvent): number {
+    dragTime(e) {
         const startTime = moment(this.props.item.start_time);
-
-        if (this.state.dragStart === null) {
-            throw new Error(
-                `This should never happen: the "dragStart" value is "null" when we try to calculate the drag time`,
-            );
-        }
 
         if (this.state.dragging) {
             return this.dragTimeSnap(this.timeFor(e) + this.state.dragStart.offset, true);
         } else {
-            return startTime.valueOf(); // This was originally just a `startTime` return, but I think we need number here.
+            return startTime;
         }
     }
 
-    timeFor(e: DragEvent | ResizeEvent) {
+    timeFor(e) {
         const ratio = millisecondsInPixel(this.props.canvasTimeStart, this.props.canvasTimeEnd, this.props.canvasWidth);
 
         const offset = getSumOffset(this.props.scrollRef).offsetLeft;
@@ -243,7 +157,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         return (e.pageX - offset + scrolls.scrollLeft) * ratio + this.props.canvasTimeStart;
     }
 
-    dragGroupDelta(e: DragEvent) {
+    dragGroupDelta(e) {
         const { groupTops, order } = this.props;
         if (this.state.dragging) {
             if (!this.props.canChangeGroup) {
@@ -254,8 +168,8 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
             const offset = getSumOffset(this.props.scrollRef).offsetTop;
             const scrolls = getSumScroll(this.props.scrollRef);
 
-            for (const key of Object.keys(groupTops)) {
-                const groupTop = groupTops[key as keyof typeof groupTops];
+            for (var key of Object.keys(groupTops)) {
+                var groupTop = groupTops[key];
                 if (e.pageY - offset + scrolls.scrollTop > groupTop) {
                     groupDelta = parseInt(key, 10) - order.index;
                 } else {
@@ -273,15 +187,8 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         }
     }
 
-    resizeTimeDelta(e: ResizeEvent, resizeEdge: TimelineItemEdge | null) {
+    resizeTimeDelta(e, resizeEdge) {
         const length = this.props.item.end_time - this.props.item.start_time;
-
-        if (this.state.resizeStart === null) {
-            throw new Error(
-                `This should never happen: the "resizeStart" is null when we try to calculate resize time delta`,
-            );
-        }
-
         const timeDelta = this.dragTimeSnap((e.pageX - this.state.resizeStart) * this.getTimeRatio());
 
         if (length + (resizeEdge === "left" ? -timeDelta : timeDelta) < (this.props.dragSnap || 1000)) {
@@ -299,11 +206,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         const leftResize = this.props.useResizeHandle ? ".rct-item-handler-resize-left" : true;
         const rightResize = this.props.useResizeHandle ? ".rct-item-handler-resize-right" : true;
 
-        if (this._item === null) {
-            throw new Error(`Item reference should be never emtpy.`);
-        }
-
-        interact(this._item)
+        interact(this.item)
             .resizable({
                 edges: {
                     left: this.canResizeLeft() && leftResize,
@@ -317,10 +220,9 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
                 enabled: this.props.selected && this.canMove(),
             })
             .styleCursor(false)
-            .on("dragstart", (e: DragEvent) => {
+            .on("dragstart", e => {
                 if (this.props.selected) {
                     const clickTime = this.timeFor(e);
-                    const hackedTarget = e.target as { offsetLeft: number; offsetTop: number }; // TODO: remove this ugly type hack
                     this.setState({
                         dragging: true,
                         dragStart: {
@@ -328,19 +230,18 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
                             y: e.pageY,
                             offset: this.props.item.start_time - clickTime,
                         },
-                        preDragPosition: { x: hackedTarget.offsetLeft, y: hackedTarget.offsetTop },
+                        preDragPosition: { x: e.target.offsetLeft, y: e.target.offsetTop },
                         dragTime: this.props.item.start_time,
                         dragGroupDelta: 0,
                     });
-                    return;
                 } else {
                     return false;
                 }
             })
-            .on("dragmove", (e: DragEvent) => {
+            .on("dragmove", e => {
                 if (this.state.dragging) {
                     let dragTime = this.dragTime(e);
-                    const dragGroupDelta = this.dragGroupDelta(e);
+                    let dragGroupDelta = this.dragGroupDelta(e);
                     if (this.props.moveResizeValidator) {
                         dragTime = this.props.moveResizeValidator("move", this.props.item, dragTime);
                     }
@@ -355,7 +256,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
                     });
                 }
             })
-            .on("dragend", (e: DragEvent) => {
+            .on("dragend", e => {
                 if (this.state.dragging) {
                     if (this.props.onDrop) {
                         let dragTime = this.dragTime(e);
@@ -380,7 +281,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
                     });
                 }
             })
-            .on("resizestart", (e: ResizeEvent) => {
+            .on("resizestart", e => {
                 if (this.props.selected) {
                     this.setState({
                         resizing: true,
@@ -388,17 +289,16 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
                         resizeStart: e.pageX,
                         resizeTime: 0,
                     });
-                    return;
                 } else {
                     return false;
                 }
             })
-            .on("resizemove", (e: ResizeEvent) => {
+            .on("resizemove", e => {
                 if (this.state.resizing) {
                     let resizeEdge = this.state.resizeEdge;
 
                     if (!resizeEdge) {
-                        resizeEdge = e.deltaRect?.left !== 0 ? "left" : "right";
+                        resizeEdge = e.deltaRect.left !== 0 ? "left" : "right";
                         this.setState({ resizeEdge });
                     }
                     let resizeTime = this.resizeTimeSnap(this.timeFor(e));
@@ -416,22 +316,16 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
                     });
                 }
             })
-            .on("resizeend", (e: ResizeEvent) => {
+            .on("resizeend", e => {
                 if (this.state.resizing) {
                     const { resizeEdge } = this.state;
                     let resizeTime = this.resizeTimeSnap(this.timeFor(e));
 
                     if (this.props.moveResizeValidator) {
-                        if (resizeEdge === null) {
-                            throw new Error(`This should never happen: resize edge is null when resize ended`);
-                        }
                         resizeTime = this.props.moveResizeValidator("resize", this.props.item, resizeTime, resizeEdge);
                     }
 
                     if (this.props.onResized) {
-                        if (resizeEdge === null) {
-                            throw new Error(`This should never happen: resize edge is null when resize ended`);
-                        }
                         this.props.onResized(
                             this.props.item.id,
                             resizeTime,
@@ -447,8 +341,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
                     });
                 }
             })
-            // TODO: Dangerous type hack, should be removed
-            .on("tap", (e: PointerEvent & React.MouseEvent) => {
+            .on("tap", e => {
                 this.actualClick(e, e.pointerType === "mouse" ? "click" : "touch");
             });
 
@@ -461,7 +354,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         if (!props.canResizeLeft) {
             return false;
         }
-        const width = parseInt(`${props.dimensions.width}`, 10); // TODO: Really?!
+        let width = parseInt(props.dimensions.width, 10);
         return width >= props.minResizeWidth;
     }
 
@@ -469,7 +362,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         if (!props.canResizeRight) {
             return false;
         }
-        const width = parseInt(`${props.dimensions.width}`, 10); // TODO: Really?!
+        let width = parseInt(props.dimensions.width, 10);
         return width >= props.minResizeWidth;
     }
 
@@ -477,7 +370,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         return !!props.canMove;
     }
 
-    componentDidUpdate(prevProps: Readonly<ItemProps<TGroup, TItem>>) {
+    componentDidUpdate(prevProps) {
         let { interactMounted } = this.state;
         const couldDrag = prevProps.selected && this.canMove(prevProps);
         const couldResizeLeft = prevProps.selected && this.canResizeLeft(prevProps);
@@ -486,7 +379,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         const willBeAbleToResizeLeft = this.props.selected && this.canResizeLeft(this.props);
         const willBeAbleToResizeRight = this.props.selected && this.canResizeRight(this.props);
 
-        if (!!this._item) {
+        if (!!this.item) {
             if (this.props.selected && !interactMounted) {
                 this.mountInteract();
                 interactMounted = true;
@@ -495,25 +388,21 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
                 interactMounted &&
                 (couldResizeLeft !== willBeAbleToResizeLeft || couldResizeRight !== willBeAbleToResizeRight)
             ) {
-                const leftResize = this.props.useResizeHandle ? this._dragLeft : true;
-                const rightResize = this.props.useResizeHandle ? this._dragRight : true;
+                const leftResize = this.props.useResizeHandle ? this.dragLeft : true;
+                const rightResize = this.props.useResizeHandle ? this.dragRight : true;
 
-                if (leftResize !== null && rightResize !== null) {
-                    interact(this._item).resizable({
-                        enabled: willBeAbleToResizeLeft || willBeAbleToResizeRight,
-                        edges: {
-                            top: false,
-                            bottom: false,
-                            left: willBeAbleToResizeLeft && leftResize,
-                            right: willBeAbleToResizeRight && rightResize,
-                        },
-                    });
-                } else {
-                    // This should never happen
-                }
+                interact(this.item).resizable({
+                    enabled: willBeAbleToResizeLeft || willBeAbleToResizeRight,
+                    edges: {
+                        top: false,
+                        bottom: false,
+                        left: willBeAbleToResizeLeft && leftResize,
+                        right: willBeAbleToResizeRight && rightResize,
+                    },
+                });
             }
             if (interactMounted && couldDrag !== willBeAbleToDrag) {
-                interact(this._item).draggable({ enabled: willBeAbleToDrag });
+                interact(this.item).draggable({ enabled: willBeAbleToDrag });
             }
         } else {
             interactMounted = false;
@@ -523,45 +412,42 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         });
     }
 
-    private _startedClicking = false;
-    private _startedTouching = false;
-
-    onMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    onMouseDown = e => {
         if (!this.state.interactMounted) {
             e.preventDefault();
-            this._startedClicking = true;
+            this.startedClicking = true;
         }
     };
 
-    onMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (!this.state.interactMounted && this._startedClicking) {
-            this._startedClicking = false;
+    onMouseUp = e => {
+        if (!this.state.interactMounted && this.startedClicking) {
+            this.startedClicking = false;
             this.actualClick(e, "click");
         }
     };
 
-    onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    onTouchStart = e => {
         if (!this.state.interactMounted) {
             e.preventDefault();
-            this._startedTouching = true;
+            this.startedTouching = true;
         }
     };
 
-    onTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-        if (!this.state.interactMounted && this._startedTouching) {
-            this._startedTouching = false;
+    onTouchEnd = e => {
+        if (!this.state.interactMounted && this.startedTouching) {
+            this.startedTouching = false;
             this.actualClick(e, "touch");
         }
     };
 
-    handleDoubleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    handleDoubleClick = e => {
         e.stopPropagation();
         if (this.props.onItemDoubleClick) {
             this.props.onItemDoubleClick(this.props.item.id, e);
         }
     };
 
-    handleContextMenu = (e: React.MouseEvent) => {
+    handleContextMenu = e => {
         if (this.props.onContextMenu) {
             e.preventDefault();
             e.stopPropagation();
@@ -569,25 +455,21 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         }
     };
 
-    actualClick(e: React.MouseEvent | React.TouchEvent, clickType: "touch" | "click") {
+    actualClick(e, clickType) {
         if (this.props.canSelect && this.props.onSelect) {
             this.props.onSelect(this.props.item.id, clickType, e);
         }
     }
 
-    private _item: HTMLDivElement | null = null;
-    private _dragLeft: HTMLDivElement | null = null;
-    private _dragRight: HTMLDivElement | null = null;
+    getItemRef = el => (this.item = el);
+    getDragLeftRef = el => (this.dragLeft = el);
+    getDragRightRef = el => (this.dragRight = el);
 
-    getItemRef = (el: HTMLDivElement | null) => (this._item = el);
-    getDragLeftRef = (el: HTMLDivElement | null) => (this._dragLeft = el);
-    getDragRightRef = (el: HTMLDivElement | null) => (this._dragRight = el);
-
-    getItemProps = (props: Partial<Omit<TimelineItemProps, "key" | "ref">> = {}) => {
+    getItemProps = (props = {}) => {
         //TODO: maybe shouldnt include all of these classes
         const classNames = "rct-item" + (this.props.item.className ? ` ${this.props.item.className}` : "");
 
-        const result: TimelineItemProps & { title: string | undefined } = {
+        return {
             key: this.props.item.id,
             ref: this.getItemRef,
             title: this.props.item.title,
@@ -600,10 +482,9 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
             onContextMenu: composeEvents(this.handleContextMenu, props.onContextMenu),
             style: Object.assign({}, this.getItemStyle(props)),
         };
-        return result;
     };
 
-    getResizeProps = (props: ResizeStyles = {}) => {
+    getResizeProps = (props = {}) => {
         let leftName = "rct-item-handler rct-item-handler-left rct-item-handler-resize-left";
         if (props.leftClassName) {
             leftName += ` ${props.leftClassName}`;
@@ -627,7 +508,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         };
     };
 
-    getItemStyle(props: React.HTMLAttributes<HTMLDivElement>) {
+    getItemStyle(props) {
         const dimensions = this.props.dimensions;
 
         const baseStyles = {
@@ -644,13 +525,13 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
             {},
             overridableStyles,
             this.props.selected ? selectedStyle : {},
-            this.props.selected && this.canMove(this.props) ? selectedAndCanMove : {},
-            this.props.selected && this.canResizeLeft(this.props) ? selectedAndCanResizeLeft : {},
-            this.props.selected && this.canResizeLeft(this.props) && this.state.dragging
+            this.props.selected & this.canMove(this.props) ? selectedAndCanMove : {},
+            this.props.selected & this.canResizeLeft(this.props) ? selectedAndCanResizeLeft : {},
+            this.props.selected & this.canResizeLeft(this.props) & this.state.dragging
                 ? selectedAndCanResizeLeftAndDragLeft
                 : {},
-            this.props.selected && this.canResizeRight(this.props) ? selectedAndCanResizeRight : {},
-            this.props.selected && this.canResizeRight(this.props) && this.state.dragging
+            this.props.selected & this.canResizeRight(this.props) ? selectedAndCanResizeRight : {},
+            this.props.selected & this.canResizeRight(this.props) & this.state.dragging
                 ? selectedAndCanResizeRightAndDragRight
                 : {},
             props.style,
@@ -664,8 +545,8 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
             return null;
         }
 
-        const timelineContext: TimelineContext = this.context.getTimelineContext();
-        const itemContext: ItemContext<TGroup> = {
+        const timelineContext = this.context.getTimelineContext();
+        const itemContext = {
             dimensions: this.props.dimensions,
             useResizeHandle: this.props.useResizeHandle,
             title: this.props.item.title,
@@ -682,10 +563,9 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
             resizeStart: this.state.resizeStart,
             resizeTime: this.state.resizeTime,
             width: this.props.dimensions.width,
-        }; // I am too tired for this...
+        };
 
-        const itemRenderer = this.props.itemRenderer ?? defaultItemRenderer;
-        return itemRenderer({
+        return this.props.itemRenderer({
             item: this.props.item,
             timelineContext,
             itemContext,
@@ -694,5 +574,3 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
         });
     }
 }
-
-// TODO: wrapper with the timeline context
