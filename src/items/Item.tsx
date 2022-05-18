@@ -35,11 +35,13 @@ import {
     TimelineItemEdge,
     TimelineItemProps,
 } from "../types";
+import { binarySearch } from "../utility/search";
 
 type ItemProps<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> = {
     canvasTimeStart: number;
     canvasTimeEnd: number;
     canvasWidth: number;
+    canvasTop: number;
     order: GroupOrder<TGroup>; // Maybe this can be empty... But it seems defined where we use it.
     dragSnap: number;
     minResizeWidth: number;
@@ -236,33 +238,24 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
     }
 
     dragGroupDelta(e: DragEvent) {
-        const { groupTops, order } = this.props;
-        if (this.state.dragging) {
-            if (!this.props.canChangeGroup) {
-                return 0;
-            }
-            let groupDelta = 0;
+        const { canvasTop, canChangeGroup, groupTops, order } = this.props;
 
-            const offset = getSumOffset(this.props.scrollRef).offsetTop;
-            const scrolls = getSumScroll(this.props.scrollRef);
+        if (!(this.state.dragging && canChangeGroup)) return 0;
 
-            for (const key of Object.keys(groupTops)) {
-                const groupTop = groupTops[key as keyof typeof groupTops];
-                if (e.pageY - offset + scrolls.scrollTop > groupTop) {
-                    groupDelta = parseInt(key, 10) - order.index;
-                } else {
-                    break;
-                }
-            }
-
-            if (this.props.order.index + groupDelta < 0) {
-                return 0 - this.props.order.index;
-            } else {
-                return groupDelta;
-            }
-        } else {
-            return 0;
-        }
+        const offset = getSumOffset(this.props.scrollRef).offsetTop;
+        const scrollTop = getSumScroll(this.props.scrollRef).scrollTop;
+        const correctedEventY = e.pageY + canvasTop - offset + scrollTop;
+        const lastGroupIndex = groupTops.length - 1;
+        const eventGroupIndex = binarySearch(groupTops, (groupTop, groupIndex): number =>
+            groupIndex < lastGroupIndex
+                ? correctedEventY < groupTop
+                    ? 1
+                    : correctedEventY < groupTops[groupIndex + 1]
+                    ? 0
+                    : -1
+                : 0,
+        );
+        return eventGroupIndex < 0 ? 0 : eventGroupIndex - order.index;
     }
 
     resizeTimeDelta(e: ResizeEvent, resizeEdge: TimelineItemEdge | null) {

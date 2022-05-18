@@ -146,6 +146,7 @@ export default class Items<TGroup extends TimelineGroupBase, TItem extends Timel
                                 canvasTimeStart={this.props.canvasTimeStart}
                                 canvasTimeEnd={this.props.canvasTimeEnd}
                                 canvasWidth={this.props.canvasWidth}
+                                canvasTop={canvasTop}
                                 dragSnap={this.props.dragSnap}
                                 minResizeWidth={this.props.minResizeWidth}
                                 onResizing={this.props.itemResizing}
