@@ -55,7 +55,7 @@ export class GroupRows<TGroup extends TimelineGroupBase = TimelineGroupBase> ext
         return (
             <div className="rct-horizontal-lines">
                 {Array.from(
-                    mapRange(lineCount, index => {
+                    mapRange(0, lineCount, index => {
                         const group = groups[index];
                         const groupHeight = groupHeights[index];
 
