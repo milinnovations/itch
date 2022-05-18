@@ -26,11 +26,24 @@ import { TimelineHeadersProvider } from "./headers/HeadersContext";
 import TimelineHeaders from "./headers/TimelineHeaders";
 import DateHeader from "./headers/DateHeader";
 import { mapRange } from "./utility/generators";
+import { binarySearch } from "./utility/search";
 
 /**
  * Default style for the Timeline container div.
  */
 const defaultContainerStyle = { height: "100%", overflowY: "auto" };
+
+/**
+ * Finds the index of the first fully visible group.
+ *
+ * @param {number[]} groupTops  The top coordinates of the groups in order.
+ * @param {number} visibleTop  The topmost coordinate that is visible.
+ *
+ * @returns  The index of the first fully visible group.
+ */
+function findFirstFullyVisibleGroupIndex(groupTops, visibleTop) {
+    return binarySearch(groupTops, groupTop => (groupTop >= visibleTop ? 0 : -1), "leftmost");
+}
 
 /**
  * Calculates new vertical canvas dimensions to comfortably cover the visible area.
@@ -83,18 +96,9 @@ function needNewVerticalCanvas(visibleTop, visibleHeight, canvasTop, canvasBotto
  * @param {number} canvasBottom  The bottom position of the current vertical canvas in pixels.
  */
 function calculateVisibleGroups(groups, groupTops, lineHeight, canvasTop, canvasBottom) {
-    let firstGroupIndex = -1;
-
-    // Find the first visible group.
-    // TODO: We could use a binary search here for more performance.
-    for (let i = 0; i < groupTops.length; i++) {
-        if (groupTops[i] > canvasTop) {
-            // The previous group is also partially visible, unless there is no
-            // previous group.
-            firstGroupIndex = Math.max(0, i - 1);
-            break;
-        }
-    }
+    // The previous group may also be partially visible, unless there is no
+    // previous group.
+    const firstGroupIndex = Math.max(0, findFirstFullyVisibleGroupIndex(groupTops, canvasTop));
 
     if (firstGroupIndex < 0) {
         // No visible groups at all
@@ -529,18 +533,15 @@ export default class ReactCalendarTimeline extends Component {
         // If the group tops have changed but the groups are the same keep the first currently
         // visible group in a fixed scroll position. This prevents the chart from jumping randomly
         // when fresh item data is loaded to the chart.
-        if (isEqual(prevProps.groups, this.props.groups) && !isEqual(prevState.groupTops, this.state.groupTops)) {
+        if (prevProps.groups === this.props.groups && !isEqual(prevState.groupTops, this.state.groupTops)) {
             const visibleTop = this.container.scrollTop;
             const prevGroupTops = prevState.groupTops;
 
             // Find what was the first visible group id in the previous state
-            for (let i = 0; i < prevGroupTops.length; i++) {
-                if (prevGroupTops[i] >= visibleTop) {
-                    // Adjust the scroll to keep the first visible group in the same position
-                    this.container.scrollBy(0, this.state.groupTops[i] - prevGroupTops[i]);
-                    break;
-                }
-            }
+            const index = findFirstFullyVisibleGroupIndex(prevGroupTops, visibleTop);
+
+            // Adjust the scroll to keep the first visible group in the same position
+            this.container.scrollBy(0, this.state.groupTops[index] - prevGroupTops[index]);
         }
 
         // The bounds have changed? Report it!
