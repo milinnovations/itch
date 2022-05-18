@@ -3,7 +3,7 @@ import { calculateXPositionForTime, calculateTimeForXPosition } from "../utility
 import { Moment } from "moment";
 import { TimeUnit } from "../types";
 
-type ProvidedTimelineContext = {
+export type ProvidedTimelineContext = {
     getTimelineState: () => {
         visibleTimeStart: number;
         visibleTimeEnd: number;

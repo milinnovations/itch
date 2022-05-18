@@ -15,12 +15,12 @@ import { arraysEqual, keyBy } from "../utility/generic";
 import { getGroupOrders, getVisibleItems } from "../utility/calendar";
 import type { ItemDimensions } from "../utility/calendar";
 
-const canResizeLeft = (item: TimelineItemBase, canResize: ResizeOptions | undefined) => {
+const canResizeLeft = (item: TimelineItemBase, canResize: ResizeOptions) => {
     const value = item.canResize ?? canResize;
     return value === "left" || value === "both";
 };
 
-const canResizeRight = (item: TimelineItemBase, canResize: ResizeOptions | undefined) => {
+const canResizeRight = (item: TimelineItemBase, canResize: ResizeOptions) => {
     const value = item.canResize ?? canResize;
     return value === "right" || value === "both" || value === true;
 };
@@ -36,31 +36,31 @@ type Props<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> = {
     canvasTop: number;
     canvasBottom: number;
 
-    groupTops?: number[];
+    groupTops?: number[]; // Maybe this can be undefined...
 
-    dragSnap?: number;
-    minResizeWidth?: number;
+    dragSnap: number;
+    minResizeWidth: number;
     selectedItem?: Id | null;
     selected?: Id[] | null;
 
     canChangeGroup: boolean;
     canMove: boolean;
-    canResize?: ResizeOptions;
-    canSelect?: boolean;
-    useResizeHandle?: boolean;
+    canResize: ResizeOptions;
+    canSelect: boolean;
+    useResizeHandle: boolean;
 
-    moveResizeValidator?: MoveResizeValidator;
-    itemSelect?: (item: Id, clickType: ClickType, event: React.MouseEvent | React.TouchEvent) => void;
-    itemDrag?: (item: Id, dragTime: number, newGroup: Id) => void;
-    itemDrop?: (item: Id, dragTime: number, newGroup: Id) => void;
-    itemResizing?: (item: Id, resizeTime: number, edge: TimelineItemEdge) => void;
-    itemResized?: (item: Id, resizeTime: number, edge: TimelineItemEdge, timeDelta: number) => void;
+    moveResizeValidator?: MoveResizeValidator<TItem>;
+    itemSelect: (item: Id, clickType: ClickType, event: React.MouseEvent | React.TouchEvent) => void;
+    itemDrag: (item: Id, dragTime: number, newGroup: Id) => void;
+    itemDrop: (item: Id, dragTime: number, newGroup: Id) => void;
+    itemResizing: (item: Id, resizeTime: number, edge: TimelineItemEdge) => void;
+    itemResized: (item: Id, resizeTime: number, edge: TimelineItemEdge, timeDelta: number) => void;
 
-    onItemDoubleClick?: (item: Id, event: React.MouseEvent) => void;
-    onItemContextMenu?: (item: Id, event: React.MouseEvent) => void;
+    onItemDoubleClick: (item: Id, event: React.MouseEvent) => void;
+    onItemContextMenu: (item: Id, event: React.MouseEvent) => void;
 
-    itemRenderer?: (props: ReactCalendarItemRendererProps<TItem>) => React.ReactNode;
-    scrollRef?: React.Ref<HTMLDivElement>;
+    itemRenderer?: (props: ReactCalendarItemRendererProps<TItem, TGroup>) => React.ReactNode;
+    scrollRef: HTMLDivElement | null;
 };
 
 export default class Items<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> extends Component<
@@ -142,7 +142,7 @@ export default class Items<TGroup extends TimelineGroupBase, TItem extends Timel
                                 canResizeRight={canResizeRight(item, this.props.canResize)}
                                 canSelect={item.canSelect !== undefined ? item.canSelect : this.props.canSelect}
                                 useResizeHandle={this.props.useResizeHandle}
-                                groupTops={this.props.groupTops}
+                                groupTops={this.props.groupTops ?? []} // I used an empty array here as a default value to make it safer
                                 canvasTimeStart={this.props.canvasTimeStart}
                                 canvasTimeEnd={this.props.canvasTimeEnd}
                                 canvasWidth={this.props.canvasWidth}

@@ -80,7 +80,7 @@ class TimelineHeaders extends React.Component<TimelineHeadersProps> {
         }
         return (
             <div
-                ref={this.handleRootRef as React.Ref<HTMLDivElement>}
+                ref={this.handleRootRef}
                 data-testid="headerRootDiv"
                 style={this.getRootStyle()}
                 className={classNames("rct-header-root", this.props.className)}

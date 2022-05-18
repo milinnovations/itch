@@ -49,7 +49,7 @@ export type TimelineHeaderProps = {
 export type TimelineItemBase = {
     id: Id;
     group: Id;
-    title?: React.ReactNode;
+    title?: string; // This was originally a React.ReactNode, but based on the usage I think this is only a string
     start_time: number;
     end_time: number;
     canMove?: boolean;
@@ -74,42 +74,40 @@ export type TimelineItemProps = {
     style: React.CSSProperties;
 };
 
-export type ItemContext = {
+export type ItemContext<TGroup extends TimelineGroupBase> = {
     dimensions: {
         collisionLeft: number;
         collisionWidth: number;
         height: number;
-        isDragging: boolean;
+        // isDragging: boolean;
         left: number;
         order: {
-            group: {
-                id: string;
-            };
+            group: TGroup;
             index: number;
         };
-        originalLeft: number;
+        // originalLeft: number;
         stack: boolean;
         top: number | null;
         width: number;
     };
     useResizeHandle: boolean;
-    title: string;
+    title: string | undefined;
     canMove: boolean;
     canResizeLeft: boolean;
     canResizeRight: boolean;
     selected: boolean;
-    dragging: boolean;
+    dragging: boolean | null;
     dragStart: {
         x: number;
         y: number;
-    };
-    dragTime: number;
-    dragGroupDelta: number;
-    resizing: boolean;
-    resizeEdge: TimelineItemEdge;
-    resizeStart: number;
-    resizeTime: number;
-    width: boolean;
+    } | null;
+    dragTime: number | null;
+    dragGroupDelta: number | null;
+    resizing: boolean | null;
+    resizeEdge: TimelineItemEdge | null;
+    resizeStart: number | null;
+    resizeTime: number | null;
+    width: number;
 };
 
 export type TimeFormat = {
@@ -146,18 +144,19 @@ export type ResizeStyles = {
     rightClassName?: string;
 };
 
-export type MoveResizeValidator = (
+export type MoveResizeValidator<TItem extends TimelineItemBase> = (
     action: "move" | "resize",
-    itemId: Id,
+    itemId: TItem,
     time: number,
-    resizeEdge: TimelineItemEdge,
+    resizeEdge?: TimelineItemEdge, // This value is only available for resize
 ) => number;
 
-export type ReactCalendarItemRendererProps<TItem extends TimelineItemBase = TimelineItemBase> = {
+export type ReactCalendarItemRendererProps<TItem extends TimelineItemBase, TGroup extends TimelineGroupBase> = {
     item: TItem;
-    itemContext: ItemContext;
+    itemContext: ItemContext<TGroup>;
     getItemProps: (props?: Partial<Omit<TimelineItemProps, "key" | "ref">>) => TimelineItemProps;
     getResizeProps: (styles?: ResizeStyles) => ItemRendererResizeProps;
+    timelineContext: TimelineContext;
 };
 
 export type Interval = {

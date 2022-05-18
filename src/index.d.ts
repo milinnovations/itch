@@ -46,7 +46,7 @@ import type {
 
 declare module "@mil/itch" {
     export type Id = Id_;
-    export type ItemContext = ItemContext_;
+    export type ItemContext<TGroup extends TimelineGroupBase> = ItemContext_<TGroup>;
     export type ItemRendererResizeProps = ItemRendererResizeProps_;
     export type ITimeSteps = ITimeSteps_;
     export type LabelFormat = LabelFormat_;
@@ -64,10 +64,12 @@ declare module "@mil/itch" {
     export type TimelineItem<CustomItemFields> = TimelineItemBase & CustomItemFields;
     export type TimelineGroup<CustomGroupFields> = TimelineGroupBase & CustomGroupFields;
 
-    export type ReactCalendarItemRendererProps<CustomItem extends TimelineItemBase = TimelineItemBase> =
-        ReactCalendarItemRendererProps_<CustomItem>;
+    export type ReactCalendarItemRendererProps<
+        CustomItem extends TimelineItemBase,
+        CustomGroup extends TimelineGroupBase,
+    > = ReactCalendarItemRendererProps_<CustomItem, CustomGroup>;
 
-    export type ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase = TimelineGroupBase> = {
+    export type ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase> = {
         group: CustomGroup;
         isRightSidebar?: boolean;
     };
@@ -118,7 +120,7 @@ declare module "@mil/itch" {
         stackItems?: boolean;
         itemTouchSendsClick?: boolean;
         timeSteps?: ITimeSteps;
-        scrollRef?: React.Ref<any>;
+        scrollRef?: HTMLDivElement | null;
         zoomSpeed?: { alt: number; ctrl: number; meta: number };
         onItemDrag?(itemDragObject: OnItemDragObjectMove | OnItemDragObjectResize): void;
         onItemMove?(itemId: Id, dragTime: number, newGroupOrder: number): void;
@@ -133,14 +135,14 @@ declare module "@mil/itch" {
         onCanvasDoubleClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
         onCanvasDrop?(groupId: Id, time: number, e: React.DragEvent): void;
         onZoom?(timelineContext: TimelineContext): void;
-        moveResizeValidator?: MoveResizeValidator;
+        moveResizeValidator?: MoveResizeValidator<CustomItem>;
         onTimeChange?(
             visibleTimeStart: number,
             visibleTimeEnd: number,
             updateScrollCanvas: (start: number, end: number) => void,
         ): any;
         onBoundsChange?(canvasTimeStart: number, canvasTimeEnd: number): any;
-        itemRenderer?: (props: ReactCalendarItemRendererProps<CustomItem>) => React.ReactNode;
+        itemRenderer?: (props: ReactCalendarItemRendererProps<CustomItem, CustomGroup>) => React.ReactNode;
         groupRenderer?: (props: ReactCalendarGroupRendererProps<CustomGroup>) => React.ReactNode;
         verticalLineClassNamesForTime?: (start: number, end: number) => string[] | undefined;
         horizontalLineClassNamesForGroup?: (group: CustomGroup) => string[];
