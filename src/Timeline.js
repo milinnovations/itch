@@ -87,7 +87,7 @@ function calculateVisibleGroups(groups, groupTops, lineHeight, canvasTop, canvas
 
     // Find the first visible group.
     // TODO: We could use a binary search here for more performance.
-    for (let i = 0; i < groups.length; i++) {
+    for (let i = 0; i < groupTops.length; i++) {
         if (groupTops[i] > canvasTop) {
             // The previous group is also partially visible, unless there is no
             // previous group.
@@ -524,6 +524,23 @@ export default class ReactCalendarTimeline extends Component {
         // are we changing zoom? Report it!
         if (this.props.onZoom && newZoom !== oldZoom) {
             this.props.onZoom(this.getTimelineContext());
+        }
+
+        // If the group tops have changed but the groups are the same keep the first currently
+        // visible group in a fixed scroll position. This prevents the chart from jumping randomly
+        // when fresh item data is loaded to the chart.
+        if (isEqual(prevProps.groups, this.props.groups) && !isEqual(prevState.groupTops, this.state.groupTops)) {
+            const visibleTop = this.container.scrollTop;
+            const prevGroupTops = prevState.groupTops;
+
+            // Find what was the first visible group id in the previous state
+            for (let i = 0; i < prevGroupTops.length; i++) {
+                if (prevGroupTops[i] >= visibleTop) {
+                    // Adjust the scroll to keep the first visible group in the same position
+                    this.container.scrollBy(0, this.state.groupTops[i] - prevGroupTops[i]);
+                    break;
+                }
+            }
         }
 
         // The bounds have changed? Report it!
