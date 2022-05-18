@@ -1,20 +1,20 @@
-import PropTypes from "prop-types";
 import React, { Component } from "react";
+import { ReactCalendarGroupRendererProps, TimelineGroupBase } from "../types";
 
 import { arraysEqual } from "../utility/generic";
 
-export default class Sidebar extends Component {
-    static propTypes = {
-        groups: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
-        width: PropTypes.number.isRequired,
-        canvasTop: PropTypes.number.isRequired,
-        canvasBottom: PropTypes.number.isRequired,
-        groupHeights: PropTypes.array.isRequired,
-        groupRenderer: PropTypes.func,
-        isRightSidebar: PropTypes.bool,
-    };
+type SidebarProps<CustomGroup extends TimelineGroupBase> = {
+    groups: CustomGroup[];
+    width: number;
+    canvasTop: number;
+    canvasBottom: number;
+    groupHeights: number[];
+    groupRenderer?: (props: ReactCalendarGroupRendererProps<CustomGroup>) => React.ReactNode;
+    isRightSidebar?: boolean;
+};
 
-    shouldComponentUpdate(nextProps) {
+export default class SidebarCustom<Group extends TimelineGroupBase> extends Component<SidebarProps<Group>> {
+    shouldComponentUpdate(nextProps: Readonly<SidebarProps<Group>>) {
         return !(
             nextProps.width === this.props.width &&
             nextProps.canvasTop === this.props.canvasTop &&
@@ -24,12 +24,14 @@ export default class Sidebar extends Component {
         );
     }
 
-    renderGroupContent(group, isRightSidebar, groupTitleKey, groupRightTitleKey) {
+    renderGroupContent(
+        group: Group,
+        isRightSidebar: boolean | undefined,
+        groupTitleKey: keyof Group,
+        groupRightTitleKey: keyof Group,
+    ) {
         if (this.props.groupRenderer) {
-            return React.createElement(this.props.groupRenderer, {
-                group,
-                isRightSidebar,
-            });
+            return this.props.groupRenderer({ group, isRightSidebar });
         } else {
             return group[isRightSidebar ? groupRightTitleKey : groupTitleKey];
         }
@@ -52,7 +54,7 @@ export default class Sidebar extends Component {
         let currentGroupBottom = 0;
         let totalSkippedGroupHeight = 0;
 
-        let groupLines = this.props.groups.map((group, index) => {
+        const groupLines = this.props.groups.map((group, index) => {
             const groupHeight = groupHeights[index];
 
             // Go to the next group
@@ -65,7 +67,7 @@ export default class Sidebar extends Component {
                 return undefined;
             }
 
-            const elementStyle = {
+            const elementStyle: React.CSSProperties = {
                 position: "relative",
                 top: `${totalSkippedGroupHeight - canvasTop}px`,
                 height: `${groupHeights[index]}px`,

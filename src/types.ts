@@ -236,3 +236,8 @@ export type TodayMarkerProps = MarkerProps & {
 };
 
 export type CursorMarkerProps = Omit<MarkerProps, "date">;
+
+export type ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase> = {
+    group: CustomGroup;
+    isRightSidebar?: boolean;
+};

@@ -42,6 +42,7 @@ import type {
     MarkerProps as MarkerProps_,
     TodayMarkerProps as TodayMarkerProps_,
     CursorMarkerProps as CursorMarkerProps_,
+    ReactCalendarGroupRendererProps as ReactCalendarGroupRendererProps_,
 } from "./types";
 
 declare module "@mil/itch" {
@@ -69,10 +70,8 @@ declare module "@mil/itch" {
         CustomGroup extends TimelineGroupBase,
     > = ReactCalendarItemRendererProps_<CustomItem, CustomGroup>;
 
-    export type ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase> = {
-        group: CustomGroup;
-        isRightSidebar?: boolean;
-    };
+    export type ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase> =
+        ReactCalendarGroupRendererProps_<CustomGroup>;
 
     export type OnItemDragObjectBase = {
         eventType: "move" | "resize";
