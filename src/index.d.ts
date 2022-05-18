@@ -142,6 +142,7 @@ declare module "@mil/itch" {
             updateScrollCanvas: (start: number, end: number) => void,
         ): any;
         onBoundsChange?(canvasTimeStart: number, canvasTimeEnd: number): any;
+        onVisibleGroupsChanged?(visibleGroupIds: Id[]): void;
         itemRenderer?: (props: ReactCalendarItemRendererProps<CustomItem, CustomGroup>) => React.ReactNode;
         groupRenderer?: (props: ReactCalendarGroupRendererProps<CustomGroup>) => React.ReactNode;
         verticalLineClassNamesForTime?: (start: number, end: number) => string[] | undefined;

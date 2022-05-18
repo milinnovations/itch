@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Component } from "react";
+import isEqual from "lodash.isequal";
 import moment from "moment";
 
 import Items from "./items/Items";
@@ -24,6 +25,7 @@ import { TimelineMarkersProvider } from "./markers/TimelineMarkersContext";
 import { TimelineHeadersProvider } from "./headers/HeadersContext";
 import TimelineHeaders from "./headers/TimelineHeaders";
 import DateHeader from "./headers/DateHeader";
+import { mapRange } from "./utility/generators";
 
 /**
  * Default style for the Timeline container div.
@@ -59,6 +61,55 @@ function needNewVerticalCanvas(visibleTop, visibleHeight, canvasTop, canvasBotto
     const treshold = visibleHeight * 0.5;
     const visibleBottom = visibleTop + visibleHeight;
     return visibleTop - canvasTop < treshold || canvasBottom - visibleBottom < treshold;
+}
+
+/**
+ * Calculates the possibly visible groups. It will overshoot the actual number of visible
+ * groups if some groups have a line height that is more than a normal line height, but
+ * it guarantees that there won't be a group visible on the vertical canvas that is not
+ * returned here.
+ *
+ * A significant assumption is that no group is smaller than a single line height.
+ *
+ * It should be sufficent for the user of the Timeline to only load item data for the groups
+ * returned here. It would be possible (even easier) to return only the groups that are actually
+ * on the canvas. However that would change more often as loading a new set of items (or even
+ * just interacting with one) make some groups larger or smaller when they stack.
+ *
+ * @param {{id: *}[]} groups  All of the groups of the Timeline.
+ * @param {number[]} groupTops  The calculated top position for each group in pixels.
+ * @param {number} lineHeight  The height of a single line in pixels.
+ * @param {number} canvasTop  The top position of the current vertical canvas in pixels.
+ * @param {number} canvasBottom  The bottom position of the current vertical canvas in pixels.
+ */
+function calculateVisibleGroups(groups, groupTops, lineHeight, canvasTop, canvasBottom) {
+    let firstGroupIndex = -1;
+
+    // Find the first visible group.
+    // TODO: We could use a binary search here for more performance.
+    for (let i = 0; i < groups.length; i++) {
+        if (groupTops[i] > canvasTop) {
+            // The previous group is also partially visible, unless there is no
+            // previous group.
+            firstGroupIndex = Math.max(0, i - 1);
+            break;
+        }
+    }
+
+    if (firstGroupIndex < 0) {
+        // No visible groups at all
+        return [];
+    }
+
+    const canvasHeight = canvasBottom - canvasTop;
+    // Use ceil because a partially visible group is still visible and add 1 because there
+    // may be a partial line on both ends.
+    const lineCount = Math.ceil(canvasHeight / lineHeight) + 1;
+    const lastGroupIndex = Math.min(groups.length - 1, firstGroupIndex + lineCount);
+
+    const visibleGroupIds = Array.from(mapRange(firstGroupIndex, lastGroupIndex + 1, index => groups[index].id));
+
+    return visibleGroupIds;
 }
 
 export default class ReactCalendarTimeline extends Component {
@@ -131,6 +182,7 @@ export default class ReactCalendarTimeline extends Component {
         visibleTimeEnd: PropTypes.number,
         onTimeChange: PropTypes.func,
         onBoundsChange: PropTypes.func,
+        onVisibleGroupsChanged: PropTypes.func,
 
         selected: PropTypes.array,
 
@@ -313,6 +365,9 @@ export default class ReactCalendarTimeline extends Component {
             );
         }
 
+        // Keep track of the visible groups (on the canvas)
+        this.visibleGroupIds = [];
+
         const [canvasTimeStart, canvasTimeEnd] = getCanvasBoundariesFromVisibleTime(visibleTimeStart, visibleTimeEnd);
 
         this.state = {
@@ -375,6 +430,23 @@ export default class ReactCalendarTimeline extends Component {
         }
     }
 
+    updateVisibleGroupIds() {
+        const newVisibleGroupIds = calculateVisibleGroups(
+            this.props.groups,
+            this.state.groupTops,
+            this.props.lineHeight,
+            this.state.canvasTop,
+            this.state.canvasBottom,
+        );
+        if (!isEqual(this.visibleGroupIds, newVisibleGroupIds)) {
+            this.visibleGroupIds = newVisibleGroupIds;
+            // The visible groups have changed? Report it!
+            if (this.props.onVisibleGroupsChanged) {
+                this.props.onVisibleGroupsChanged(this.visibleGroupIds);
+            }
+        }
+    }
+
     componentDidMount() {
         this.lastTouchDistance = null;
 
@@ -384,6 +456,8 @@ export default class ReactCalendarTimeline extends Component {
         // Starting the observation will call the listeners once. That initial call will
         // set up the initial horizontal and vertical canvas properly.
         this.resizeObserver.observe(this.container);
+
+        this.updateVisibleGroupIds();
     }
 
     componentWillUnmount() {
@@ -456,6 +530,8 @@ export default class ReactCalendarTimeline extends Component {
         if (this.props.onBoundsChange && this.state.canvasTimeStart !== prevState.canvasTimeStart) {
             this.props.onBoundsChange(this.state.canvasTimeStart, this.state.canvasTimeStart + newZoom * 3);
         }
+
+        this.updateVisibleGroupIds();
 
         // Check the scroll is correct
         const scrollLeft = Math.round(
