@@ -73,7 +73,7 @@ export const Itch = ({}: {
     /* Empty */
 }): JSX.Element => {
     return (
-        <div>
+        <div style={{ height: "100vh" }}>
             <Timeline
                 groups={groups}
                 items={items}
