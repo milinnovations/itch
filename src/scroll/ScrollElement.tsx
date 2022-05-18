@@ -73,7 +73,7 @@ export default class ScrollElement extends Component<Props, { isDragging: boolea
         // zoom in the time dimension
         if (e.ctrlKey || e.metaKey || e.altKey) {
             e.preventDefault();
-            const parentPosition = getParentPosition(e.currentTarget);
+            const parentPosition = getParentPosition(e.currentTarget as HTMLDivElement); // We use the handler on a DIV so it is safe to cast
             const xPosition = e.clientX - parentPosition.x;
 
             const speeds = this.props.zoomSpeed ?? defaultZoomSpeed;
@@ -141,7 +141,7 @@ export default class ScrollElement extends Component<Props, { isDragging: boolea
         }
     };
 
-    handleTouchMove = (e: React.TouchEvent) => {
+    handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
         const { isInteractingWithItem, width, onZoom } = this.props;
         if (isInteractingWithItem) {
             e.preventDefault();
