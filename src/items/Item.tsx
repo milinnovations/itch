@@ -8,7 +8,8 @@ import isEqual from "lodash.isequal";
 
 import { composeEvents } from "../utility/events";
 import { defaultItemRenderer } from "./defaultItemRenderer";
-import { GroupOrder, millisecondsInPixel } from "../utility/calendar";
+import { millisecondsInPixel } from "../utility/calendar";
+import type { Dimensions, GroupOrder } from "../utility/calendar";
 import { getSumScroll, getSumOffset } from "../utility/dom-helpers";
 import {
     overridableStyles,
@@ -57,16 +58,7 @@ type ItemProps<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>
     itemRenderer?: (props: ReactCalendarItemRendererProps<TItem, TGroup>) => React.ReactNode;
     itemProps?: object; // Is this used anywhere???
     canSelect: boolean;
-    dimensions: {
-        top: number;
-        left: number;
-        width: number;
-        collisionLeft: number;
-        collisionWidth: number;
-        order: GroupOrder<TGroup>;
-        stack: boolean;
-        height: number;
-    };
+    dimensions: Dimensions<TGroup>;
     groupTops: number[];
     useResizeHandle: boolean;
     moveResizeValidator?: MoveResizeValidator<TItem>;
