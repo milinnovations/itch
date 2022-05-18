@@ -1,36 +1,70 @@
 import React from "react";
-import Timeline from "../src";
-import "../src/Timeline.scss";
 import moment from "moment";
 
-const groups = [
-    { id: 1, title: "group 1" },
-    { id: 2, title: "group 2" },
+import Timeline from "../src";
+import type { TimelineGroupBase, TimelineItemBase } from "../src/types";
+import "../src/Timeline.scss";
+
+const groups: TimelineGroupBase[] = [];
+
+for (let id = 0; id < 10; id++) {
+    groups.push({ id: id.toString(), title: `Group ${id + 1}` });
+}
+
+const items: TimelineItemBase[] = [];
+
+type RelativeTimeWindow = {
+    startOffset: number;
+    duration: number;
+};
+
+const rowDefinitions: RelativeTimeWindow[][] = [
+    [
+        {
+            startOffset: -2,
+            duration: 1,
+        },
+        {
+            startOffset: 0,
+            duration: 2,
+        },
+        {
+            startOffset: 3,
+            duration: 2,
+        },
+    ],
+    [
+        {
+            startOffset: -1,
+            duration: 4,
+        },
+        {
+            startOffset: 4,
+            duration: 3,
+        },
+    ],
 ];
 
-const items = [
-    {
-        id: 1,
-        group: 1,
-        title: "item 1",
-        start_time: moment(),
-        end_time: moment().add(1, "hour"),
-    },
-    {
-        id: 2,
-        group: 2,
-        title: "item 2",
-        start_time: moment().add(-0.5, "hour"),
-        end_time: moment().add(0.5, "hour"),
-    },
-    {
-        id: 3,
-        group: 1,
-        title: "item 3",
-        start_time: moment().add(2, "hour"),
-        end_time: moment().add(3, "hour"),
-    },
-];
+const _baseDate = moment().startOf("hour");
+// Moment objects are mutable, use a factory to get mutable copy of the base date...
+const getBaseDate = () => moment(_baseDate);
+
+for (let group = 0; group < groups.length; group++) {
+    const rowDefinition = rowDefinitions[group % rowDefinitions.length];
+    for (let item = 0; item < rowDefinition.length; item++) {
+        const itemDefinition = rowDefinition[item];
+        const start = getBaseDate().add(itemDefinition.startOffset, "hour");
+        // Moment objects are mutable, create a clone.
+        const end = moment(start).add(itemDefinition.duration, "hour");
+        items.push({
+            id: `${group}-${item}`,
+            group: group.toString(),
+            title: `Group ${group} / Item ${item}`,
+            start_time: start.valueOf(),
+            end_time: end.valueOf(),
+        });
+    }
+}
 
 /**
  * Primary UI component for user interaction
@@ -43,8 +77,8 @@ export const Itch = ({}: {
             <Timeline
                 groups={groups}
                 items={items}
-                defaultTimeStart={moment().add(-12, "hour")}
-                defaultTimeEnd={moment().add(12, "hour")}
+                defaultTimeStart={getBaseDate().add(-12, "hour")}
+                defaultTimeEnd={getBaseDate().add(12, "hour")}
             />
         </div>
     );
