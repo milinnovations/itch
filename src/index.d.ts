@@ -120,7 +120,7 @@ declare module "@mil/itch" {
         stackItems?: boolean;
         itemTouchSendsClick?: boolean;
         timeSteps?: ITimeSteps;
-        scrollRef?: HTMLDivElement | null;
+        scrollRef?: React.Ref<any>;
         zoomSpeed?: { alt: number; ctrl: number; meta: number };
         onItemDrag?(itemDragObject: OnItemDragObjectMove | OnItemDragObjectResize): void;
         onItemMove?(itemId: Id, dragTime: number, newGroupOrder: number): void;
