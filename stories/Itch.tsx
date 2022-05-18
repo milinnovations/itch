@@ -7,8 +7,8 @@ import "../src/Timeline.scss";
 
 const groups: TimelineGroupBase[] = [];
 
-for (let id = 0; id < 10; id++) {
-    groups.push({ id: id.toString(), title: `Group ${id + 1}` });
+for (let id = 0; id < 2000; id++) {
+    groups.push({ id: id.toString(), title: `Group ${id}` });
 }
 
 const items: TimelineItemBase[] = [];
