@@ -49,9 +49,9 @@ export type TimelineHeaderProps = {
 export type TimelineItemBase = {
     id: Id;
     group: Id;
-    title?: string; // This was originally a React.ReactNode, but based on the usage I think this is only a string
-    start_time: number;
-    end_time: number;
+    title?: string;
+    startTime: number;
+    endTime: number;
     canMove?: boolean;
     canResize?: ResizeOptions;
     canChangeGroup?: boolean;
@@ -277,7 +277,7 @@ export type ReactCalendarTimelineProps<
     dragSnap?: number;
     minResizeWidth?: number;
     lineHeight?: number;
-    itemHeightRatio?: number;
+    itemHeight?: number;
     minZoom?: number;
     maxZoom?: number;
     clickTolerance?: number;

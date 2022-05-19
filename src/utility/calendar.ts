@@ -393,7 +393,7 @@ export function getVisibleItems<TItem extends TimelineItemBase>(
     canvasTimeEnd: number,
 ) {
     return items.filter(item => {
-        return item.start_time <= canvasTimeEnd && item.end_time >= canvasTimeStart;
+        return item.startTime <= canvasTimeEnd && item.endTime >= canvasTimeStart;
     });
 }
 
@@ -604,7 +604,7 @@ function stackGroup<TGroup extends TimelineGroupBase>(
  * @param canvasTimeStart  The start time of the canvas in milliseconds.
  * @param canvasTimeEnd  The end time of the canvas in milliseconds.
  * @param lineHeight  The height of a single line in pixels.
- * @param itemHeightRatio  The ratio of the height of an item to the height of the line.
+ * @param itemHeight  The of a single item in pixels.
  * @param stackItems  Whether items should be stacked by default.
  * @param draggingItem  The id of the item being dragged.
  * @param resizingItem  The id of the item being resized.
@@ -622,7 +622,7 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
     canvasTimeStart: number,
     canvasTimeEnd: number,
     lineHeight: number,
-    itemHeightRatio: number,
+    itemHeight: number,
     stackItems: boolean,
     draggingItem: Id | null,
     resizingItem: Id | null,
@@ -664,8 +664,7 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
             canvasTimeEnd,
             canvasWidth,
             groupOrders,
-            lineHeight,
-            itemHeightRatio,
+            itemHeight,
         }),
     );
     // Get a new array of groupOrders holding the stacked items
@@ -692,7 +691,7 @@ export function getCanvasWidth(width: number, buffer = 3) {
  * @param canvasWidth  The width of the canvas in pixels.
  * @param groupOrders  The group orders.
  * @param lineHeight  The height of a row in pixels.
- * @param itemHeightRatio  The ratio of the height of an item to the height of the row.
+ * @param itemHeight  The height of a single item in pixels.
  *
  * @returns  The calculated dimensions the item.
  */
@@ -702,21 +701,19 @@ function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends Timel
     canvasTimeEnd,
     canvasWidth,
     groupOrders,
-    lineHeight,
-    itemHeightRatio,
+    itemHeight,
 }: {
     item: TItem;
     canvasTimeStart: number;
     canvasTimeEnd: number;
     canvasWidth: number;
     groupOrders: GroupOrders<TGroup>;
-    lineHeight: number;
-    itemHeightRatio: number;
+    itemHeight: number;
 }): { id: Id; dimensions: Dimensions<TGroup> } {
     const itemId = item.id;
     const verticalDimensions: VerticalDimensions = calculateDimensions({
-        itemTimeStart: item.start_time,
-        itemTimeEnd: item.end_time,
+        itemTimeStart: item.startTime,
+        itemTimeEnd: item.endTime,
         canvasTimeStart,
         canvasTimeEnd,
         canvasWidth,
@@ -729,7 +726,7 @@ function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends Timel
         // Disabled the undocumented magic that if an item has an isOverlay=true property we won't stack it.
         // stack: !item.isOverlay;
         stack: true,
-        height: lineHeight * itemHeightRatio,
+        height: itemHeight,
     };
     return {
         id: itemId,
@@ -776,8 +773,8 @@ function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends
     const isDragging = itemId === draggingItem;
     const isResizing = itemId === resizingItem;
     const [itemTimeStart, itemTimeEnd] = calculateInteractionNewTimes({
-        itemTimeStart: item.start_time,
-        itemTimeEnd: item.end_time,
+        itemTimeStart: item.startTime,
+        itemTimeEnd: item.endTime,
         isDragging,
         isResizing,
         dragTime,
@@ -786,8 +783,8 @@ function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends
     });
     const newItem = {
         ...item,
-        start_time: itemTimeStart,
-        end_time: itemTimeEnd,
+        startTime: itemTimeStart,
+        endTime: itemTimeEnd,
         // The `newGroupOrder` will be never `null` when the `isDragging` is true
         group: isDragging && newGroupOrder !== null ? groups[newGroupOrder].id : item.group,
     };
@@ -870,7 +867,7 @@ export function calculateScrollCanvas<TGroup extends TimelineGroupBase, TItem ex
                 mergedState.canvasTimeStart,
                 mergedState.canvasTimeEnd,
                 props.lineHeight,
-                props.itemHeightRatio,
+                props.itemHeight,
                 props.stackItems,
                 mergedState.draggingItem,
                 mergedState.resizingItem,

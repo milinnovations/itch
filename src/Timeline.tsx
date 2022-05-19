@@ -167,8 +167,8 @@ const defaultRightSidebarWidth = 0;
 const defaultDragSnap = 1000 * 60 * 15; // 15min
 const defaultMinResizeWidth = 20;
 // const defaultStickyHeader = true;
-const defuaultLineHeight = 30;
-const defaultItemHeightRatio = 0.65;
+const defuaultLineHeight = 36;
+const defaultItemHeight = 28;
 const defaultMinZoom = 60 * 60 * 1000; // 1 hour
 const defaultMaxZoom = 5 * 365.24 * 86400 * 1000; // 5 years
 const defaultClickTolerance = 3; // how many pixels can we drag for it to be still considered a click?
@@ -279,7 +279,7 @@ export default class ReactCalendarTimeline<
             canvasTimeStart,
             canvasTimeEnd,
             props.lineHeight ?? defuaultLineHeight,
-            props.itemHeightRatio ?? defaultItemHeightRatio,
+            props.itemHeight ?? defaultItemHeight,
             props.stackItems ?? defaultStackItems,
             null, // this.state.draggingItem,
             null, // this.state.resizingItem,
@@ -420,7 +420,7 @@ export default class ReactCalendarTimeline<
                     prevState.canvasTimeStart,
                     prevState.canvasTimeEnd,
                     nextProps.lineHeight ?? defuaultLineHeight,
-                    nextProps.itemHeightRatio ?? defaultItemHeightRatio,
+                    nextProps.itemHeight ?? defaultItemHeight,
                     nextProps.stackItems ?? defaultStackItems,
                     prevState.draggingItem,
                     prevState.resizingItem,
@@ -503,7 +503,7 @@ export default class ReactCalendarTimeline<
             this.state.canvasTimeStart,
             this.state.canvasTimeEnd,
             props.lineHeight ?? defuaultLineHeight,
-            props.itemHeightRatio ?? defaultItemHeightRatio,
+            props.itemHeight ?? defaultItemHeight,
             props.stackItems ?? defaultStackItems,
             this.state.draggingItem,
             this.state.resizingItem,
@@ -584,7 +584,7 @@ export default class ReactCalendarTimeline<
                 {
                     // DON'T FORGET THE DEFAULT VALUES!
                     lineHeight: defuaultLineHeight,
-                    itemHeightRatio: defaultItemHeightRatio,
+                    itemHeight: defaultItemHeight,
                     stackItems: defaultStackItems,
                     ...this.props,
                 },
@@ -1051,7 +1051,7 @@ export default class ReactCalendarTimeline<
                 this.state.canvasTimeStart,
                 this.state.canvasTimeEnd,
                 this.props.lineHeight ?? defuaultLineHeight,
-                this.props.itemHeightRatio ?? defaultItemHeightRatio,
+                this.props.itemHeight ?? defaultItemHeight,
                 this.props.stackItems ?? defaultStackItems,
                 this.state.draggingItem,
                 this.state.resizingItem,

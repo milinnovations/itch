@@ -205,7 +205,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
     resizeTimeSnap(dragTime: number) {
         const { dragSnap } = this.props;
         if (dragSnap) {
-            const endTime = this.props.item.end_time % dragSnap;
+            const endTime = this.props.item.endTime % dragSnap;
             return Math.round((dragTime - endTime) / dragSnap) * dragSnap + endTime;
         } else {
             return dragTime;
@@ -213,7 +213,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
     }
 
     dragTime(e: DragEvent): number {
-        const startTime = moment(this.props.item.start_time);
+        const startTime = moment(this.props.item.startTime);
 
         if (this.state.dragStart === null) {
             throw new Error(
@@ -259,7 +259,7 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
     }
 
     resizeTimeDelta(e: ResizeEvent, resizeEdge: TimelineItemEdge | null) {
-        const length = this.props.item.end_time - this.props.item.start_time;
+        const length = this.props.item.endTime - this.props.item.startTime;
 
         if (this.state.resizeStart === null) {
             throw new Error(
@@ -311,10 +311,10 @@ export default class Item<TGroup extends TimelineGroupBase, TItem extends Timeli
                         dragStart: {
                             x: e.pageX,
                             y: e.pageY,
-                            offset: this.props.item.start_time - clickTime,
+                            offset: this.props.item.startTime - clickTime,
                         },
                         preDragPosition: { x: hackedTarget.offsetLeft, y: hackedTarget.offsetTop },
-                        dragTime: this.props.item.start_time,
+                        dragTime: this.props.item.startTime,
                         dragGroupDelta: 0,
                     });
                     return;

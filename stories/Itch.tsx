@@ -60,8 +60,8 @@ for (let group = 0; group < groups.length; group++) {
             id: `${group}-${item}`,
             group: group.toString(),
             title: `Group ${group} / Item ${item}`,
-            start_time: start.valueOf(),
-            end_time: end.valueOf(),
+            startTime: start.valueOf(),
+            endTime: end.valueOf(),
         });
     }
 }
@@ -79,6 +79,9 @@ export const Itch = ({}: {
                 items={items}
                 defaultTimeStart={getBaseDate().add(-12, "hour")}
                 defaultTimeEnd={getBaseDate().add(12, "hour")}
+                lineHeight={42}
+                itemHeight={34}
+                stackItems
             />
         </div>
     );
