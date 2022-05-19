@@ -8,4 +8,46 @@ export { default as TimelineHeaders } from "./headers/TimelineHeaders";
 export { default as SidebarHeader } from "./headers/SidebarHeader";
 export { default as CustomHeader } from "./headers/CustomHeader";
 export { default as DateHeader } from "./headers/DateHeader";
+
+export { defaultTimeSteps, defaultHeaderFormats } from "./default-config";
+
+export {
+    CompleteTimeSteps,
+    Id,
+    ItemContext,
+    ItemRendererResizeProps,
+    ITimeSteps,
+    LabelFormat,
+    ResizeOptions,
+    ResizeStyles,
+    TimelineContext,
+    TimelineGroupBase,
+    TimelineHeaderProps,
+    TimelineItemBase,
+    TimelineItemEdge,
+    TimelineItemProps,
+    TimeFormat,
+    TimeUnit,
+    ReactCalendarItemRendererProps,
+    ReactCalendarGroupRendererProps,
+    OnItemDragObjectBase,
+    OnItemDragObjectMove,
+    OnItemDragObjectResize,
+    ReactCalendarTimelineProps,
+    CustomMarkerChildrenProps,
+    MarkerProps,
+    TodayMarkerProps,
+    CursorMarkerProps,
+    SidebarHeaderChildrenFnProps,
+    SidebarHeaderProps,
+    IntervalContext,
+    GetIntervalProps,
+    IntervalRenderer,
+    DateHeaderProps,
+    Interval,
+    HeaderContext,
+    CustomHeaderPropsChildrenFnProps,
+    CustomHeaderProps,
+} from "./types";
+
 export default Timeline;

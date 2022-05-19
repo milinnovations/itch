@@ -18,7 +18,7 @@
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook"
     },
-    "typings": "./src/index.d.ts",
+    "typings": "./lib/index.d.ts",
     "files": [
         "lib/**/*",
         "src/**/*"

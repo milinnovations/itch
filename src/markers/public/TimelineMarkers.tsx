@@ -15,8 +15,8 @@ import React from "react";
 */
 
 // If we decide to pass in props to TimelineMarkers, then yes, this is necessary.
-const TimelineMarkers = <T extends object>(props: React.PropsWithChildren<T>) => {
-    return props.children || null;
+const TimelineMarkers = <T extends object>(props: React.PropsWithChildren<T>): JSX.Element => {
+    return <>{props.children || null}</>;
 };
 
 export default TimelineMarkers;

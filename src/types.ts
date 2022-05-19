@@ -199,8 +199,8 @@ export type CustomHeaderPropsChildrenFnProps<Data> = {
 };
 
 export type SidebarHeaderChildrenFnProps<Data> = {
-    getRootProps: (propsToOverride?: { style: React.CSSProperties }) => { style: React.CSSProperties };
-    data: Data;
+    getRootProps: (propsToOverride: { style: React.CSSProperties }) => { style: React.CSSProperties };
+    data?: Data;
 };
 
 export type CustomHeaderProps<Data> = {
@@ -321,4 +321,10 @@ export type ReactCalendarTimelineProps<
 
     canSelect?: boolean; // This was missing from the original type
     style?: React.CSSProperties; // This was missing from the original type
+};
+
+export type SidebarHeaderProps<Data> = {
+    variant?: "left" | "right";
+    headerData?: Data;
+    children?: (props: SidebarHeaderChildrenFnProps<Data>) => JSX.Element;
 };

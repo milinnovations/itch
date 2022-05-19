@@ -1,25 +1,15 @@
 import React from "react";
+import { SidebarHeaderChildrenFnProps, SidebarHeaderProps } from "../types";
 import { TimelineHeadersConsumer } from "./HeadersContext";
 
-export interface ISidebarHeaderChildrenFnProps<T> {
-    getRootProps: (propsToOverride: { style: React.CSSProperties }) => { style: React.CSSProperties };
-    data?: T; // TODO: I had to make this optional, please check it later
-}
-
-export interface ISidebarWrapperProps<T> {
-    variant?: "left" | "right";
-    headerData?: T;
-    children?: (props: ISidebarHeaderChildrenFnProps<T>) => JSX.Element;
-}
-
-export interface ISidebarHeaderProps<T> extends ISidebarWrapperProps<T> {
+type WrappedSidebarHeaderProps<T> = SidebarHeaderProps<T> & {
     rightSidebarWidth?: number;
     leftSidebarWidth: number;
     style?: React.CSSProperties;
-    children: (props: ISidebarHeaderChildrenFnProps<T>) => JSX.Element;
-}
+    children: (props: SidebarHeaderChildrenFnProps<T>) => JSX.Element;
+};
 
-class SidebarHeader<T> extends React.PureComponent<ISidebarHeaderProps<T>> {
+class SidebarHeader<T> extends React.PureComponent<WrappedSidebarHeaderProps<T>> {
     getRootProps = (props: { style?: React.CSSProperties } = {}) => {
         const { style = {} } = props;
         const width = this.props.variant === "right" ? this.props.rightSidebarWidth : this.props.leftSidebarWidth;
@@ -31,7 +21,7 @@ class SidebarHeader<T> extends React.PureComponent<ISidebarHeaderProps<T>> {
         };
     };
 
-    getStateAndHelpers = (): ISidebarHeaderChildrenFnProps<T> => {
+    getStateAndHelpers = (): SidebarHeaderChildrenFnProps<T> => {
         return {
             getRootProps: this.getRootProps,
             data: this.props.headerData,
@@ -45,11 +35,11 @@ class SidebarHeader<T> extends React.PureComponent<ISidebarHeaderProps<T>> {
     }
 }
 
-const defaultSidebarHeaderChildren = ({ getRootProps }: ISidebarHeaderChildrenFnProps<unknown>) => (
+const defaultSidebarHeaderChildren = ({ getRootProps }: SidebarHeaderChildrenFnProps<unknown>) => (
     <div data-testid="sidebarHeader" {...getRootProps({ style: {} })} />
 );
 
-function SidebarWrapper<T>(props: ISidebarWrapperProps<T>): JSX.Element {
+function SidebarWrapper<T>(props: SidebarHeaderProps<T>): JSX.Element {
     const { children = defaultSidebarHeaderChildren, variant = "left", headerData } = props;
     return (
         <TimelineHeadersConsumer>
