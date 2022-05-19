@@ -1,7 +1,15 @@
 import moment from "moment";
 import type { Moment } from "moment";
 
-import type { CompleteTimeSteps, Id, ITimeSteps, TimelineGroupBase, TimelineItemBase, TimeUnit } from "../types";
+import type {
+    CompleteTimeSteps,
+    Id,
+    ITimeSteps,
+    TimelineGroupBase,
+    TimelineItemBase,
+    TimelineItemEdge,
+    TimeUnit,
+} from "../types";
 
 export type GroupOrder<TGroup extends TimelineGroupBase> = { index: number; group: TGroup };
 export type GroupOrders<TGroup extends TimelineGroupBase> = Record<string | number, GroupOrder<TGroup>>;
@@ -261,7 +269,7 @@ function calculateInteractionNewTimes({
     dragTime: number | null;
     isDragging: boolean;
     isResizing: boolean;
-    resizingEdge: "left" | "right" | null;
+    resizingEdge: TimelineItemEdge | null;
     resizeTime: number | null;
 }) {
     const originalItemRange = itemTimeEnd - itemTimeStart;
@@ -619,7 +627,7 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
     draggingItem: Id | null,
     resizingItem: Id | null,
     dragTime: number | null,
-    resizingEdge: "left" | "right" | null,
+    resizingEdge: TimelineItemEdge | null,
     resizeTime: number | null,
     newGroupOrder: number | null,
 ) {
@@ -758,7 +766,7 @@ function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends
     draggingItem: Id | null;
     resizingItem: Id | null;
     dragTime: number | null;
-    resizingEdge: "left" | "right" | null;
+    resizingEdge: TimelineItemEdge | null;
     resizeTime: number | null;
     groups: TGroup[];
     newGroupOrder: number | null;

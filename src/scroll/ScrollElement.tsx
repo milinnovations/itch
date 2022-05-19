@@ -25,12 +25,12 @@ type Props = {
     width: number;
     height: number;
     top: number;
-    scrollRef: React.RefCallback<HTMLDivElement>; // TODO
+    scrollRef: React.RefCallback<HTMLDivElement>;
     isInteractingWithItem: boolean;
-    onZoom: (scale: number, offset: number) => void; // TODO
+    onZoom: (scale: number, offset: number) => void;
     onWheelZoom: (speed: number, xPosition: number, deltaY: number) => void;
-    onHorizontalScroll: (scrollX: number) => void; // TODO
-    onVerticalScrollBy: (deltaY: number) => void; // TODO
+    onHorizontalScroll: (scrollX: number) => void;
+    onVerticalScrollBy: (deltaY: number) => void;
     zoomSpeed?: ZoomSpeed;
 };
 

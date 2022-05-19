@@ -51,8 +51,8 @@ type Props<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase> = {
 
     moveResizeValidator?: MoveResizeValidator<TItem>;
     itemSelect: (item: Id, clickType: ClickType, event: React.MouseEvent | React.TouchEvent) => void;
-    itemDrag: (item: Id, dragTime: number, newGroup: number) => void;
-    itemDrop: (item: Id, dragTime: number, newGroup: number) => void;
+    itemDrag: (item: Id, dragTime: number, newGroupIndex: number) => void;
+    itemDrop: (item: Id, dragTime: number, newGroupIndex: number) => void;
     itemResizing: (item: Id, resizeTime: number, edge: TimelineItemEdge) => void;
     itemResized: (item: Id, resizeTime: number, edge: TimelineItemEdge, timeDelta: number) => void;
 
