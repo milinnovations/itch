@@ -581,7 +581,13 @@ export default class ReactCalendarTimeline<
                 forceUpdateDimensions,
                 items,
                 groups,
-                this.props,
+                {
+                    // DON'T FORGET THE DEFAULT VALUES!
+                    lineHeight: defuaultLineHeight,
+                    itemHeightRatio: defaultItemHeightRatio,
+                    stackItems: defaultStackItems,
+                    ...this.props,
+                },
                 this.state,
             ) as ReactCalendarTimelineState<CustomGroup>, // TODO: this is ugly, we need to use proper state type in the calculateScrollCanvas
         );
