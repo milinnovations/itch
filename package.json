@@ -12,7 +12,7 @@
     "scripts": {
         "build": "npx rimraf ./lib && tsc && tsc-alias && sass src/Timeline.scss lib/Timeline.css",
         "prepare": "npm run build",
-        "build-to": "ts-node -O '{\"module\":\"commonjs\"}' ./scripts/buildTo.ts",
+        "build-to": "ts-node -O '{\\\"module\\\":\\\"commonjs\\\"}' ./scripts/buildTo.ts",
         "lint": "eslint \"./**/*.ts\" \"./**/*.tsx\" --ignore-pattern \"node_modules/\" --ignore-pattern \"./lib/\" ",
         "lint:fix": "eslint \"./**/*.ts\" \"./**/*.tsx\" --ignore-pattern \"node_modules/\" --ignore-pattern \"./lib/\" --fix ",
         "storybook": "start-storybook -p 6006",
