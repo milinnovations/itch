@@ -13,7 +13,7 @@ type BaseProps = {
     height: number;
     minUnit: TimeUnit;
     timeSteps: CompleteTimeSteps;
-    verticalLineClassNamesForTime: (start: number, end: number) => string[] | undefined;
+    verticalLineClassNamesForTime: ((start: number, end: number) => string[]) | undefined;
 };
 
 type Props = BaseProps & {

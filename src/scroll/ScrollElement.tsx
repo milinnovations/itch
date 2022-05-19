@@ -25,7 +25,7 @@ type Props = {
     width: number;
     height: number;
     top: number;
-    scrollRef: React.RefCallback<unknown>; // TODO
+    scrollRef: React.RefCallback<HTMLDivElement>; // TODO
     isInteractingWithItem: boolean;
     onZoom: (scale: number, offset: number) => void; // TODO
     onWheelZoom: (speed: number, xPosition: number, deltaY: number) => void;

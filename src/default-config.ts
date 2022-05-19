@@ -1,4 +1,6 @@
-export const defaultTimeSteps = {
+import { CompleteTimeSteps } from "./types";
+
+export const defaultTimeSteps: CompleteTimeSteps = {
     second: 1,
     minute: 1,
     hour: 1,

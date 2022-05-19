@@ -8,7 +8,6 @@
 // TypeScript Version: 3.5
 
 import type React from "react";
-import type { Moment } from "moment";
 
 import type {
     CompleteTimeSteps,
@@ -17,7 +16,6 @@ import type {
     ItemRendererResizeProps as ItemRendererResizeProps_,
     ITimeSteps as ITimeSteps_,
     LabelFormat as LabelFormat_,
-    MoveResizeValidator,
     ReactCalendarItemRendererProps as ReactCalendarItemRendererProps_,
     ResizeOptions as ResizeOptions_,
     ResizeStyles as ResizeStyles_,
@@ -43,6 +41,10 @@ import type {
     TodayMarkerProps as TodayMarkerProps_,
     CursorMarkerProps as CursorMarkerProps_,
     ReactCalendarGroupRendererProps as ReactCalendarGroupRendererProps_,
+    OnItemDragObjectBase as OnItemDragObjectBase_,
+    OnItemDragObjectMove as OnItemDragObjectMove_,
+    OnItemDragObjectResize as OnItemDragObjectResize_,
+    ReactCalendarTimelineProps as ReactCalendarTimelineProps_,
 } from "./types";
 
 declare module "@mil/itch" {
@@ -73,83 +75,16 @@ declare module "@mil/itch" {
     export type ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBase> =
         ReactCalendarGroupRendererProps_<CustomGroup>;
 
-    export type OnItemDragObjectBase = {
-        eventType: "move" | "resize";
-        itemId: Id;
-        time: number;
-    };
+    export type OnItemDragObjectBase = OnItemDragObjectBase_;
 
-    export type OnItemDragObjectMove = OnItemDragObjectBase & {
-        eventType: "move";
-        newGroupOrder: number;
-    };
+    export type OnItemDragObjectMove = OnItemDragObjectMove_;
 
-    export type OnItemDragObjectResize = OnItemDragObjectBase & {
-        eventType: "resize";
-        edge?: TimelineItemEdge;
-    };
+    export type OnItemDragObjectResize = OnItemDragObjectResize_;
 
     export type ReactCalendarTimelineProps<
         CustomItem extends TimelineItemBase = TimelineItemBase,
         CustomGroup extends TimelineGroupBase = TimelineGroupBase,
-    > = {
-        groups: CustomGroup[];
-        items: CustomItem[];
-        className?: string;
-        defaultTimeStart?: Date | Moment;
-        defaultTimeEnd?: Date | Moment;
-        visibleTimeStart?: Date | Moment | number;
-        visibleTimeEnd?: Date | Moment | number;
-        selected?: number[];
-        sidebarWidth?: number;
-        sidebarContent?: React.ReactNode;
-        rightSidebarWidth?: number;
-        rightSidebarContent?: React.ReactNode;
-        dragSnap?: number;
-        minResizeWidth?: number;
-        lineHeight?: number;
-        itemHeightRatio?: number;
-        minZoom?: number;
-        maxZoom?: number;
-        clickTolerance?: number;
-        canMove?: boolean;
-        canChangeGroup?: boolean;
-        canResize?: ResizeOptions;
-        useResizeHandle?: boolean;
-        stackItems?: boolean;
-        itemTouchSendsClick?: boolean;
-        timeSteps?: ITimeSteps;
-        scrollRef?: HTMLDivElement | null;
-        zoomSpeed?: { alt: number; ctrl: number; meta: number };
-        onItemDrag?(itemDragObject: OnItemDragObjectMove | OnItemDragObjectResize): void;
-        onItemMove?(itemId: Id, dragTime: number, newGroupOrder: number): void;
-        onItemResize?(itemId: Id, endTimeOrStartTime: number, edge: TimelineItemEdge): void;
-        onItemSelect?(itemId: Id, e: any, time: number): void;
-        onItemDeselect?(e: React.SyntheticEvent): void;
-        onItemClick?(itemId: Id, e: React.SyntheticEvent, time: number): void;
-        onItemDoubleClick?(itemId: Id, e: React.SyntheticEvent, time: number): void;
-        onItemContextMenu?(itemId: Id, e: React.SyntheticEvent, time: number): void;
-        onCanvasClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
-        onCanvasContextMenu?(groupId: Id, time: number, e: React.SyntheticEvent): void;
-        onCanvasDoubleClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
-        onCanvasDrop?(groupId: Id, time: number, e: React.DragEvent): void;
-        onZoom?(timelineContext: TimelineContext): void;
-        moveResizeValidator?: MoveResizeValidator<CustomItem>;
-        onTimeChange?(
-            visibleTimeStart: number,
-            visibleTimeEnd: number,
-            updateScrollCanvas: (start: number, end: number) => void,
-        ): any;
-        onBoundsChange?(canvasTimeStart: number, canvasTimeEnd: number): any;
-        onVisibleGroupsChanged?(visibleGroupIds: Id[]): void;
-        itemRenderer?: (props: ReactCalendarItemRendererProps<CustomItem, CustomGroup>) => React.ReactNode;
-        groupRenderer?: (props: ReactCalendarGroupRendererProps<CustomGroup>) => React.ReactNode;
-        verticalLineClassNamesForTime?: (start: number, end: number) => string[] | undefined;
-        horizontalLineClassNamesForGroup?: (group: CustomGroup) => string[];
-
-        // Fields that are in propTypes but not documented
-        headerRef?: React.Ref<any>;
-    };
+    > = ReactCalendarTimelineProps_<CustomItem, CustomGroup>;
 
     export class TimelineMarkers extends React.Component {}
     export type CustomMarkerChildrenProps = CustomMarkerChildrenProps_;

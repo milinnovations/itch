@@ -258,16 +258,19 @@ function calculateInteractionNewTimes({
 }: {
     itemTimeStart: number;
     itemTimeEnd: number;
-    dragTime: number;
+    dragTime: number | null;
     isDragging: boolean;
     isResizing: boolean;
-    resizingEdge: "left" | "right";
-    resizeTime: number;
+    resizingEdge: "left" | "right" | null;
+    resizeTime: number | null;
 }) {
     const originalItemRange = itemTimeEnd - itemTimeStart;
     const itemStart = isResizing && resizingEdge === "left" ? resizeTime : itemTimeStart;
     const itemEnd = isResizing && resizingEdge === "right" ? resizeTime : itemTimeEnd;
-    return [isDragging ? dragTime : itemStart, isDragging ? dragTime + originalItemRange : itemEnd];
+    return [
+        isDragging && dragTime !== null ? dragTime : itemStart,
+        isDragging && dragTime !== null ? dragTime + originalItemRange : itemEnd,
+    ];
 }
 
 /**
@@ -613,12 +616,12 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
     lineHeight: number,
     itemHeightRatio: number,
     stackItems: boolean,
-    draggingItem: Id,
-    resizingItem: Id,
-    dragTime: number,
-    resizingEdge: "left" | "right",
-    resizeTime: number,
-    newGroupOrder: number,
+    draggingItem: Id | null,
+    resizingItem: Id | null,
+    dragTime: number | null,
+    resizingEdge: "left" | "right" | null,
+    resizeTime: number | null,
+    newGroupOrder: number | null,
 ) {
     const visibleItems = getVisibleItems(items, canvasTimeStart, canvasTimeEnd);
     const visibleItemsWithInteraction = visibleItems.map(item =>
@@ -752,13 +755,13 @@ function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends
     newGroupOrder,
 }: {
     item: TItem;
-    draggingItem: Id;
-    resizingItem: Id;
-    dragTime: number;
-    resizingEdge: "left" | "right";
-    resizeTime: number;
+    draggingItem: Id | null;
+    resizingItem: Id | null;
+    dragTime: number | null;
+    resizingEdge: "left" | "right" | null;
+    resizeTime: number | null;
     groups: TGroup[];
-    newGroupOrder: number;
+    newGroupOrder: number | null;
 }) {
     if (!resizingItem && !draggingItem) return item;
     const itemId = item.id;
@@ -777,7 +780,8 @@ function getItemWithInteractions<TGroup extends TimelineGroupBase, TItem extends
         ...item,
         start_time: itemTimeStart,
         end_time: itemTimeEnd,
-        group: isDragging ? groups[newGroupOrder].id : item.group,
+        // The `newGroupOrder` will be never `null` when the `isDragging` is true
+        group: isDragging && newGroupOrder !== null ? groups[newGroupOrder].id : item.group,
     };
     return newItem;
 }

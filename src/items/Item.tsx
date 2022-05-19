@@ -52,8 +52,8 @@ type ItemProps<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>
     canResizeRight: boolean;
     item: TItem;
     onSelect: (item: Id, clickType: ClickType, event: React.MouseEvent | React.TouchEvent) => void;
-    onDrag: (item: Id, dragTime: number, newGroup: Id) => void;
-    onDrop: (item: Id, dragTime: number, newGroup: Id) => void;
+    onDrag: (item: Id, dragTime: number, newGroup: number) => void;
+    onDrop: (item: Id, dragTime: number, newGroup: number) => void;
     onResizing: (item: Id, resizeTime: number, edge: TimelineItemEdge) => void;
     onResized: (item: Id, resizeTime: number, edge: TimelineItemEdge, timeDelta: number) => void;
     onContextMenu: (item: Id, event: React.MouseEvent) => void;

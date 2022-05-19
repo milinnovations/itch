@@ -241,3 +241,84 @@ export type ReactCalendarGroupRendererProps<CustomGroup extends TimelineGroupBas
     group: CustomGroup;
     isRightSidebar?: boolean;
 };
+
+export type OnItemDragObjectBase = {
+    eventType: "move" | "resize";
+    itemId: Id;
+    time: number;
+};
+
+export type OnItemDragObjectMove = OnItemDragObjectBase & {
+    eventType: "move";
+    newGroupOrder: number;
+};
+
+export type OnItemDragObjectResize = OnItemDragObjectBase & {
+    eventType: "resize";
+    edge?: TimelineItemEdge;
+};
+
+export type ReactCalendarTimelineProps<
+    CustomItem extends TimelineItemBase = TimelineItemBase,
+    CustomGroup extends TimelineGroupBase = TimelineGroupBase,
+> = {
+    groups: CustomGroup[];
+    items: CustomItem[];
+    className?: string;
+    defaultTimeStart?: Date | Moment;
+    defaultTimeEnd?: Date | Moment;
+    visibleTimeStart?: number; // Originally: Date | Moment | number
+    visibleTimeEnd?: number; // Originally: Date | Moment | number
+    selected?: number[];
+    sidebarWidth?: number;
+    sidebarContent?: React.ReactNode;
+    rightSidebarWidth?: number;
+    rightSidebarContent?: React.ReactNode;
+    dragSnap?: number;
+    minResizeWidth?: number;
+    lineHeight?: number;
+    itemHeightRatio?: number;
+    minZoom?: number;
+    maxZoom?: number;
+    clickTolerance?: number;
+    canMove?: boolean;
+    canChangeGroup?: boolean;
+    canResize?: ResizeOptions;
+    useResizeHandle?: boolean;
+    stackItems?: boolean;
+    itemTouchSendsClick?: boolean;
+    timeSteps?: ITimeSteps;
+    scrollRef?: React.RefCallback<HTMLElement>;
+    zoomSpeed?: { alt: number; ctrl: number; meta: number };
+    onItemDrag?(itemDragObject: OnItemDragObjectMove | OnItemDragObjectResize): void;
+    onItemMove?(itemId: Id, dragTime: number, newGroupOrder: number): void;
+    onItemResize?(itemId: Id, endTimeOrStartTime: number, edge: TimelineItemEdge): void;
+    onItemSelect?(itemId: Id, e: any, time: number): void;
+    onItemDeselect?(e: React.SyntheticEvent): void;
+    onItemClick?(itemId: Id, e: React.SyntheticEvent, time: number): void;
+    onItemDoubleClick?(itemId: Id, e: React.SyntheticEvent, time: number): void;
+    onItemContextMenu?(itemId: Id, e: React.SyntheticEvent, time: number): void;
+    onCanvasClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
+    onCanvasContextMenu?(groupId: Id, time: number, e: React.SyntheticEvent): void;
+    onCanvasDoubleClick?(groupId: Id, time: number, e: React.SyntheticEvent): void;
+    onCanvasDrop?(groupId: Id, time: number, e: React.DragEvent): void;
+    onZoom?(timelineContext: TimelineContext): void;
+    moveResizeValidator?: MoveResizeValidator<CustomItem>;
+    onTimeChange?(
+        visibleTimeStart: number,
+        visibleTimeEnd: number,
+        updateScrollCanvas: (start: number, end: number) => void,
+    ): any;
+    onBoundsChange?(canvasTimeStart: number, canvasTimeEnd: number): any;
+    onVisibleGroupsChanged?(visibleGroupIds: Id[]): void;
+    itemRenderer?: (props: ReactCalendarItemRendererProps<CustomItem, CustomGroup>) => React.ReactNode;
+    groupRenderer?: (props: ReactCalendarGroupRendererProps<CustomGroup>) => React.ReactNode;
+    verticalLineClassNamesForTime?: ((start: number, end: number) => string[]) | undefined;
+    horizontalLineClassNamesForGroup?: (group: CustomGroup) => string[];
+
+    // Fields that are in propTypes but not documented
+    headerRef?: React.RefCallback<HTMLElement>;
+
+    canSelect?: boolean; // This was missing from the original type
+    style?: React.CSSProperties; // This was missing from the original type
+};
