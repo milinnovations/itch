@@ -404,7 +404,13 @@ export default class ReactCalendarTimeline<
                     forceUpdate,
                     items,
                     groups,
-                    nextProps,
+                    {
+                        // Provide default values
+                        lineHeight: defaultLineHeight,
+                        itemHeight: defaultItemHeight,
+                        stackItems: defaultStackItems,
+                        ...nextProps,
+                    },
                     prevState,
                 ),
             );
