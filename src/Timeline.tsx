@@ -167,7 +167,7 @@ const defaultRightSidebarWidth = 0;
 const defaultDragSnap = 1000 * 60 * 15; // 15min
 const defaultMinResizeWidth = 20;
 // const defaultStickyHeader = true;
-const defuaultLineHeight = 36;
+const defaultLineHeight = 36;
 const defaultItemHeight = 28;
 const defaultMinZoom = 60 * 60 * 1000; // 1 hour
 const defaultMaxZoom = 5 * 365.24 * 86400 * 1000; // 5 years
@@ -278,7 +278,7 @@ export default class ReactCalendarTimeline<
             canvasWidth,
             canvasTimeStart,
             canvasTimeEnd,
-            props.lineHeight ?? defuaultLineHeight,
+            props.lineHeight ?? defaultLineHeight,
             props.itemHeight ?? defaultItemHeight,
             props.stackItems ?? defaultStackItems,
             null, // this.state.draggingItem,
@@ -338,7 +338,7 @@ export default class ReactCalendarTimeline<
         const newVisibleGroupIds = calculateVisibleGroups(
             this.props.groups,
             this.state.groupTops,
-            this.props.lineHeight ?? defuaultLineHeight,
+            this.props.lineHeight ?? defaultLineHeight,
             this.state.canvasTop,
             this.state.canvasBottom,
         );
@@ -419,7 +419,7 @@ export default class ReactCalendarTimeline<
                     canvasWidth,
                     prevState.canvasTimeStart,
                     prevState.canvasTimeEnd,
-                    nextProps.lineHeight ?? defuaultLineHeight,
+                    nextProps.lineHeight ?? defaultLineHeight,
                     nextProps.itemHeight ?? defaultItemHeight,
                     nextProps.stackItems ?? defaultStackItems,
                     prevState.draggingItem,
@@ -502,7 +502,7 @@ export default class ReactCalendarTimeline<
             canvasWidth,
             this.state.canvasTimeStart,
             this.state.canvasTimeEnd,
-            props.lineHeight ?? defuaultLineHeight,
+            props.lineHeight ?? defaultLineHeight,
             props.itemHeight ?? defaultItemHeight,
             props.stackItems ?? defaultStackItems,
             this.state.draggingItem,
@@ -583,7 +583,7 @@ export default class ReactCalendarTimeline<
                 groups,
                 {
                     // DON'T FORGET THE DEFAULT VALUES!
-                    lineHeight: defuaultLineHeight,
+                    lineHeight: defaultLineHeight,
                     itemHeight: defaultItemHeight,
                     stackItems: defaultStackItems,
                     ...this.props,
@@ -1050,7 +1050,7 @@ export default class ReactCalendarTimeline<
                 canvasWidth,
                 this.state.canvasTimeStart,
                 this.state.canvasTimeEnd,
-                this.props.lineHeight ?? defuaultLineHeight,
+                this.props.lineHeight ?? defaultLineHeight,
                 this.props.itemHeight ?? defaultItemHeight,
                 this.props.stackItems ?? defaultStackItems,
                 this.state.draggingItem,
