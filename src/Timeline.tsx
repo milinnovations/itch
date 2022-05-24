@@ -1,14 +1,20 @@
-import PropTypes from "prop-types";
 import React, { Component } from "react";
 import isEqual from "lodash.isequal";
+import { Moment } from "moment";
+import PropTypes from "prop-types";
 
+import Columns from "./columns/Columns";
+import { defaultTimeSteps } from "./default-config";
+import DateHeader from "./headers/DateHeader";
+import { TimelineHeadersProvider } from "./headers/HeadersContext";
+import TimelineHeaders from "./headers/TimelineHeaders";
 import Items from "./items/Items";
 import Sidebar from "./layout/Sidebar";
-import Columns from "./columns/Columns";
+import MarkerCanvas from "./markers/MarkerCanvas";
+import { TimelineMarkersProvider } from "./markers/TimelineMarkersContext";
 import { GroupRows } from "./row/GroupRows";
 import ScrollElement from "./scroll/ScrollElement";
-import MarkerCanvas from "./markers/MarkerCanvas";
-
+import { TimelineStateProvider } from "./timeline/TimelineStateContext";
 import {
     getMinUnit,
     calculateTimeForXPosition,
@@ -19,15 +25,10 @@ import {
     ItemDimensions,
     Dimensions,
 } from "./utility/calendar";
-import { defaultTimeSteps } from "./default-config";
-import { TimelineStateProvider } from "./timeline/TimelineStateContext";
-import { TimelineMarkersProvider } from "./markers/TimelineMarkersContext";
-import { TimelineHeadersProvider } from "./headers/HeadersContext";
-import TimelineHeaders from "./headers/TimelineHeaders";
-import DateHeader from "./headers/DateHeader";
 import { mapRange } from "./utility/generators";
 import { binarySearch } from "./utility/search";
-import {
+
+import type {
     ClickType,
     CompleteTimeSteps,
     Id,
@@ -38,7 +39,6 @@ import {
     TimelineItemEdge,
     TimeUnit,
 } from "./types";
-import { Moment } from "moment";
 
 type ReactNodeWithPossibleTypeAndSecretKey = React.ReactNode & { type?: { secretKey?: unknown } };
 type ReactElementWithPossibleTypeAndSecretKey = React.ReactElement & { type?: { secretKey?: unknown } };
