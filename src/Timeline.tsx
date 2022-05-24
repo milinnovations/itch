@@ -31,10 +31,12 @@ import {
     ClickType,
     CompleteTimeSteps,
     Id,
+    ITimeSteps,
     ReactCalendarTimelineProps,
     TimelineGroupBase,
     TimelineItemBase,
     TimelineItemEdge,
+    TimeUnit,
 } from "./types";
 import { Moment } from "moment";
 
@@ -750,7 +752,7 @@ export default class ReactCalendarTimeline<
         canvasTimeStart: number,
         canvasTimeEnd: number,
         canvasWidth: number,
-        minUnit: keyof CompleteTimeSteps,
+        minUnit: TimeUnit,
         timeSteps: CompleteTimeSteps,
         height: number,
     ) {
@@ -936,8 +938,8 @@ export default class ReactCalendarTimeline<
         height: number,
         visibleTimeStart: number | Date | Moment,
         visibleTimeEnd: number | Date | Moment,
-        minUnit: keyof CompleteTimeSteps,
-        timeSteps: Partial<CompleteTimeSteps> | undefined,
+        minUnit: TimeUnit,
+        timeSteps: ITimeSteps | undefined,
     ) {
         if (!this.props.children) {
             return null;
