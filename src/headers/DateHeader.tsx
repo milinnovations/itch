@@ -1,12 +1,15 @@
 import React from "react";
-import { TimelineStateConsumer } from "../timeline/TimelineStateContext";
-import CustomHeader from "./CustomHeader";
-import { getNextUnit } from "../utility/calendar";
-import { defaultHeaderFormats } from "../default-config";
 import memoize from "memoize-one";
-import { CustomDateHeader } from "./CustomDateHeader";
 import { Moment } from "moment";
-import { TimeUnit, IntervalRenderer, DateHeaderProps } from "../types";
+
+import { defaultHeaderFormats } from "../default-config";
+import { TimelineStateConsumer } from "../timeline/TimelineStateContext";
+import { getNextUnit } from "../utility/calendar";
+
+import type { TimeUnit, IntervalRenderer, DateHeaderProps } from "../types";
+
+import { CustomDateHeader } from "./CustomDateHeader";
+import CustomHeader from "./CustomHeader";
 
 type WrappedDateHeaderProps<Data> = DateHeaderProps<Data> & {
     timelineUnit: TimeUnit;
