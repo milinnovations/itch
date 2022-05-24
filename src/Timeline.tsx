@@ -831,14 +831,11 @@ export default class ReactCalendarTimeline<
 
     items(
         canvasTimeStart: number,
-        _zoom: unknown,
         canvasTimeEnd: number,
         canvasWidth: number,
         canvasTop: number,
         canvasBottom: number,
-        _minUnit: unknown,
         dimensionItems: ItemDimensions<CustomGroup>[],
-        _groupHeights: unknown,
         groupTops: number[] | undefined,
     ) {
         return (
@@ -1126,14 +1123,11 @@ export default class ReactCalendarTimeline<
                                         {this.rows(canvasWidth, canvasTop, canvasBottom, groupHeights, groups)}
                                         {this.items(
                                             canvasTimeStart,
-                                            zoom,
                                             canvasTimeEnd,
                                             canvasWidth,
                                             canvasTop,
                                             canvasBottom,
-                                            minUnit,
                                             dimensionItems,
-                                            groupHeights,
                                             groupTops,
                                         )}
                                         {this.childrenWithProps(
