@@ -111,7 +111,7 @@ export function* generateTimes(
     unit: TimeUnit,
     timeSteps: ITimeSteps,
 ): Generator<[Moment, Moment], void, void> {
-    let time = moment(start).startOf(unit);
+    let time = moment(start).startOf(unit === "week" ? "isoWeek" : unit);
     const steps = timeSteps[unit] ?? 1;
 
     // If we need to go more steps in an iteration (like iterate every 30 minutes), we need to find the
@@ -161,74 +161,49 @@ export function iterateTimes(
 // i think this is the distance between cell lines
 export const minCellWidth = 17;
 
-// for supporting weeks, its important to remember that each of these
-// units has a natural progression to the other. i.e. a year is 12 months
-// a month is 24 days, a day is 24 hours.
-// with weeks this isnt the case so weeks needs to be handled specially
-const timeDividers: CompleteTimeSteps = {
+const millisecondsIn: CompleteTimeSteps = {
     second: 1000,
-    minute: 60,
-    hour: 60,
-    day: 24,
-    month: 30,
-    year: 12,
+    minute: 60 * 1000,
+    hour: 60 * 60 * 1000,
+    day: 24 * 60 * 60 * 1000,
+    week: 7 * 24 * 60 * 60 * 1000,
+    month: 30 * 24 * 60 * 60 * 1000,
+    year: 365 * 24 * 60 * 60 * 1000,
 };
 
 /**
  * Determine the current rendered time unit based on timeline time span.
  *
  * This function is VERY HOT as its used in Timeline.js render function.
- * TODO: check if there are performance implications here.
- * When "weeks" feature is implemented, this function will be modified heavily.
  *
  * @param zoom Difference between time start and time end of timeline canvas (in milliseconds).
  * @param width Width of timeline canvas (in pixels).
  * @param timeSteps Map of time units with number to indicate step of each unit.
  */
 export function getMinUnit(zoom: number, width: number, timeSteps: ITimeSteps) {
-    let minUnit: TimeUnit = "year";
+    let currentUnit: TimeUnit = "second";
 
-    // this timespan is in ms initially
-    let nextTimeSpanInUnitContext = zoom;
+    do {
+        const stepForCurrentUnit = timeSteps[currentUnit] ?? 1;
+        const millisecondsInCurrentUnit = millisecondsIn[currentUnit] * stepForCurrentUnit;
+        const numberOfCurrentUnitInDuration = zoom / millisecondsInCurrentUnit;
+        const cellWidthForCurrentUnit = width / numberOfCurrentUnitInDuration;
 
-    let unit: TimeUnit;
-    for (unit in timeDividers) {
-        const stepForUnit = timeSteps[unit] ?? 1;
-
-        // converts previous time span to current unit
-        // (e.g. milliseconds to seconds, seconds to minutes, etc)
-        nextTimeSpanInUnitContext = nextTimeSpanInUnitContext / timeDividers[unit];
-
-        // timeSteps is "
-        // With what step to display different units. E.g. 15 for minute means only minutes 0, 15, 30 and 45 will be shown."
-        // how many cells would be rendered given this time span, for this unit?
-        // e.g. for time span of 60 minutes, and time step of 1, we would render 60 cells
-        const cellsToBeRenderedForCurrentUnit = nextTimeSpanInUnitContext / stepForUnit;
-
-        // what is happening here? why 3 if time steps are greater than 1??
-        const cellWidthToUse = stepForUnit > 1 ? 3 * minCellWidth : minCellWidth;
-
-        // for the minWidth of a cell, how many cells would be rendered given
-        // the current pixel width
-        // i.e. f
-        const minimumCellsToRenderUnit = width / cellWidthToUse;
-
-        if (cellsToBeRenderedForCurrentUnit < minimumCellsToRenderUnit) {
-            // for the current zoom, the number of cells we'd need to render all parts of this unit
-            // is less than the minimum number of cells needed at minimum cell width
-            minUnit = unit;
+        if (cellWidthForCurrentUnit > minCellWidth) {
             break;
         }
-    }
+        currentUnit = getNextUnit(currentUnit);
+    } while (currentUnit !== "year");
 
-    return minUnit;
+    return currentUnit;
 }
 
 const nextTimeUnitMap: Record<TimeUnit, TimeUnit> = {
     second: "minute",
     minute: "hour",
     hour: "day",
-    day: "month",
+    day: "week",
+    week: "month",
     month: "year",
     year: "year",
 };

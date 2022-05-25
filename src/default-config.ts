@@ -5,6 +5,7 @@ export const defaultTimeSteps: CompleteTimeSteps = {
     minute: 1,
     hour: 1,
     day: 1,
+    week: 1,
     month: 1,
     year: 1,
 };
@@ -18,15 +19,15 @@ export const defaultHeaderFormats = {
     },
     month: {
         long: "MMMM YYYY",
-        mediumLong: "MMMM",
+        mediumLong: "MMMM YYYY",
         medium: "MMMM",
         short: "MM/YY",
     },
     week: {
-        long: "w",
-        mediumLong: "w",
-        medium: "w",
-        short: "w",
+        long: "\\W\\e\\e\\k W, YYYY",
+        mediumLong: "\\W\\e\\e\\k W, YYYY",
+        medium: "\\W W",
+        short: "W",
     },
     day: {
         long: "dddd, LL",
