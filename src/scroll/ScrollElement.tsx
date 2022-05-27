@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 
+import { millisecondsInPixel } from "../utility/calendar";
 import { getParentPosition } from "../utility/dom-helpers";
 
 type ZoomSpeed = {
@@ -25,11 +26,16 @@ type Props = {
     width: number;
     height: number;
     top: number;
+    getVisibleTimeWindow: () => {
+        visibleTimeStart: number;
+        visibleTimeEnd: number;
+    };
     scrollRef: React.RefCallback<HTMLDivElement>;
     isInteractingWithItem: boolean;
     onZoom: (scale: number, offset: number) => void;
     onWheelZoom: (speed: number, xPosition: number, deltaY: number) => void;
     onHorizontalScroll: (scrollX: number) => void;
+    scrollHorizontallyByTime: (timeDelta: number) => void;
     onVerticalScrollBy: (deltaY: number) => void;
     zoomSpeed?: ZoomSpeed;
 };
@@ -39,6 +45,11 @@ export default class ScrollElement extends Component<Props, { isDragging: boolea
     private _lastTouchDistance: number | null = null;
     private _singleTouchStart: TouchCoordinates | null = null;
     private _lastSingleTouch: TouchCoordinates | null = null;
+
+    // Remember these values at the start of a mouse drag
+    private _dragStartClientX = 0;
+    private _dragStartMillisecondsInPixel = 0;
+    private _dragStartVisibleTimeStart = 0;
 
     constructor(props: Props) {
         super(props);
@@ -93,6 +104,15 @@ export default class ScrollElement extends Component<Props, { isDragging: boolea
         if (e.isDefaultPrevented()) return;
 
         if (e.button === 0) {
+            const { visibleTimeStart, visibleTimeEnd } = this.props.getVisibleTimeWindow();
+            this._dragStartVisibleTimeStart = visibleTimeStart;
+            this._dragStartMillisecondsInPixel = millisecondsInPixel(
+                visibleTimeStart,
+                visibleTimeEnd,
+                this.props.width,
+            );
+            this._dragStartClientX = e.clientX;
+
             this.setState({
                 isDragging: true,
             });
@@ -101,10 +121,18 @@ export default class ScrollElement extends Component<Props, { isDragging: boolea
     };
 
     handleMouseMove = (e: React.MouseEvent) => {
-        // this.props.onMouseMove(e)
-        //why is interacting with item important?
+        // Check the interacion because we don't want to drag the chart if
+        // the user is dragging an item.
         if (this.state.isDragging && !this.props.isInteractingWithItem && this._scrollComponent) {
-            this.props.onHorizontalScroll(this._scrollComponent.scrollLeft - e.movementX);
+            // Horizontal scrolling
+            const { visibleTimeStart } = this.props.getVisibleTimeWindow();
+            const pixelMovement = this._dragStartClientX - e.clientX;
+            const desiredTimeMovement = pixelMovement * this._dragStartMillisecondsInPixel;
+            const chartMovement = this._dragStartVisibleTimeStart - visibleTimeStart;
+            const timeDelta = desiredTimeMovement + chartMovement;
+            this.props.scrollHorizontallyByTime(timeDelta);
+
+            // Vertical scrolling
             this.props.onVerticalScrollBy(-e.movementY);
         }
     };

@@ -568,6 +568,28 @@ export default class ReactCalendarTimeline<
         }
     };
 
+    /**
+     * Scrolls the timeline by the given time delta.
+     *
+     * @param timeDelta  The time delta in milliseconds (either negative or positive) to scroll the timeline by.
+     */
+    scrollHorizontallyByTime = (timeDelta: number) => {
+        if (timeDelta !== 0) {
+            this.onTimeChange(
+                this.state.visibleTimeStart + timeDelta,
+                this.state.visibleTimeEnd + timeDelta,
+                this.updateScrollCanvas,
+            );
+        }
+    };
+
+    /**
+     * Returns the currently visible time window.
+     */
+    getVisibleTimeWindow = () => {
+        return { visibleTimeStart: this.state.visibleTimeStart, visibleTimeEnd: this.state.visibleTimeEnd };
+    };
+
     scrollVerticallyBy = (deltaY: number) => {
         if (deltaY) {
             this._container?.scrollBy(0, deltaY);
@@ -1106,9 +1128,11 @@ export default class ReactCalendarTimeline<
                                     width={width}
                                     height={canvasHeight}
                                     top={canvasTop}
+                                    getVisibleTimeWindow={this.getVisibleTimeWindow}
                                     onZoom={this.changeZoom}
                                     onWheelZoom={this.handleWheelZoom}
                                     onHorizontalScroll={this.scrollHorizontally}
+                                    scrollHorizontallyByTime={this.scrollHorizontallyByTime}
                                     onVerticalScrollBy={this.scrollVerticallyBy}
                                     isInteractingWithItem={isInteractingWithItem}
                                     zoomSpeed={this.props.zoomSpeed}
