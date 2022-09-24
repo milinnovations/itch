@@ -180,6 +180,7 @@ const defaultCanResize = "right";
 const defaultUseResizeHandle = false;
 const defaultCanSelect = true;
 const defaultStackItems = false;
+const defaultCalculateExtraSpace = false;
 const defaultItemTouchSendsClick = false;
 const defaultStyle: React.CSSProperties = {};
 const defaultClassName = "";
@@ -283,6 +284,7 @@ export default class ReactCalendarTimeline<
             props.lineHeight ?? defaultLineHeight,
             props.itemHeight ?? defaultItemHeight,
             props.stackItems ?? defaultStackItems,
+            props.calculateExtraSpace ?? defaultCalculateExtraSpace,
             null, // this.state.draggingItem,
             null, // this.state.resizingItem,
             null, // this.state.dragTime,
@@ -430,6 +432,7 @@ export default class ReactCalendarTimeline<
                     nextProps.lineHeight ?? defaultLineHeight,
                     nextProps.itemHeight ?? defaultItemHeight,
                     nextProps.stackItems ?? defaultStackItems,
+                    nextProps.calculateExtraSpace ?? defaultCalculateExtraSpace,
                     prevState.draggingItem,
                     prevState.resizingItem,
                     prevState.dragTime,
@@ -513,6 +516,7 @@ export default class ReactCalendarTimeline<
             props.lineHeight ?? defaultLineHeight,
             props.itemHeight ?? defaultItemHeight,
             props.stackItems ?? defaultStackItems,
+            props.calculateExtraSpace ?? defaultCalculateExtraSpace,
             this.state.draggingItem,
             this.state.resizingItem,
             this.state.dragTime,
@@ -1080,6 +1084,7 @@ export default class ReactCalendarTimeline<
                 this.props.lineHeight ?? defaultLineHeight,
                 this.props.itemHeight ?? defaultItemHeight,
                 this.props.stackItems ?? defaultStackItems,
+                this.props.calculateExtraSpace ?? defaultCalculateExtraSpace,
                 this.state.draggingItem,
                 this.state.resizingItem,
                 this.state.dragTime,

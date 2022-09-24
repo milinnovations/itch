@@ -90,6 +90,10 @@ export type ItemContext<TGroup extends TimelineGroupBase> = {
         stack: boolean;
         top: number | null;
         width: number;
+        // Free space to the right of the item in pixels, or null if the space is not limited.
+        extraSpaceRight: number | null;
+        // Free space to the left of the item in pixels, or null if the space is not limited.
+        extraSpaceLeft: number | null;
     };
     useResizeHandle: boolean;
     title: string | undefined;
@@ -265,6 +269,9 @@ export type ReactCalendarTimelineProps<
 > = {
     groups: CustomGroup[];
     items: CustomItem[];
+    // Whether to calculate extra space to the right and left of an item. The calculated value is
+    // returned as part of the item context.
+    calculateExtraSpace?: boolean;
     className?: string;
     defaultTimeStart?: Date | Moment;
     defaultTimeEnd?: Date | Moment;

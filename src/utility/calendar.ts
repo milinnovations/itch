@@ -26,6 +26,8 @@ export type Dimensions<TGroup extends TimelineGroupBase> = VerticalDimensions & 
     order: GroupOrder<TGroup>;
     stack: boolean;
     height: number;
+    extraSpaceRight: number | null;
+    extraSpaceLeft: number | null;
 };
 
 export type ItemDimensions<TGroup extends TimelineGroupBase> = {
@@ -571,6 +573,62 @@ function stackGroup<TGroup extends TimelineGroupBase>(
 }
 
 /**
+ * Calculates the extra space to the left and to the right of an item. The extra space is the space to
+ * the next item in the same row and is measured in pixels. The calculated value will be set on the
+ * itemDimensions directly. If an item does not have a next (or previous) item in the row, the corresponding
+ * extra space will be set to null.
+ *
+ * @param itemsDimensions  The item dimensions (after the position of all items are calculated).
+ */
+function calculateSpaceBetweenItems<TGroup extends TimelineGroupBase>(itemsDimensions: ItemDimensions<TGroup>[]) {
+    for (let itemIndex = 0; itemIndex < itemsDimensions.length; itemIndex++) {
+        for (let otherIndex = 0; otherIndex < itemsDimensions.length; otherIndex++) {
+            if (itemIndex === otherIndex) {
+                continue;
+            }
+
+            const itemDimension = itemsDimensions[itemIndex].dimensions;
+            const otherDimension = itemsDimensions[otherIndex].dimensions;
+
+            if (otherDimension.left + otherDimension.width < itemDimension.left + itemDimension.width) {
+                // The other item is to the left of this item
+                continue;
+            }
+
+            if ((otherDimension.top ?? 0) + otherDimension.height < (itemDimension.top ?? 0)) {
+                // The other item is above this item
+                continue;
+            }
+
+            if ((otherDimension.top ?? 0) > (itemDimension.top ?? 0) + itemDimension.height) {
+                // The other item is below this item
+                continue;
+            }
+
+            // Calculate the extra space we have until we reach this item
+            const extraSpaceRightToOther = Math.max(
+                0,
+                otherDimension.left - (itemDimension.left + itemDimension.width),
+            );
+
+            // Update extraSpaceRight on this item
+            if (itemDimension.extraSpaceRight === null) {
+                itemDimension.extraSpaceRight = extraSpaceRightToOther;
+            } else {
+                itemDimension.extraSpaceRight = Math.min(itemDimension.extraSpaceRight, extraSpaceRightToOther);
+            }
+
+            // Update extraSpaceLeft on the other item
+            if (otherDimension.extraSpaceLeft === null) {
+                otherDimension.extraSpaceLeft = extraSpaceRightToOther;
+            } else {
+                otherDimension.extraSpaceLeft = Math.min(otherDimension.extraSpaceLeft, extraSpaceRightToOther);
+            }
+        }
+    }
+}
+
+/**
  * Stack the items that will be visible within the canvas area.
  *
  * @param items  All the items on the chart.
@@ -599,6 +657,7 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
     lineHeight: number,
     itemHeight: number,
     stackItems: boolean,
+    calculateExtraSpace: boolean,
     draggingItem: Id | null,
     resizingItem: Id | null,
     dragTime: number | null,
@@ -644,6 +703,9 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
     );
     // Get a new array of groupOrders holding the stacked items
     const { height, groupHeights, groupTops } = stackAll(dimensionItems, groupOrders, lineHeight, stackItems);
+    if (calculateExtraSpace) {
+        calculateSpaceBetweenItems(dimensionItems);
+    }
     return { dimensionItems, height, groupHeights, groupTops };
 }
 
@@ -702,6 +764,8 @@ function getItemDimensions<TGroup extends TimelineGroupBase, TItem extends Timel
         // stack: !item.isOverlay;
         stack: true,
         height: itemHeight,
+        extraSpaceRight: null,
+        extraSpaceLeft: null,
     };
     return {
         id: itemId,
@@ -844,6 +908,7 @@ export function calculateScrollCanvas<TGroup extends TimelineGroupBase, TItem ex
                 props.lineHeight,
                 props.itemHeight,
                 props.stackItems,
+                props.calculateExtraSpace,
                 mergedState.draggingItem,
                 mergedState.resizingItem,
                 mergedState.dragTime,
