@@ -37,6 +37,7 @@ export type TimelineGroupBase = {
     rightTitle?: React.ReactNode;
     height?: number;
     stackItems?: boolean;
+    calculateExtraSpace?: boolean;
 };
 
 export type TimelineHeaderProps = {

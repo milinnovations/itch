@@ -579,15 +579,30 @@ function stackGroup<TGroup extends TimelineGroupBase>(
  * extra space will be set to null.
  *
  * @param itemsDimensions  The item dimensions (after the position of all items are calculated).
+ * @param shouldCalculateByDefault  Whether to calculate the space if the item's group doesn't specify.
  */
-function calculateSpaceBetweenItems<TGroup extends TimelineGroupBase>(itemsDimensions: ItemDimensions<TGroup>[]) {
+function calculateSpaceBetweenItems<TGroup extends TimelineGroupBase>(
+    itemsDimensions: ItemDimensions<TGroup>[],
+    shouldCalculateByDefault: boolean,
+) {
     for (let itemIndex = 0; itemIndex < itemsDimensions.length; itemIndex++) {
+        const itemDimension = itemsDimensions[itemIndex].dimensions;
+        const shouldCalculateExtraSpaceForItem =
+            itemDimension.order.group.calculateExtraSpace ?? shouldCalculateByDefault;
+        if (!shouldCalculateExtraSpaceForItem) {
+            // Here we rely on the fact that the default behaviour can only be changed for a whole group,
+            // and not individual items. Only because of this assumption is it safe to skip the whole loop
+            // here.
+            // For better understanding, consider a case when one item in a group doesn't need the calculation,
+            // but the other does. Since here we set the extraSpaceLeft on the other item in this loop as well,
+            // skipping this based on only one item would be a problem.
+            // If later we want to allow different settings in the same group, we should update the logic here.
+            continue;
+        }
         for (let otherIndex = 0; otherIndex < itemsDimensions.length; otherIndex++) {
             if (itemIndex === otherIndex) {
                 continue;
             }
-
-            const itemDimension = itemsDimensions[itemIndex].dimensions;
             const otherDimension = itemsDimensions[otherIndex].dimensions;
 
             if (otherDimension.left + otherDimension.width < itemDimension.left + itemDimension.width) {
@@ -703,9 +718,7 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
     );
     // Get a new array of groupOrders holding the stacked items
     const { height, groupHeights, groupTops } = stackAll(dimensionItems, groupOrders, lineHeight, stackItems);
-    if (calculateExtraSpace) {
-        calculateSpaceBetweenItems(dimensionItems);
-    }
+    calculateSpaceBetweenItems(dimensionItems, calculateExtraSpace);
     return { dimensionItems, height, groupHeights, groupTops };
 }
 
