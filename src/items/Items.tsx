@@ -99,7 +99,7 @@ export default class Items<TGroup extends TimelineGroupBase, TItem extends Timel
         const { canvasTimeStart, canvasTimeEnd, canvasTop, canvasBottom, dimensionItems, groups, items } = this.props;
 
         const groupOrders = getGroupOrders(groups);
-        const visibleItems = getVisibleItems(items, canvasTimeStart, canvasTimeEnd);
+        const visibleItems = getVisibleItems(items, canvasTimeStart, canvasTimeEnd, groupOrders);
         const sortedDimensionItems = keyBy(dimensionItems, item => item.id);
 
         return (

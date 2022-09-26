@@ -356,21 +356,26 @@ function getGroupedItems<TGroup extends TimelineGroupBase>(
 }
 
 /**
- * Filters timeline items to those that should be visible on the canvas.
+ * Filters timeline items to those that should be visible on the horizontal canvas. Items that are completely
+ * outside of it will be dropped, as well as items that are not belonging to a defined group.
  *
  * @param items The timeline items to filter.
  * @param canvasTimeStart The start time of the canvas in milliseconds.
  * @param canvasTimeEnd The end time of the canvas in milliseconds.
+ * @param groupOrders The result of `getGroupOrders`.
  *
  * @returns The filtered list of timeline items.
  */
-export function getVisibleItems<TItem extends TimelineItemBase>(
+export function getVisibleItems<TGroup extends TimelineGroupBase, TItem extends TimelineItemBase>(
     items: TItem[],
     canvasTimeStart: number,
     canvasTimeEnd: number,
+    groupOrders: GroupOrders<TGroup>,
 ) {
     return items.filter(item => {
-        return item.startTime <= canvasTimeEnd && item.endTime >= canvasTimeStart;
+        return (
+            groupOrders[item.group] !== undefined && item.startTime <= canvasTimeEnd && item.endTime >= canvasTimeStart
+        );
     });
 }
 
@@ -680,7 +685,10 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
     resizeTime: number | null,
     newGroupOrder: number | null,
 ) {
-    const visibleItems = getVisibleItems(items, canvasTimeStart, canvasTimeEnd);
+    // Get the order of groups based on their id key
+    const groupOrders = getGroupOrders(groups);
+
+    const visibleItems = getVisibleItems(items, canvasTimeStart, canvasTimeEnd, groupOrders);
     const visibleItemsWithInteraction = visibleItems.map(item =>
         getItemWithInteractions({
             item,
@@ -704,8 +712,6 @@ export function stackTimelineItems<TGroup extends TimelineGroupBase, TItem exten
         };
     }
 
-    // Get the order of groups based on their id key
-    const groupOrders = getGroupOrders(groups);
     const dimensionItems = visibleItemsWithInteraction.map(item =>
         getItemDimensions({
             item,
